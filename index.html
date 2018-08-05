@@ -47,13 +47,20 @@
                       $(function(){
                          for(var key in paisClube){
                                 if(key in paises){
-                                  // if(key == "Brazil")
-                                  //   $('#countries').append('<option value="' + key + '" data-image="images/msdropdown/icons/blank.gif" data-imagecss="flag '+ paises[key]['sigla'].toLowerCase() +'" data-title="' + key + '" onclick="javascript:startMap();" selected="selected">' + key + '</option>');
-                                  // else
+                                  if(key == "Brazil")
+                                    $('#countries').append('<option value="' + key + '" data-image="images/msdropdown/icons/blank.gif" data-imagecss="flag '+ paises[key]['sigla'].toLowerCase() +'" data-title="' + key + '" onclick="javascript:startMap();" selected="selected">' + key + '</option>');
+                                  else
                                     $('#countries').append('<option value="' + key + '" data-image="images/msdropdown/icons/blank.gif" data-imagecss="flag '+ paises[key]['sigla'].toLowerCase() +'" data-title="' + key + '">' + key + '</option>');
                                 }
                           }
+                          startMap();
+                          $('#countries').on("change", function(){
+                              startMap();
+                          });
+
                       });
+
+                      
               </script>
               <select name="countries" id="countries" style="width:300px;"></select>
             </td>
@@ -180,8 +187,8 @@
     height: 600,
     width: 900,
     geographyConfig: {
-            highlightOnHover: false,
-            popupOnHover: false
+            highlightOnHover: true,
+            popupOnHover: true
     },
     fills: {
       // defaultFill: '#f0af0a',
@@ -189,6 +196,15 @@
       // lt50: 'rgba(0,244,244,0.9)',
       lt50: 'rgba(20,20,20,0.9)',
       gt50: 'red'
+    },
+    done: function(datamap) {
+            datamap.svg.selectAll('.datamaps-subunit').on('click', function(geography) {
+                link = geography.properties.name;
+                $("li").removeClass("selected");
+                $("li[title="+link+"]").addClass("selected");
+                $(".ddTitleText ").click(); 
+                $(".ddTitleText ").click();
+            });
     },
 
     data: {
