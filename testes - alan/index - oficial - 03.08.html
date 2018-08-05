@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<html>
+  <head>
+    <meta charset="UTF-8">
+  	<meta charset="UTF-8">
+  	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+  	<link href="https://fonts.googleapis.com/css?family=Anton|Roboto:300,400,700" rel="stylesheet">
+  	<link rel="stylesheet" href="css/normalize.css">
+  	<!-- <link rel="stylesheet" href="css/bootstrap.min.css"> -->
+  	<link rel="stylesheet" href="css/style.css">
+  	<title>Trabalho InfoVis</title>
+    <!-- <link rel="stylesheet" type="text/css" href="/css/default.css"/> -->
+    <link rel="stylesheet" href="css/style-slider.css">
+    <link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+  	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  	<script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="http://d3js.org/topojson.v1.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+    <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+    <!-- I recommend you host this file on your own, since this will change without warning -->
+    <script src="http://datamaps.github.io/scripts/datamaps.world.min.js?v=1"></script>
+    <script src="./json-csv/base-jogadores.js"></script>
+    <script src="./js/jogadores.js"></script>
+    <script src="./json-csv/all_countries_hash.js"></script>
+  </head>
+
+<body style="padding:0px;">
+
+	<div class="site">
+		<header class="l-cabecalho">
+ 				<div class="container">
+					<a href="/index.html" class="logo-defensoria"></a>
+				  <table width=100%> <tr class="menubar"> <td width=100% style="background-color:#1abc9c"> <table> <tr>
+    		</div>
+      </div></tr></table></td></tr></table></div>
+		</header>
+
+		<main>
+			<header class="main-header">
+
+        <table>
+          <tr>
+            <td>
+              <script type="text/javascript">
+                      $(function(){
+                         for(var key in paisClube){
+                                if(key in paises){
+                                  // if(key == "Brazil")
+                                  //   $('#countries').append('<option value="' + key + '" data-image="images/msdropdown/icons/blank.gif" data-imagecss="flag '+ paises[key]['sigla'].toLowerCase() +'" data-title="' + key + '" onclick="javascript:startMap();" selected="selected">' + key + '</option>');
+                                  // else
+                                    $('#countries').append('<option value="' + key + '" data-image="images/msdropdown/icons/blank.gif" data-imagecss="flag '+ paises[key]['sigla'].toLowerCase() +'" data-title="' + key + '">' + key + '</option>');
+                                }
+                          }
+                      });
+              </script>
+              <select name="countries" id="countries" style="width:300px;"></select>
+            </td>
+            <td>
+              <button class="dropbtn" onclick="javascript:startMap();" style="height: 25px;width: 100px;">Aplicar</button>
+            </td>
+          </tr>
+        </table>
+			</header>
+
+			<div class="container">
+        <div class="range-slider">
+          <input class="range-slider__range" type="range" value="1930" min="1930" max="2014" step="4">
+          <span class="range-slider__value">0</span>
+        </div>
+        <script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+        <script  src="js/index.js"></script>
+				<table>
+  				<tr>
+  				    <td width=470 valign=top>
+          				<h3 id="PanelClub" class="subtitle-settings" style="visibility: hidden;">
+          				    <span id="mediaName" class="subtitle-box"></span>
+          				</h3>
+          				<!-- Club Details Panel-->
+
+          				<h3 id="PanelClubDetails" class="subtitle-settings" style="visibility: hidden;">
+          				    <span class="subtitle-box">Clube</span>
+          				</h3>
+          				<!-- Map Panel-->
+
+                  <div id="container1" style="position: relative; width: 100%;"></div>
+  				    </td>
+  				</tr>
+				</table>
+			</div>
+		</main>
+
+		<footer class="l-footer">
+      	<span class="versao-sistema">  </span>
+        <img src="images/logo-fifa.png" alt="COPPE" class="logo-desfensoria" style="width:120px; height:"90px"">
+        <img src="images/logo-coppe.png" alt="FIFA" class="logo-desfensoria" style="width:120px; height:"90px"">
+    </footer>
+	</div>
+	<script src="js/jquery.min.js"></script>
+	<!-- <script src="js/jquery.bundle.min.js"></script> -->
+</body>
+
+
+<!-- <msdropdown> -->
+<link rel="stylesheet" type="text/css" href="css/msdropdown/dd.css" />
+<script src="js/msdropdown/jquery.dd.min.js"></script>
+<!-- </msdropdown> -->
+<link rel="stylesheet" type="text/css" href="css/msdropdown/flags.css" />
+<script>
+
+  $(document).ready(function() {
+  	$("#countries").msDropdown();
+  })
+
+</script>
+
+<script>
+
+ function startMap() {
+  var teste = [{
+      "origin": {
+          "latitude": 40.639722,
+          "longitude": 73.778889
+      },
+      "destination": {
+          "latitude": -14.235004,
+          "longitude": -51.92528
+      }
+    },{
+      "origin": {
+          "latitude": 40.639722,
+          "longitude": 73.778889
+      },
+      "destination": {
+          "latitude": -14.235004,
+          "longitude": -51.92528
+      }
+    }];
+
+    latLong = {};
+    final = [];
+    var pais = $("#countries").val();
+    var bubbles = {};
+    bubblesFinal = [];
+
+    for(year in paisClube[pais]){
+        // console.log(year);
+
+        for(origem in paisClube[pais][year]){
+
+          if(paises[origem]){
+            if(origem != pais){
+                latLong["origin"] = {"latitude": paises[origem]["lat"], "longitude": paises[origem]["lon"]};
+                latLong["destination"] = {"latitude": paises[pais]["lat"], "longitude": paises[pais]["lon"]};
+                latLong["options"] = {"strokeWidth": (paisClube[pais][year][origem]/23)*10}
+                final.push(latLong);
+                latLong = {};
+            }
+
+            bubbles = {"name": origem, "latitude": paises[origem]["lat"], "longitude": paises[origem]["lon"], radius: ((paisClube[pais][year][origem]/23)*15)+2, fillKey: 'gt50', borderWidth: 0.7, "copa":year + "'s World Cup", "qtdJogadores": paisClube[pais][year][origem]};
+            bubblesFinal.push(bubbles);
+            bubbles = {}
+          }
+        }
+
+    }
+
+    console.log(bubblesFinal);
+
+  d3.csv("", function(json){
+    //sample of the arc plugin
+
+    map.arc(final);
+
+    // map.arc([
+    //  {
+    //   origin: {
+    //       latitude: 40.639722,
+    //       longitude: 73.778889
+    //   },
+    //   destination: {
+    //       latitude: -14.235004,
+    //       longitude: -51.92528
+    //   }
+    // },
+    //   {
+    //   origin: {
+    //       latitude: 70.639722,
+    //       longitude: 73.778889
+    //   },
+    //   destination: {
+    //       latitude: -14.235004,
+    //       longitude: -51.92528
+    //   }
+    // },
+    // {
+    //     origin: {
+    //         latitude: 30.194444,
+    //         longitude: -97.67
+    //     },
+    //     destination: {
+    //         latitude: -14.235004,
+    //         longitude: -51.92528
+    //     }
+    // }
+    // ], {strokeWidth: 6});
+    // console.log(map.arc);
+
+     //bubbles, custom popup on hover template
+   map.bubbles(bubblesFinal, {
+     popupTemplate: function(geo, data) {
+       return "<div class='hoverinfo' style='text-align: center'>"
+       + data.copa +
+       "<br/><b>"
+       + data.name +
+       "</b><br/>"
+       + data.qtdJogadores +
+       " players</div>";
+     }
+   });
+  });
+ }
+
+ // function startMap2() {
+ //      d3.csv("./cities.csv", function(json){
+ //       //sample of the arc plugin
+ //       map.arc([
+ //        {
+ //         origin: {
+ //             latitude: 73.778889,
+ //             longitude: 40.639722
+ //         },
+ //         destination: {
+ //           latitude: 70.639722,
+ //           longitude: 73.778889
+ //         }
+ //       },
+ //         {
+ //         origin: {
+ //             latitude: 30.194444,
+ //             longitude: 73.778889
+ //         },
+ //         destination: {
+ //             latitude: 70.639722,
+ //             longitude: 73.778889
+ //         }
+ //       },
+ //       {
+ //           origin: {
+ //               latitude: 30.194444,
+ //               longitude: -97.67
+ //           },
+ //           destination: {
+ //             latitude: 70.639722,
+ //             longitude: 73.778889
+ //           }
+ //       }
+ //       ], {strokeWidth: 6});
+
+
+ //     //bubbles, custom popup on hover template
+ //   map.bubbles([
+ //     {name: 'Hot', latitude: 40.639722, longitude: 73.778889, radius: 10, fillKey: 'gt50'},
+ //     {name: 'Chilly', latitude: 70.639722, longitude: 73.778889, radius: 18, fillKey: 'lt50'},
+ //     {name: 'Hot again', latitude: 30.194444, longitude: -97.67, radius: 8, fillKey: 'gt50'},
+
+ //   ], {
+ //     popupTemplate: function(geo, data) {
+ //       return "<div class='hoverinfo'>It is " + data.name + "</div>";
+ //     }
+ //   });
+ //  });
+ // }
+
+   //basic map config with custom fills, mercator projection
+  var map = new Datamap({
+    scope: 'world',
+    element: document.getElementById('container1'),
+    projection: 'mercator',
+    height: 600,
+    width: 900,
+    geographyConfig: {
+            highlightOnHover: false,
+            popupOnHover: false
+    },
+    fills: {
+      // defaultFill: '#f0af0a',
+      defaultFill: '#b1dad2',
+      // lt50: 'rgba(0,244,244,0.9)',
+      lt50: 'rgba(20,20,20,0.9)',
+      gt50: 'red'
+    },
+
+    data: {
+      // USA: {fillKey: 'lt50' },
+      // RUS: {fillKey: 'lt50' },
+      // CAN: {fillKey: 'lt50' },
+      // BRA: {fillKey: 'gt50' },
+      // ARG: {fillKey: 'gt50'},
+      // COL: {fillKey: 'gt50' },
+      // AUS: {fillKey: 'gt50' },
+      // ZAF: {fillKey: 'gt50' },
+      // MAD: {fillKey: 'gt50' }
+    }
+  })
+
+
+</script>

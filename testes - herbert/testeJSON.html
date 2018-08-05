@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Page Title</title>
+	</head>
+    <script src="../js/jquery/jquery-1.8.2.min.js"></script>
+    <script src="../json-csv/base-jogadores.js"></script>
+	<script type="text/javascript">
+    
+    // console.log(jogadores);   
+	vazio = 0;
+	paisClube = {};
+	// for(i=0;i<jogadores.length;i++){
+	// 	if((jogadores[i]['Team'] == "BRA" || jogadores[i]['Team'] == "Brazil") && jogadores[i]['Year'] >= 2014){
+	// 		// console.log(jogadores[i]['FullName'] + " " + jogadores[i]['Year']);
+	// 		if(!(jogadores[i]['ClubCountry'] in paisClube))
+	// 			paisClube[jogadores[i]['ClubCountry']] = 0;
+	// 		paisClube[jogadores[i]['ClubCountry']] += 1;
+	// 		vazio++;
+	// 	}
+	// }
+    for(i=0;i<jogadores.length;i++){
+        if(!(jogadores[i]['Team'] in paisClube)){
+            paisClube[jogadores[i]['Team']] = 0;
+            vazio++;
+        }
+        paisClube[jogadores[i]['Team']]++;
+
+    }
+	console.log(paisClube);
+	console.log(vazio);
+	</script>
+	<body>
+
+		<h1>This is a Heading</h1>
+		<p>This is a paragraph.</p>
+
+	</body>
+</html>

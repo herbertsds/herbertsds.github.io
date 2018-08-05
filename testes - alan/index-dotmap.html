@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<html>
+    <head>
+        <meta charset="UTF-8">
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<link href="https://fonts.googleapis.com/css?family=Anton|Roboto:300,400,700" rel="stylesheet">
+	<link rel="stylesheet" href="css/normalize.css">
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<link rel="stylesheet" href="css/style.css">
+	<title>Trabalho InfoVis</title>     
+        <link rel="stylesheet" type="text/css" href="/css/default.css"/>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script src="http://d3js.org/d3.v3.min.js"></script>
+
+    </head>
+
+
+<body onload="javascript:onLoad()">
+
+	<div class="site">
+		<header class="l-cabecalho">
+				
+ 				<div class="container">
+
+					<a href="/index.html" class="logo-defensoria">
+					</a>
+					
+				<table width=100%>
+				    
+				    <tr class="menubar">
+					<td width=100% style="background-color:#1abc9c">
+					    <table>
+						<tr>
+						    <div class="dropdown">
+				  <button class="dropbtn" onclick="javascript:startMap();">Clube 1</button>				 
+		 				
+				  <button class="dropbtn">Clube 2</button>
+				
+				</div>
+						</tr>
+					    </table>
+					</td>
+				    </tr>
+				</table>
+ 				</div>
+		</header>
+
+		<main>
+			<header class="main-header">
+			        <h2 class="titulo-pagina">
+				   <span class="titulo-subsecao">Trabalho InfoVis</span>
+			        </h2>
+				
+			</header>
+			<div class="container">
+				
+		
+				<br>
+				<table>
+				<tr>
+				   
+				    <td width=470 valign=top>
+					<h3 id="PanelClub" class="subtitle-settings" style="visibility: hidden;">
+					    <span id="mediaName" class="subtitle-box"></span>
+					</h3>
+					<!-- Club Details Panel-->
+					  
+					<h3 id="PanelClubDetails" class="subtitle-settings" style="visibility: hidden;">
+					    <span class="subtitle-box">Clube</span>
+					</h3>
+					<!-- Map Panel-->
+					
+					<div id="d3_map" style="border:1;overflow-y:auto; height:400px;"></div> 
+
+
+				    </td>
+				</tr>
+				</table>
+
+
+			</div>
+		</main>
+
+		<footer class="l-footer">
+      	<span class="versao-sistema">  </span>
+       
+    </footer>
+	</div>
+	<script src="js/jquery.min.js"></script>
+	<script src="js/jquery.bundle.min.js"></script>
+</body>
+
+<script>
+
+/*global d3: false  */
+"use strict";
+
+//set up map
+var w = 960;
+var h = 500;
+
+
+//map type & center point 
+var projection = d3.geo.mercator()
+    .center([-47.109375, 34.664841])
+    .scale(100);
+
+var path = d3.geo.path().projection(projection);
+
+//initialize map
+var svg = d3.select("#d3_map")
+    .append("svg")
+    .attr("width", w)
+    .attr("height", h);
+
+// seperating out the elements lets us organize the draw order
+var country_group = svg.append("g");
+var arcGroup = svg.append("g");
+var point_group = svg.append("g");
+
+
+//reading geoJSON & CSV files
+d3.json("./countries.json", function(json){
+    createMap(json);
+});
+
+
+
+
+function startMap() {
+	d3.csv("./cities.csv", function(json){
+		createPoints(json);
+	});
+}
+
+//draw world map
+var createMap = function (json) {
+    country_group.append("g")
+        .selectAll("path")
+        .data(json.features)
+        .enter()
+        .append("path")
+        .attr("title", function(d) { return d.id; })
+        .style("fill", "#43a2ca")
+        .attr("d", path);
+};
+
+var createLinks = function (json) {
+    var links = [];
+
+    for(var i=0, len=json.length-1; i<len; i++){
+        links.push({
+            type: "LineString",
+            coordinates: [
+                [ json[0].lon, json[0].lat ],
+                [ json[i+1].lon, json[i+1].lat ]
+                ]
+        });
+    }
+    return links;
+};
+
+// place dots on screen based on cities
+var createPoints = function(json){
+    point_group.selectAll("circle")
+        .data(json)
+        .enter()
+        .append("circle")
+        .attr("cx", function(d) { return projection([d.lon, d.lat])[0]; })
+        .attr("cy", function(d) { return projection([d.lon, d.lat])[1]; })
+        .attr("place", function(d) { return d.place; })
+        .attr("r", 6)
+        .style("fill", "red")
+        .on("mouseover", mouseover);
+
+    //functions for tweening the path
+    var lineTransition = function lineTransition(path) {
+        path.transition()
+            .duration(3000)
+            .attrTween("stroke-dasharray", tweenDash);
+    };
+
+    var tweenDash = function tweenDash() {
+        var len = this.getTotalLength(),
+            interpolate = d3.interpolateString("0," + len, len + "," + len);
+
+        return function(t) { return interpolate(t); };
+    };
+
+    //assemble links from office locations
+    var links = createLinks(json);
+
+    //append the arcs
+    arcGroup.selectAll(".arc")
+        .data(links)
+        .enter()
+        .append("path")
+        .attr({ "class": "arc" })
+        .attr({ d: path })
+        .style({ fill: "none", stroke: "red", "stroke-width": "3px" })
+        .call(lineTransition); 
+};
+
+
+//D3 hoverbox info way
+var mouseover = function() {
+    var place = d3.select(this).attr("place");
+    d3.select("#info").html("<b>Contact / " + place + "</b>");
+};
+
+</script>
