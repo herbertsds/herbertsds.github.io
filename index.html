@@ -48,6 +48,7 @@
             <td>
               <script type="text/javascript">
                       $(function(){
+                          sliderValue = [];
                          for(var key in paisClube){
                                 if(key in paises){
                                   if(key == "Brazil")
@@ -146,8 +147,11 @@
                     $("#slider-range").slider('values',1,1950);
                   }
                 }
-                
+                sliderValue[0] = $("#slider-range").slider('values',0);
+                sliderValue[1] = $("#slider-range").slider('values',1);
+                startMap();
               }
+              
             });
             //Escreve a mensagem acima do slider para os casos que o anterior não cobre
             $( "#amount" ).val( "Copa de " + $( "#slider-range" ).slider( "values", 0 ) +
@@ -223,32 +227,33 @@
     var bubbles = {};
     bubblesFinal = [];
 
-    for(paisI in paisClube){
-      for(year in paisClube[paisI]){
-        for(origem in paisClube[paisI][year]){
-          if(!paises[origem]){
-            console.log(origem);
-          }
-        }
-      }
-    }
+    // for(paisI in paisClube){
+    //   for(year in paisClube[paisI]){
+    //     for(origem in paisClube[paisI][year]){
+    //       if(!paises[origem]){
+    //         console.log(origem);
+    //       }
+    //     }
+    //   }
+    // }
 
     for(year in paisClube[pais]){
 
         for(origem in paisClube[pais][year]){
+          if(year >= sliderValue[0] && year <= sliderValue[1]){
+            if(paises[origem]){
+              if(origem != pais){
+                  latLong["origin"] = {"latitude": paises[origem]["lat"], "longitude": paises[origem]["lon"]};
+                  latLong["destination"] = {"latitude": paises[pais]["lat"], "longitude": paises[pais]["lon"]};
+                  latLong["options"] = {"strokeWidth": (paisClube[pais][year][origem]/23)*10}
+                  final.push(latLong);
+                  latLong = {};
+              }
 
-          if(paises[origem]){
-            if(origem != pais){
-                latLong["origin"] = {"latitude": paises[origem]["lat"], "longitude": paises[origem]["lon"]};
-                latLong["destination"] = {"latitude": paises[pais]["lat"], "longitude": paises[pais]["lon"]};
-                latLong["options"] = {"strokeWidth": (paisClube[pais][year][origem]/23)*10}
-                final.push(latLong);
-                latLong = {};
+              bubbles = {"name": origem, "latitude": paises[origem]["lat"], "longitude": paises[origem]["lon"], radius: ((paisClube[pais][year][origem]/23)*15)+2, fillKey: 'gt50', borderWidth: 0.7, "copa":year + "'s World Cup", "qtdJogadores": paisClube[pais][year][origem]};
+              bubblesFinal.push(bubbles);
+              bubbles = {}
             }
-
-            bubbles = {"name": origem, "latitude": paises[origem]["lat"], "longitude": paises[origem]["lon"], radius: ((paisClube[pais][year][origem]/23)*15)+2, fillKey: 'gt50', borderWidth: 0.7, "copa":year + "'s World Cup", "qtdJogadores": paisClube[pais][year][origem]};
-            bubblesFinal.push(bubbles);
-            bubbles = {}
           }
         }
 
