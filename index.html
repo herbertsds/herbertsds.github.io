@@ -78,12 +78,11 @@
 			</header>
 
 			<div class="container">
-        <div class="divSelect">
+        <div class="divSelect" style="text-align: center">
           <select name="countries" id="countries" style="width:300px; text-align: center"></select>
         </div>
         <!-- <script src='./js/jquery.min.js'></script> -->
         <script  src="js/index.js"></script>
-        <div id="slider"></div>
         <script>
           //Função responsável por criar o slider
           $( function() {
@@ -167,16 +166,62 @@
                rangeValue[1] = $("#slider-range").slider('values',1);
 
             });
-      
-         });
 
+            var start;
+
+
+            $( "#play" ).click(function() {
+              //Tempo em segundos
+              var tempo = 1.5;
+              start = 1930;
+              $("#slider-range").slider('disable');
+              $("#slider-range").slider('values',0,start);
+              $("#slider-range").slider('values',1,start);
+              $( "#amount" ).val( "Copa de " + start );
+              start += 4;
+
+              refresh = setInterval(function(){ 
+                $("#slider-range").slider('values',0,start);
+                $("#slider-range").slider('values',1,start);
+                $( "#amount" ).val( "Copa de " + start );
+                start += 4;
+                if(start == 1942)
+                  start = 1950;
+                if(start > 2018){
+                  $("#slider-range").slider('values',0,1930);
+                  $("#slider-range").slider('values',1,2014);
+                  $( "#amount" ).val( "Copa de " + 1930 + " até Copa de " + 2014 );
+                  $("#slider-range").slider('enable');
+                  clearInterval(refresh);
+                }
+              }, tempo*1000);
+
+              $("#play").hide();
+              $("#stop").show();
+              
+            });
+
+            $( "#stop" ).click(function() {
+              $("#slider-range").slider('values',0,1930);
+              $("#slider-range").slider('values',1,2014);
+              $( "#amount" ).val( "Copa de " + 1930 + " até Copa de " + 2014 );
+              clearInterval(refresh);
+              $("#stop").hide();
+              $("#play").show();
+            });
+          });
+      
         </script>          
         <p>
           <!-- <label for="amount">Copas</label> -->
-          <input type="text" id="amount" readonly style="border:0; color:#06928a; font-weight:bold; text-align: center;">
+          <input type="text" id="amount" readonly style="border:0; color:#06928a; font-weight:bold; text-align: center; font-size: 16px;">
         </p>
          
-        <div id="slider-range"></div>
+        <div id="slider-range" style="width: 90%; float: left; margin-top: 13px;"></div>
+        <div id="slider-play" style="width: 8%; float: right;">
+          <button type="button" id="play" class="btn btn-success" style="width: 100%;">Play</button>
+          <button type="button" id="stop" class="btn btn-danger" style="width: 100%; display: none" >Stop</button>
+        </div>
 				<table>
   				<tr>
   				    <td width=470 valign=top>
@@ -260,7 +305,6 @@
         }
 
     }
-    console.log(bubblesFinal);
 
   d3.csv("", function(json){
 
