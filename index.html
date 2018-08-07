@@ -15,15 +15,18 @@
     <!-- <link rel="stylesheet" type="text/css" href="/css/default.css"/> -->
     <link rel="stylesheet" href="css/style-slider.css">
     <link href="./css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-  	<script src="./js/jquery.min.js"></script>
+  	<!-- <script src="./js/jquery.min.js"></script> -->
   	<script src="./js/d3.v3.min.js"></script>
     <script src="./js/topojson.v1.min.js"></script>
-    <script src="./js/jquery-1.11.1.min.js"></script>
+    <!-- <script src="./js/jquery-1.11.1.min.js"></script> -->
     <!-- I recommend you host this file on your own, since this will change without warning -->
     <script src="./js/datamaps.world.min.js?v=1"></script>
     <script src="./json-csv/base-jogadores.js"></script>
     <script src="./js/jogadores.js"></script>
     <script src="./json-csv/all_countries_hash.js"></script>
+    <link rel="stylesheet" href="./css/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
   </head>
 
 <body style="padding:0px;">
@@ -72,9 +75,102 @@
 			</header>
 
 			<div class="container">
-        <select name="countries" id="countries" style="width:300px;"></select>
-        <script src='./js/jquery.min.js'></script>
+        <div class="divSelect">
+          <select name="countries" id="countries" style="width:300px; text-align: center"></select>
+        </div>
+        <!-- <script src='./js/jquery.min.js'></script> -->
         <script  src="js/index.js"></script>
+        <div id="slider"></div>
+        <script>
+          //Função responsável por criar o slider
+          $( function() {
+            //Variável que irá guardar o valor antes da mudança do slider
+            rangeValue = [];
+            $( "#slider-range" ).slider({
+              range: true,
+              min: 1930,
+              max: 2014,
+              step: 4,
+              values: [ 1930, 2014 ],
+              //Função a ser executada na hora do slide
+              slide: function( event, ui ) {
+                //Verifica se é um ano sem copa e atualiza com o novo ano (não funciona para todos os casos)
+                if(ui.values[ 0 ] == 1942 || ui.values[ 0 ] == 1946)
+                    ui.values[ 0 ] = 1950;
+                if(ui.values[ 1 ] == 1942 || ui.values[ 1 ] == 1946)
+                  ui.values[ 1 ] = 1950;
+
+                //Escreve a mensagem acima do slider (não funciona em todos os casos)
+                if(ui.values[ 0 ] == ui.values[ 1 ]){
+                  $( "#amount" ).val( "Copa de " + ui.values[ 0 ] );
+                }
+                else{
+                  $( "#amount" ).val( "Copa de " + ui.values[ 0 ] + " até Copa de " + ui.values[ 1 ] );
+                }
+
+              },
+              //Função a ser executada após o slide ter modificado
+              change: function( event, ui ) {
+                if(ui.values[ 0 ] == 1942 || ui.values[ 0 ] == 1946){
+                  //Verificação do slider menor
+                  //Se valor anterior for maior que o atual, estou diminuindo o valor do slider
+                  if(rangeValue[0] > ui.values[ 0 ]){
+                    $("#slider-range").slider('values',0,1938);
+
+                    //Escreve a mensagem acima do slider para os casos que o anterior não cobre
+                    if($("#slider-range").slider('values',0) == ui.values[ 1 ]){
+                      $( "#amount" ).val( "Copa de " + 1938 );
+                    }
+                    else{
+                      $( "#amount" ).val( "Copa de " + 1938 + " até Copa de " + ui.values[ 1 ] );
+                    }
+                  }
+                  else{
+                    $("#slider-range").slider('values',0,1950);
+                  }
+
+                } 
+                //Verificação do slider maior
+                //Se valor anterior for maior que o atual, estou diminuindo o valor do slider
+                if(ui.values[ 1 ] == 1942 || ui.values[ 1 ] == 1946){
+                  if(rangeValue[1] > ui.values[ 1 ]){
+                    $("#slider-range").slider('values',1,1938);
+                    if(ui.values[ 0 ] == $("#slider-range").slider('values',1)){
+                      $( "#amount" ).val( "Copa de " + 1938 );
+                    }
+                    else{
+                      $( "#amount" ).val( "Copa de " + ui.values[ 0 ] + " até Copa de " + 1938 );
+                    }
+                  }
+                  else{
+                    $("#slider-range").slider('values',1,1950);
+                  }
+                }
+                
+              }
+            });
+            //Escreve a mensagem acima do slider para os casos que o anterior não cobre
+            $( "#amount" ).val( "Copa de " + $( "#slider-range" ).slider( "values", 0 ) +
+              " até Copa de " + $( "#slider-range" ).slider( "values", 1 ) );
+          } );
+
+          //Guarda o valor antigo do slider
+          $( function() {
+            $('#slider-range').on("slide", function(){
+               rangeValue[0] = $("#slider-range").slider('values',0);
+               rangeValue[1] = $("#slider-range").slider('values',1);
+
+            });
+      
+         });
+
+        </script>          
+        <p>
+          <!-- <label for="amount">Copas</label> -->
+          <input type="text" id="amount" readonly style="border:0; color:#06928a; font-weight:bold; text-align: center;">
+        </p>
+         
+        <div id="slider-range"></div>
 				<table>
   				<tr>
   				    <td width=470 valign=top>
@@ -101,7 +197,7 @@
         <img src="images/logo-coppe.png" alt="FIFA" class="logo-desfensoria" style="width:120px; height:"90px"">
     </footer>
 	</div>
-	<script src="js/jquery.min.js"></script>
+	<!-- <script src="js/jquery.min.js"></script> -->
 	<!-- <script src="js/jquery.bundle.min.js"></script> -->
 </body>
 

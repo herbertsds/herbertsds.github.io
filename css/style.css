@@ -1406,3 +1406,11 @@ input[type=submit] {
 .borderRadius{-moz-border-radius:5px; border-radius:5px; }
 .borderRadiusTp{-moz-border-radius:5px 5px 0 0; border-radius:5px 5px 0 0;}
 .borderRadiusBtm{-moz-border-radius:0 0 5px 5px ; border-radius:0 0 5px 5px;}
+
+.ui-draggable, .ui-droppable {
+  background-position: top;
+}
+
+.divSelect{
+  margin-bottom: 20px;
+}
