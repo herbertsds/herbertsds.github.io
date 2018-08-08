@@ -66,7 +66,7 @@
 
                       });
 
-                      
+
               </script>
               <!-- <select name="countries" id="countries" style="width:300px;"></select> -->
             </td>
@@ -131,7 +131,7 @@
                     $("#slider-range").slider('values',0,1950);
                   }
 
-                } 
+                }
                 //Verificação do slider maior
                 //Se valor anterior for maior que o atual, estou diminuindo o valor do slider
                 if(ui.values[ 1 ] == 1942 || ui.values[ 1 ] == 1946){
@@ -152,7 +152,7 @@
                 sliderValue[1] = $("#slider-range").slider('values',1);
                 startMap();
               }
-              
+
             });
             //Escreve a mensagem acima do slider para os casos que o anterior não cobre
             $( "#amount" ).val( "Copa de " + $( "#slider-range" ).slider( "values", 0 ) +
@@ -180,7 +180,7 @@
               $( "#amount" ).val( "Copa de " + start );
               start += 4;
 
-              refresh = setInterval(function(){ 
+              refresh = setInterval(function(){
                 $("#slider-range").slider('values',0,start);
                 $("#slider-range").slider('values',1,start);
                 $( "#amount" ).val( "Copa de " + start );
@@ -200,7 +200,7 @@
 
               $("#play").hide();
               $("#stop").show();
-              
+
             });
 
             $( "#stop" ).click(function() {
@@ -212,13 +212,13 @@
               $("#play").show();
             });
           });
-      
-        </script>          
+
+        </script>
         <p>
           <!-- <label for="amount">Copas</label> -->
           <input type="text" id="amount" readonly style="border:0; color:#06928a; font-weight:bold; text-align: center; font-size: 16px;">
         </p>
-         
+
         <div id="slider-range" style="width: 90%; float: left; margin-top: 13px;"></div>
         <div id="slider-play" style="width: 8%; float: right;">
           <button type="button" id="play" class="btn btn-success" style="width: 100%;">Play</button>
@@ -330,7 +330,7 @@
     scope: 'world',
     element: document.getElementById('container1'),
     projection: 'mercator',
-    height: 600,
+    height: 500,
     width: 900,
     geographyConfig: {
             highlightOnHover: true,
@@ -348,7 +348,7 @@
                 link = geography.properties.name;
                 $("li").removeClass("selected");
                 $("li[title="+link+"]").addClass("selected");
-                $(".ddTitleText ").click(); 
+                $(".ddTitleText ").click();
                 $(".ddTitleText ").click();
             });
     },
