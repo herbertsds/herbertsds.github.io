@@ -21,7 +21,7 @@ var vet_idListas = [];
 var exercicios;
 var inicio = 0;
 var manual = false;
-var urlWebService = "http://logicapi.tk/";
+var urlWebService = "https://logicapi.tk/";
 // var urlWebService = "http://127.0.0.1:8000/";
 
 // funcao apenas para testes de eventos
