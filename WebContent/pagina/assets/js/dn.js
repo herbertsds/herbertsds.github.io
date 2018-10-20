@@ -48,13 +48,18 @@ function initDeducao(){
    	$('#jstree_div').empty().jstree('destroy');
 
    	$('#jstree_div').jstree({
-		'plugins' : [ "checkbox" ],
+		'plugins' : [ "checkbox", "types" ],
 		'checkbox' : {
 			'three_state' : false
 		},
 		'core' : {
 
 			'check_callback' : true
+		},
+		"types" : {
+		    "default" : {
+		      "icon" : "./WebContent/pagina/assets/img/sup.png"
+		    }
 		}
 	});
 
