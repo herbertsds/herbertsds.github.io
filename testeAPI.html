@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+$(document).ready(function(){
+    $("button").click(function(){
+    	var myData = {
+	        'formulas': ["(((not(A))ouB)", "(CouD)", "(AouB)"]
+	    };
+
+        $.ajax({
+	        url: urlWebService+'api/tableaux',
+	        type: 'GET',
+	        callback: '?',
+	        data: myData,
+	        datatype: 'application/json',
+	        success: function(teste) { 
+			
+	        // console.log(teste);
+	        // var obj = JSON.parse(teste);
+	        // console.log(obj[0]['sentenca'].split(","));
+
+	         // console.log(teste);
+	        // var obj = JSON.parse(teste);
+	        // console.log(obj[0]['sentenca'].split(","));
+
+	        },
+	        error: function(erro) {
+				console.log(erro.responseText);
+			}
+	    });
+    });
+});
+</script>
+</head>
+<body>
+
+<button>Testar o retorno da API</button>
+
+<div class='resultado'>
+
+</div>
+</body>
+</html>

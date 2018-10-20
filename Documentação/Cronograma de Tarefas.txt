@@ -1,0 +1,20 @@
+﻿*Árvore Tableaux ------------- OK
+*Árvore Semântica
+*stepByStep da Resolução
+*TableauxLPO
+*DN (Proposicional e primeira ordem)
+*Front-End da Semântica
+*Front-End do TableauxLPO
+*Front-End da DN (Proposicional e primeira ordem)
+*Melhorias do front-end: Tela de escolha de exercício, alterar design da árvore
+*Escrever Monografia
+
+Acima dessa linha é o esperado pra ser terminado
+----------------------------------------------------------------  
+Abaixo é o Plus
+
+*Melhorias do back-end: Inserção de novo exercício
+*Histórico de todos os métodos
+*Tabela Verdade
+*Prevenção contra ataque DDoS
+*Pesquisar sobre certificado WSDL

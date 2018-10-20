@@ -1,0 +1,4 @@
+1 - Rodar o seguinte comando: php artisan migrate:rollback
+2 - Pegar as atualizações no git (se atualizar antes de rodar o rollback, tente executar o primeiro passo. Caso o rollback dê algum erro, apague na mão as tabelas no banco)
+3 - Rodar o seguinte comando: php artisan migrate
+4 - Rodar o seguinte comando: php artisan db:seed

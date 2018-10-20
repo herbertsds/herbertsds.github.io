@@ -1,0 +1,7 @@
+Passo a Passo para instalar o Laravel:
+
+1 - Entre no site do composer e instale-o (veja a documentação para instalação do composer)
+2 - No terminal, digite: composer global require "laravel/installer"
+3 - Abra o terminal, navegue até a pasta LogicAPI dentro do projeto final (é onde foi instalado o Laravel) e rode o comando: composer install
+4 - Ainda com o terminal na pasta, rode o comando: php artisan key:generate
+5 - rode o servidor (php artisan serve) e teste a aplicação, uma página com o escrito "WebService Funcionando!" deve aparecer

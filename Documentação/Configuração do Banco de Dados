@@ -1,0 +1,15 @@
+1 - Instalar o mysql workbench (pesquisar no google)
+2 - Abrir xampp e dar start no mysql
+3 - No workbench, clicar em + no MySQL Connection
+4 - Em Connection Name, colocar localhost
+5 - Clicar em Test Connection e depois em Continue Anyway (caso apareça)
+6 - Verificar se a conexão foi feita com sucesso
+7 - Dar OK nas duas janelas
+8 - Abrir a conexão criada
+9 - Abaixo de "Schemas", clicar com o botão direito do mouse e clicar em "Create Schema"
+10 - Em "Name" digitar "logicAPI" e dar Apply
+11 - Clicar com o botão direito do mouse em cima de logicAPI e clicar em "Set as Default schema"
+12 - Abrir o cmd na pasta LogicAPI
+13 - rodar o comando: php artisan migrate
+14 - rodar o comando: php artisan db:seed
+15 - Verificar se todos os dados da lista estão no banco de dados

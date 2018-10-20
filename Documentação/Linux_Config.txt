@@ -1,0 +1,12 @@
+> Ordem de instalação:
+- mysql
+- composer
+- apache
+- php
+- laravel
+
+> Após isso, seguir o passo a passo da configuração do laravel 
+
+> Configurar o egit:
+- instalar o egit pelo eclipse market place
+- para permitir a conexão : https://sachin4java.blogspot.com.br/2018/03/git-cannot-open-git-receive-pack.html
