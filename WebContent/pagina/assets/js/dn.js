@@ -675,7 +675,19 @@ function finalizaExercício(texto,id){
 		    $('#jstree_div').jstree(true)._model.data["#"].children_d
 		);
 		$('#jstree_div').jstree(true).hide_checkboxes();
-	}else{
+	}else if(texto.substring(1, texto.length-1) == pergunta && Number.isInteger(Number(id)) ){
+		console.log("estou aqui");
+    	data['text'] = "Exercício Finalizado";
+    	data['icon'] = false;
+    	data['state'] = {"opened" : true};
+    	$('#jstree_div').jstree().create_node("#", data, 'last', function(){}, true);
+    	$('#jstree_div').jstree(true).uncheck_all();
+    	$('#jstree_div').jstree(true).disable_checkbox(
+		    $('#jstree_div').jstree(true)._model.data["#"].children_d
+		);
+		$('#jstree_div').jstree(true).hide_checkboxes();
+	}
+	else{
 		console.log("Prints");
 		console.log(pergunta);
 		console.log(texto);
