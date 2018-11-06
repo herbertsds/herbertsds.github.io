@@ -139,7 +139,7 @@ function supor(){
         	data['icon'] = resposta['icon'] == "" ? false:true;
         	data['state'] = {"opened" : true};
         	$('#jstree_div').jstree().create_node(resposta['parent'], data, 'last', function(){}, true);
-        	finalizaExercício(resposta['text'],resposta['id']);
+        	// finalizaExercício(resposta['text'],resposta['id']);
         	$('#jstree_div').jstree(true).uncheck_all();
         },
         error: function(erro) {
