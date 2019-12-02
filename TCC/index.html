@@ -1,0 +1,927 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<title>Sistema de Aprendizado de Lógica</title>
+
+<meta
+	content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0'
+	name='viewport' />
+<meta name="viewport" content="width=device-width" />
+
+<!-- 	<link rel="icon" type="image/png" href="assets/mBranca.png" /> -->
+<link rel="icon" type="image/png" href="./WebContent/pagina/assets/ico-dcc.png" />
+
+<!--     Fonts and icons     -->
+<link rel="stylesheet" type="text/css" href="./WebContent/pagina/assets/css/roboto.css" />
+<link rel="stylesheet" href="./WebContent/pagina/assets/css/font-awesome.css" />
+
+<!-- CSS Files -->
+<link href="./WebContent/pagina/assets/css/bootstrap.min.css" rel="stylesheet" />
+<link href="./WebContent/pagina/assets/css/material-bootstrap-wizard.css" rel="stylesheet" />
+
+<!-- CSS Just for demo purpose, don't include it in your project -->
+<link href="./WebContent/pagina/assets/css/demo.css" rel="stylesheet" />
+<!--     <link rel="stylesheet" href="demo_arvore.css"/> -->
+<link rel="stylesheet" href="./WebContent/pagina/jquery.orgchart.css" />
+
+<!-- 	DN -->
+<link rel="stylesheet" type="text/css"
+	href="./WebContent/pagina/assets/js/jstree/dist/themes/default/style.min.css" />
+
+
+<!-- ---------------	 -->
+
+
+<script src="./WebContent/pagina/assets/js/jquery-1-12-4.js"></script>
+
+
+<script src="./WebContent/pagina/assets/js/orgchart/jquery.orgchart.js"
+	type="text/javascript"></script>
+<!-- 	<script src="/js/orgchart/jquery.orgchart.min.js" type="text/javascript"></script> -->
+<script src="./WebContent/pagina/assets/js/w3.js"></script>
+<script src="./WebContent/pagina/funcoes_gerais.js" type="text/javascript"></script>
+
+<script src="./WebContent/pagina/funcoes_resolucao.js" type="text/javascript"></script>
+<script src="./WebContent/pagina/funcoes_tableaux.js" type="text/javascript"></script>
+<script src="./WebContent/pagina/funcoes_deducao.js" type="text/javascript"></script>
+<script src="./WebContent/pagina/funcoes_semantica.js" type="text/javascript"></script>
+<script src="./WebContent/pagina/funcoes_t_lpo.js" type="text/javascript"></script>
+
+<script src="./WebContent/pagina/assets/js/jstree/dist/jstree.min.js"></script>
+<script src="./WebContent/pagina/assets/js/dn.js"></script>
+
+
+<style>
+.popover-content {
+	background-color: PaleGoldenRod;
+	color: #000000;
+	padding: 15px;
+}
+
+.popover-title {
+	background-color: GoldenRod;
+	color: #000000;
+	font-size: 14px;
+	text-align: center;
+}
+
+.popover {
+	border: 2px solid #C0C0C0;
+}
+
+.dropdown-menu {
+	border: 1px solid gray;
+	padding: 20px;
+	background-color: LemonChiffon;
+	width: 90%;
+	height: 300px;
+	overflow-y: scroll;
+}
+
+.dropdown-item {
+	width: 68px;
+}
+
+.dropdown-header {
+	border: 1px dotted gray;
+	background-color: GoldenRod;
+	color: #000000;
+	text-align: center;
+}
+
+body {
+	background: url('./WebContent/pagina/assets/img/wall.jpg') center center no-repeat fixed;
+	-webkit-background-size: cover;
+	-moz-background-size: cover;
+	-o-background-size: cover;
+	background-size: cover;
+}
+</style>
+
+</head>
+<body onload="load()">
+
+	<!-- 	    <a target="_blank" href="https://ufrj.br/"> -->
+	<!-- 	         <div class="logo-container"> -->
+	<!-- 	            <div class="logo"> -->
+	<!-- 	                <img src="assets/mBranca.png"> -->
+	<!-- 	            </div> -->
+	<!-- 	            <div class="brand"> -->
+	<!-- 	                Universidade Federal do Rio de Janeiro -->
+	<!-- 	            </div> -->
+	<!-- 	        </div> -->
+	<!-- 	    </a> -->
+
+	<a target="_blank" href="https://dcc.ufrj.br/">
+		<div class="logo-container">
+			<div class="logo">
+				<img src="./WebContent/pagina/assets/dcc-logo.png">
+			</div>
+
+		</div>
+	</a>
+	<div class="image-container set-full-height">
+
+		<!--   Big container   -->
+		<div class="container">
+			<div class="row">
+				<div class="col-sm-8 col-sm-offset-2">
+					<!--      Wizard container        -->
+					<div class="wizard-container">
+						<div class="card wizard-card" data-color="red" id="wizard">
+							<form action="" method="">
+								<!--        You can switch " data-color="blue" "  with one of the next bright colors: "green", "orange", "red", "purple"             -->
+
+								<div class="wizard-header">
+									<h3 class="wizard-title">Sistema de Aprendizado de Lógica
+									</h3>
+									<h5>Ambiente para prática de exercícios de lógica.</h5>
+								</div>
+								<div class="wizard-navigation">
+									<ul>
+										<!--  style="display:none" -->
+										<li><a href="#tipo" id="1aba" data-toggle="tab">Tipo
+												de Exercício</a></li>
+										<li><a href="#exercicio" id='tabExercicio'
+											data-toggle="tab">Seleção do Exercício</a></li>
+										<li><a href="#execucao" id='tabExecucao'
+											data-toggle="tab">Solução</a></li>
+									</ul>
+								</div>
+
+								<div class="tab-content">
+<!---------------------------------------------------------------------------------------------------------------------------------->
+
+<!------------------  TAB DOS TIPOS DE EXERCICIOS  --------------------------------------------------------------------------------->
+									<div class="tab-pane" id="tipo">
+										<div id="tiposLogica">
+											<h4 class="info-text">Qual tipo de exercício deseja
+												praticar?</h4>
+											<div class="row">
+												<div class="col-sm-10 col-sm-offset-3">
+													<div class="col-sm-4">
+														<div class="choice" data-toggle="wizard-radio"
+															rel="tooltip">
+															<input type="radio" name="tipo" value="tipoProposicional">
+
+															<div class="icon" id="botaoProposicional">
+																<i class="material-icons">hourglass_empty</i>
+															</div>
+															<h6>Lógica proposicional</h6>
+														</div>
+													</div>
+													<div class="col-sm-4">
+														<div class="choice" data-toggle="wizard-radio"
+															rel="tooltip">
+															<input type="radio" name="tipo" value="tipolpo">
+															<div class="icon" id="botaoLpo">
+																<i class="material-icons">hourglass_full</i>
+															</div>
+															<h6>Lógica de primeira ordem</h6>
+														</div>
+													</div>
+
+
+												</div>
+
+											</div>
+										</div>
+									</div>
+									<div id="metodoLpo" style="display: none">
+										<h4 class="info-text">Qual o método que deseja praticar?
+										</h4>
+										<div class="row">
+											<div class="col-sm-10 col-sm-offset-1">
+												<div class="col-sm-4">
+													<div class="choice" data-toggle="wizard-radio"
+														rel="tooltip" title="Lógica de primeira ordem">
+														<input type="radio" name="escolha" value="t_lpo">
+
+														<div class="icon" id="botaot_lpo">
+															<i class="material-icons">call_split</i>
+														</div>
+														<h6>Tableaux</h6>
+													</div>
+												</div>
+												<div class="col-sm-4">
+													<div class="choice" data-toggle="wizard-radio"
+														rel="tooltip" title="Semântica">
+														<input type="radio" name="escolha" value="semantica">
+
+														<div class="icon" id="botaoSemantica">
+															<i class="material-icons">clear_all</i>
+														</div>
+														<h6>Semântica</h6>
+													</div>
+												</div>
+												<div class="col-sm-4">
+													<div class="choice" data-toggle="wizard-radio"
+														rel="tooltip">
+														<input type="radio" name="escolha"
+															value="tipoProposicional2">
+
+														<div class="icon" id="botaoProposicional2">
+															<i class="material-icons">hourglass_empty</i>
+														</div>
+														<h6>Lógica proposicional</h6>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div id="metodoProposicional" style="display: none">
+										<h4 class="info-text">Qual o método que deseja praticar?
+										</h4>
+										<div class="row">
+											<div class="col-sm-10 col-sm-offset-1">
+												<div class="col-sm-4">
+													<div class="choice" data-toggle="wizard-radio"
+														rel="tooltip" title="Árvore de Tableaux">
+														<input type="radio" name="escolha" value="tableaux">
+
+														<div class="icon" id="botaoTableaux">
+															<i class="material-icons">call_split</i>
+														</div>
+														<h6>Tableaux</h6>
+													</div>
+												</div>
+												<div class="col-sm-4">
+													<div class="choice" data-toggle="wizard-radio"
+														rel="tooltip" title="Método de Resolução">
+														<input type="radio" name="escolha" value="resolucao">
+														<div class="icon" id="botaoResolucao">
+															<i class="material-icons">live_tv</i>
+														</div>
+														<h6>Resolução</h6>
+													</div>
+												</div>
+												<div class="col-sm-4">
+													<div class="choice" data-toggle="wizard-radio"
+														rel="tooltip" title="Método de Dedução Natural">
+														<input type="radio" name="escolha" value="deducao">
+														<div class="icon" id="botaoDeducao">
+															<i class="material-icons">search</i>
+														</div>
+														<h6>Deducao Natural</h6>
+													</div>
+												</div>
+
+												<div class="col-sm-4">
+													<div class="choice" data-toggle="wizard-radio"
+														rel="tooltip">
+														<input type="radio" name="escolha" value="tipoLpo2">
+
+														<div class="icon" id="botaoLpo2">
+															<i class="material-icons">hourglass_full</i>
+														</div>
+														<h6>Lógica de primeira ordem</h6>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+<!---------------------------------------------------------------------------------------------------------------------------------->
+
+<!-----------------  TAB DE SELECAO DE EXERCICIOS / ADD REGRAS --------------------------------------------------------------------->
+
+									<div class="tab-pane" id="exercicio" style="display: none">
+										<div class="row">
+											<div class="col-sm-14 col-sm-offset-3" id='div_Escolha'>
+
+												<br />
+												<button class='btn btn-info btn-sl' type="button"
+													id="listarEx" onClick="f_Escolha(this.id)">Listas
+													de Exercícios</button>
+												<button class='btn btn-info btn-sl' type="button"
+													id="novoExercicio" onClick="f_Escolha(this.id)"
+													data-toggle="modal" data-target="#exampleModal">Criar
+													Exercício</button>
+
+
+											</div>
+<!-- #######  MODAL		 -->
+
+											<div class="modal fade" id="exampleModal" tabindex="-1"
+												role="dialog" aria-labelledby="exampleModalLabel"
+												aria-hidden="true">
+												<div class="modal-dialog" role="document">
+													<div class="modal-content">
+														<div class="modal-header">
+															<h5 class="modal-title" id="exampleModalLabel">
+																<b>Instruções</b>
+															</h5>
+
+														</div>
+														<div class="modal-body">
+															<article>&nbsp;&nbsp;&nbsp; &bull; Todas as
+																fórmulas devem ser iniciadas com parênteses</article>
+															<article>
+																&nbsp;&nbsp;&nbsp; &bull; Utilize constantes ao invés de
+																palavras. (Ex. Terça = T; Quinta = Q; Aula = A)
+																<article>
+																	&nbsp;&nbsp;&nbsp; &bull; Utilize letras maiúsculas
+																	para as constantes e minusculas para os conectivos <br />
+																	<br />
+																	<article>
+																		&#10022; <b>Exemplos de adição de fórmula:</b>
+																	</article>
+																	<article>
+																		&nbsp;&nbsp;&nbsp; &bull;&nbsp; T&#x279D;A^Q&#x279D;A
+																		deve ser escrita como ((T implica A) e (Q implica A))
+																		<br />
+																		<article>&nbsp;&nbsp;&nbsp; &bull;&nbsp;
+																			¬A∨((B^C)&#x279D; D)) deve ser escrita como
+																			(not(A)ou((BeC)implica(D)))</article>
+																		<br /> <i>*Note que a fórmula pode ser escrita
+																			utilizando espaços em branco ou não</i> <br /> <br />
+																	</article>
+																	<article>
+																		&#10022; <b>Tradução de símbolos: </b>
+																	</article>
+																	<article>&nbsp;&nbsp;&nbsp; ¬ : not</article>
+																	<article>&nbsp;&nbsp;&nbsp; ^ : e</article>
+																	<article>&nbsp;&nbsp;&nbsp; ∨ : ou</article>
+																	<article>&nbsp;&nbsp;&nbsp; &#x279D; :
+																		implica</article>
+														</div>
+														<div class="modal-footer">
+															<button type="button" class="btn btn-secondary"
+																data-dismiss="modal">Entendi</button>
+														</div>
+													</div>
+												</div>
+											</div>
+<!-- ------------------------				 -->
+
+											<div id='div_ListasSup' style="display: none">
+												<div class="col-sm-14 col-sm-offset-1">
+
+													<button class='btn btn-default btn-xs' type="button"
+														onClick="f_Escolha('novoExercicio')" data-toggle="modal"
+														data-target="#exampleModal">Novo Exercício</button>
+												</div>
+
+											</div>
+
+
+											<div id='adicaoExercicio' style="display: none">
+												<div class="col-sm-8 col-sm-offset-1">
+
+													<button class='btn btn-default btn-xs' type="button"
+														onClick="f_Escolha('listarEx')">Listas</button>
+												</div>
+
+												<button type="button" class="btn btn-primary btn-xs"
+													data-toggle="modal" data-target="#exampleModal">
+													Instruções</button>
+												</br>
+												<div class="col-sm-4 col-sm-offset-1">
+
+													<div class="input-group">
+														<div class="form-group label-floating">
+															<label class="control-label">Regra</label> <input
+																name="regra" id="regra" type="text" class="form-control">
+															<button class='btn btn-info btn-xs' type="button"
+																id="buttonRegra" onClick="f_AddRegra()">
+																Adicionar regra</button>
+														</div>
+													</div>
+
+													<div class="input-group">
+
+														<div class="form-group label-floating">
+															<label class="control-label">Pergunta</label> <input
+																name="pergunta" id="pergunta" type="text"
+																class="form-control">
+															<button class='btn btn-info btn-xs' type="button"
+																id="buttonPergunta" onclick="f_AddPergunta()">
+																Adicionar pergunta</button>
+														</div>
+													</div>
+												</div>
+
+												<div class="col-sm-6 col-sm-offset-1">
+
+													<div class="form-group label-floating">
+														<strong>> Regras adicionadas:</strong>
+														<article id="regrasAdicionadas"></article>
+													</div>
+													<button class='btn btn-info btn-xs' type="button"
+														id="buttonRemoverRegra" onclick="f_RemoverRegra()"
+														style="display: none">Remover a ultima regra</button>
+
+													<div class="form-group label-floating">
+														<strong>> Pergunta:</strong>
+														<article id="perguntaAdicionada"></article>
+													</div>
+													<button class='btn btn-info btn-xs' type="button"
+														id="buttonRemoverPerg" onclick="f_RemoverPerg()"
+														style="display: none">Remover pergunta</button>
+													<button class='btn btn-info btn-xs' type="button"
+														id="buttonRemoverTudo" onclick="f_LimpaTipo()">
+														Remover tudo</button>
+
+												</div>
+											</div>
+
+
+										</div>
+									</div>
+<!--------------------------------------------------------------------------------------------------------------------->
+
+<!-----------------  TAB DE SOLUCAO DO EXERCICIO  --------------------------------------------------------------------------------->
+									<div class="tab-pane" id="execucao">
+
+										<div class="row">
+
+<!--  DIV PARA TABLEAUX #############################################################################-->
+											<div class="col-sm-8 col-sm-offset-2">
+
+												<div class="regrasTableaux" id='divTableaux'
+													style="display: none">
+
+													<div class="passos" id="t_passos">
+														<h4 class="control-label">
+															<strong> > Passo-a-passo para Tableaux:</strong>
+														</h4>
+
+														<article id='info1'>- Selecione a fórmula que
+															deseja expandir</article>
+														<article id='info2'>- Desenvolver o exercício
+															até fechar todos os ramos da árvore</article>
+
+														<button type="button" class="btn btn-success btn-sm"
+															data-trigger="focus" data-toggle="popover"
+															data-placement="left"
+															data-content="<ol><li>Negar a pergunta</li><li>Expanda as fórmulas selecionando-as</li>
+															<li>Econtre a contradição</li></ol>"
+															data-html="true" title="Algoritmo Base">Algoritmo
+															completo aqui</button>
+
+													</div>
+<!-- ############################################################################################### -->
+													<div class="t_inicioEx">
+														<h4>
+															<strong>> Início do Exercício</strong>
+														</h4>
+
+														<div class="col-sm-8 col-sm-offset-0">
+
+															<div id="t_divFormulas">
+
+																</style>
+															</div>
+<!-- ############################################################################################### -->
+															<div class="form-check" id="t_divNovasFormulas">
+
+																<div id="content">
+																	<div id="main">
+																		<ul id="organisation">
+
+																		</ul>
+																	</div>
+																</div>
+															</div>
+															</br>
+														</div>
+													</div>
+												</div>
+											</div>
+<!--FIM TABLEAUX	-->
+
+<!--  DIV PARA DEDUCAO NATURAL-->
+											<div class="col-sm-8 col-sm-offset-2">
+
+												<div class="regrasDeducao" id='divDeducao'
+													style="display: none">
+													<div id='dnFormmulas'>
+														<h4 class="control-label">
+															<strong> > Passo-a-passo para Dedução Natural:</strong>
+														</h4>
+
+														<article id='info1'>- Selecione uma das opções
+															de regras possíveis ou abrir uma suposição</article>
+														<article id='info2'>- Repetir o passo anterior
+															até que se chegue na pergunta</article>
+														<h4>
+															<strong>> Início do Exercício</strong>
+														</h4>
+
+													</div>
+													<div class='resultado'></div>
+
+													<div id="jstree_div"></div>
+													<div id='buttonsDN'>
+														<button type="button" class="btn btn-info btn-xs"
+															id="supor" data-toggle="collapse" data-target="#collapseExample" 
+															aria-expanded="false" aria-controls="collapseExample"
+															style='display: inline-block'>Supor</button>
+															<div class="collapse" id="collapseExample">
+																  <div class="card card-body">
+																    <div class="input-group">
+																			<div class="form-group label-floating">
+																				<label class="control-label">Supor</label> <input
+																					name="labelSupor" id="lblSupor" type="text" 
+																					class="form-control">
+																				<button class='btn btn-success btn-xs' type="button"
+																					id="btnSupor"  data-toggle="collapse"
+																					 data-target="#collapseExample"
+																					  aria-expanded="false"
+																					  aria-controls="collapseExample"	>
+																					Ok!</button>
+																			</div>
+																		</div>
+																  </div>
+															</div><br/>
+															
+														<button type="button" class="btn btn-info btn-xs"
+															id="incNot" style='display: inline-block'>Inclusão
+															do not</button>
+														<button type="button" class="btn btn-info btn-xs"
+															id="elimNot" style='display: inline-block'>Eliminação
+															do not</button><br/>
+														<button type="button" class="btn btn-info btn-xs"
+															id="incE" style='display: inline-block'>Inclusão
+															do E</button>
+														<button type="button" class="btn btn-info btn-xs"
+															id="elimE" style='display: inline-block'>Eliminação
+															do E</button>
+														<br/>
+														<button type="button" class="btn btn-info btn-xs"
+															id="incImp" style='display: inline-block'>Inclusão
+															do Implica</button>
+														
+														<button type="button" class="btn btn-info btn-xs"
+															id="excImp" style='display: inline-block'>Exclusão
+															do Implica</button><br/>
+														
+
+														<button type="button" class="btn btn-info btn-xs" id="abs"
+															style='display: inline-block'>Declarar Absurdo</button><br/>
+														<button type="button" class="btn btn-info btn-xs" id="incOu"
+															data-toggle="collapse" data-target="#collapseOU" 
+															aria-expanded="false" aria-controls="collapseOU"
+															style='display: inline-block'>Inclusão do Ou</button>
+														<div class="collapse" id="collapseOU">
+																  <div class="card card-body">
+																    <div class="input-group">
+																			<div class="form-group label-floating">
+																				<label class="control-label">Inclusão do OU</label> <input
+																					name="labelOu" id="lblOu" type="text" 
+																					class="form-control">
+																				<button class='btn btn-success btn-xs' type="button"
+																					id="btnOu"  data-toggle="collapse"
+																					 data-target="#collapseOU"
+																					  aria-expanded="false"
+																					  aria-controls="collapseOU"	>
+																					Ok!</button>
+																			</div>
+																		</div>
+																  </div>
+															</div>
+														<button type="button" class="btn btn-info btn-xs" id="excOu"
+															style='display: inline-block'>Exclusão do Ou</button>
+														<button type="button" class="btn btn-info btn-xs" id="stepOu"
+															style='display: inline-block'>Próxima Suposição da Exclusão do Ou</button>
+														<button type="button" class="btn btn-info btn-xs" id="elimOu"
+															style='display: inline-block'>Fechar Exclusão do Ou</button><br/>
+														<button type="button" class="btn btn-danger btn-xs" id="undo"
+															style='display: inline-block'>Desfazer Último Passo</button>
+														
+														
+													</div>
+
+
+												</div>
+
+											</div>
+<!--FIM DEDUCAO	-->
+<!--  DIV PARA SEMANTICA-->
+<!-- #######  MODAL		 -->
+
+											<button type="button" id='btnSem'
+												class="btn btn-primary btn-xs" data-toggle="modal"
+												data-target="#semanticaModal" style='display: none'>
+											</button>
+											<div class="modal fade" id="semanticaModal" tabindex="-1"
+												role="dialog" aria-labelledby="exampleModalLabel"
+												aria-hidden="true">
+												<div class="modal-dialog" role="document">
+													<div class="modal-content">
+														<div class="modal-header">
+															<h5 class="modal-title" id="semModal">
+																<b>Aviso</b>
+															</h5>
+
+														</div>
+														<div class="modal-body">
+															<article>Para uma melhor experiência, os
+																gabaritos dos exercícios de semântica e tableaux serão
+																exibidos em outra aba.</article>
+
+														</div>
+														<div class="modal-footer">
+															<button type="button" class="btn btn-secondary"
+																data-dismiss="modal">Entendi</button>
+														</div>
+													</div>
+												</div>
+											</div>
+<!-- ------------------------				 -->
+											<div class="col-sm-8 col-sm-offset-2">
+
+												<div class="regrasSemantica" id='divSemantica'
+													style="display: none">
+
+													<div class="passos" id="s_passos">
+														<h4 class="control-label">
+															<strong> > Passo-a-passo para Semântica:</strong>
+														</h4>
+
+														<article id='info1'>- Selecione a fórmula que
+															deseja expandir</article>
+														<article id='info2'>- Desenvolver o exercício
+															até fechar todos os ramos da árvore</article>
+
+														<button type="button" class="btn btn-success btn-sm"
+															data-trigger="focus" data-toggle="popover"
+															data-placement="left"
+															data-content="<ol><li>Entre com o dominio</li>
+															<li>Entre com as relações</li>
+															<li>Construa a árvore baseada nas fórmulas e seus valores True ou False</li></ol>"
+															data-html="true" title="Algoritmo Base">Algoritmo
+															completo aqui</button>
+
+													</div>
+<!-- ############################################################################################### -->
+													<div class="s_inicioEx">
+														<h4>
+															<strong>> Início do Exercício</strong>
+														</h4>
+																			
+
+														<div id="s_divFormulas"></div>
+<!-- 													<button class='btn btn-info btn-xs' type="button" -->
+<!-- 														id="buttonEnviarSemantica"  -->
+<!-- 														>Enviar</button>														 -->
+														<div id='adicaoSemantica'>
+
+
+												<div class="col-sm-4 col-sm-offset-1">
+
+													<div class="input-group">
+														<div class="form-group label-floating">
+															<label class="control-label">Domínio(Ex. 0)</label> <input
+																name="s_Dominio" id="s_Dominio" type="text" class="form-control">
+															<button class='btn btn-info btn-xs' type="button"
+																id="buttonDominio" onClick="f_AddDominio()">
+																Adicionar Domínio</button>
+														</div>
+													</div>
+
+													<div class="input-group">
+
+														<div class="form-group label-floating">
+															<label class="control-label">Relações(Ex. R(0;0))</label> <input
+																name="s_Relacoes" id="s_Relacoes" type="text"
+																class="form-control">
+															<button class='btn btn-info btn-xs' type="button"
+																id="buttonRelacoes" onclick="f_AddRelacao()">
+																Adicionar Relação</button>
+														</div>
+													</div>
+												</div>
+
+												<div class="col-sm-6 col-sm-offset-1">
+
+													<div class="form-group label-floating">
+														<strong>> Dominio adicionado:</strong>
+														<article id="dominioAdicionado"></article>
+													</div>
+													<button class='btn btn-info btn-xs' type="button"
+														id="buttonRemoverDominio" onclick="f_RemoverDominio()"
+														style="display: none">Remover o último domínio</button>
+
+													<div class="form-group label-floating">
+														<strong>> Relações:</strong>
+														<article id="relacoesAdicionadas"></article>
+													</div>
+													<button class='btn btn-info btn-xs' type="button"
+														id="buttonRemoverRelacao" onclick="f_RemoverRelacao()"
+														style="display: none">Remover a última relação</button>
+
+												</div>
+											</div>
+														
+													</div>
+
+													
+												</div>
+												
+											</div>
+											<div width='100%'>
+<!-- ############################################################################################### -->
+		</br>
+											</div>
+<!--FIM semantica	-->
+<!--  --t_lpo ------------------------------------------------------------------------------------------------------------------------------------->
+<!--  DIV PARA t_lpo #############################################################################-->
+											<div class="col-sm-8 col-sm-offset-2">
+
+												<div class="regrast_lpo" id='divt_lpo' style="display: none">
+
+													<div class="passos" id="t_lpo_passos">
+														<h4 class="control-label">
+															<strong> > Passo-a-passo para Tableaux LPO:</strong>
+														</h4>
+
+														<article id='info1'>- Selecione a fórmula que
+															deseja expandir</article>
+														<article id='info2'>- Desenvolver o exercício
+															até fechar todos os ramos da árvore</article>
+
+														<button type="button" class="btn btn-success btn-sm"
+															data-trigger="focus" data-toggle="popover"
+															data-placement="left"
+															data-content="<ol><li>Negar a pergunta</li><li>Expanda as fórmulas selecionando-as</li>
+															<li>Econtre a contradição</li></ol>"
+															data-html="true" title="Algoritmo Base">Algoritmo
+															completo aqui</button>
+
+													</div>
+<!-- ############################################################################################### -->
+													<div class="t_lpo_inicioEx">
+														<h4>
+															<strong>> Início do Exercício</strong>
+														</h4>
+
+														<div class="col-sm-8 col-sm-offset-0">
+
+															<div id="t_lpo_divFormulas">
+
+																</style>
+															</div>
+<!-- ############################################################################################### -->
+															<div class="form-check" id="t_lpo_divNovasFormulas">
+
+																<div id="t_lpo_content">
+																	<div id="t_lpo_main">
+																		<ul id="t_lpo_organisation">
+
+																		</ul>
+																	</div>
+																</div>
+															</div>
+															</br>
+														</div>
+													</div>
+												</div>
+											</div>
+<!--FIM t_lpo	-->
+
+
+
+<!------------------------------------------  DIV PARA RESOLUCAO ---------------------------------------------------------------------->
+											<div class="regrasResolucao" id='divResolucao'
+												style="display: none">
+
+												<div class="col-sm-14 col-sm-offset-0">
+
+
+													<div class="alert alert-info alert-dismissible"
+														id='alertResolucao'>
+														<a href="#" class="close" data-dismiss="alert"
+															aria-label="close">&times;</a> <strong>Atenção!</strong>
+														Todas as fórmulas devem passar uma vez pelo passo de
+														transformação para FNC, mesmo que já estejam inicialmente
+														em FNC.
+													</div>
+
+												</div>
+												<div class="col-sm-8 col-sm-offset-2">
+
+
+													<div class="passos" id="r_passos">
+														<h4 class="control-label">
+															<strong> > Passo-a-passo para Resolução:</strong>
+														</h4>
+
+														<span id='r_passo1'>- Negar a Pergunta</span> </br> <span
+															id='r_passo2'>- Passar todas as fórmulas e a
+															pergunta negada para FNC</span> </br> <span id='r_passo3'>-
+															Desenvolver o exercício até encontrar uma contradição ou
+															não tiver mais operações disponíveis. </span> </br>
+														<button type="button" class="btn btn-success btn-sm"
+															data-trigger="focus" data-toggle="popover"
+															data-placement="left"
+															data-content="<ol><li>Negar a pergunta</li><li>Passar todas as fórmulas e a pergunta para FNC</li><li>Separar todos os 'e', ou seja, cada 'e' vira uma fórmula (ou linha) independente.</li><li>Verificar se há 'átomos', havendo, confrontar átomos para ver se a resolução fecha, por exemplo A e ¬A são átomos que se contradizem e portanto fecharia a resolução.</li><li>Se não fechar, vá para a próxima etapa.  Fazer as simplificações do 'ou', se possível. Se Av¬B e AvB então A. Se Av¬B e B então A</li><li>Verificar se há átomos, havendo, confrontar átomos para ver se a resolução fecha.</li><li>Se não fechar após este último passo, o problema não é possível de resolver.</li></ol>"
+															data-html="true" title="Algoritmo Base">Ver o
+															algoritmo completo</button>
+
+													</div>
+<!-- ############################################################################################### -->
+													<div class="r_inicioEx">
+														<h4>
+															<strong>> Início do Exercício</strong>
+														</h4>
+
+														<div class="col-sm-8 col-sm-offset-0">
+
+															<div class='formulas' id="r_divFormulas">
+
+																</style>
+															</div>
+<!-- ############################################################################################### -->
+															<div class="form-check" id="r_divNovasFormulas"></div>
+															</br>
+															<button type="button" id="btn_Verificar"
+																class="btn btn-primary btn-xs" onclick='f_Verificar()'>Verificar</button>
+															<button type="button" id="btn_SepararE"
+																class="btn btn-info btn-xs" onclick='f_SepararE()'>Separar
+																"E"</button>
+															<button type="button" id="btn_SepararOU"
+																class="btn btn-info btn-xs" onclick='f_SepararOU()'>Separar
+																"OU"</button>
+															<button type="button" id="btn_PassarNot"
+																class="btn btn-info btn-xs"
+																onclick='f_PassarNotPraDentro()'>Passar o
+																"not" para dentro</button>
+															<button type="button" id="btn_Notnot"
+																class="btn btn-info btn-xs" onclick='f_Notnot()'>Negação
+																de negação</button>
+
+															<button type="button" id="btn_TransformarRegra"
+																class="btn btn-info btn-xs" onclick="f_Transformar()">Negar
+																Pergunta</button>
+
+														</div>
+													</div>
+												</div>
+											</div>
+<!--FIM RESOLUCAO	-->
+
+										</div>
+<!-- FIM ROW -->
+									</div>
+<!--  FIM TAB EXERCICIO -->
+<!-- fechando div do tabpane -->
+								</div>
+<!--------------------------------------------------------------------------------------------------------------------->
+
+<!-----------------  NEXT/PREVIOUS/RODAPE  --------------------------------------------------------------------------------->
+
+
+								<div class="wizard-footer">
+									</br>
+									<div class="pull-right">
+										<input disabled type='button'
+											class='btn btn-next btn-fill btn-danger btn-wd' id="proximo"
+											name='proximo' value='Próximo' /> <input type='button'
+											class='btn btn-finish btn-fill btn-warning btn-wd'
+											id="btn_gabarito" name='gabarito' value='Gabarito'
+											onclick='f_Gabarito()' />
+									</div>
+									<div class="pull-left">
+										<input type='button'
+											class='btn btn-previous btn-fill btn-default btn-wd'
+											id="anterior" name='anterior' value='Anterior' />
+
+
+									</div>
+									<div class="clearfix"></div>
+								</div>
+							</form>
+						</div>
+					</div>
+					<!-- wizard container -->
+				</div>
+			</div>
+			<!-- row -->
+		</div>
+		<!--  big container -->
+
+		<div class="footer">
+			<div class="container text-center">
+				<b>Desenvolvedores: Herbert Salazar e Yuri Santana.</b> <br /> <b>Orientador:
+					Mário Benevides.</b>
+			</div>
+		</div>
+
+	</div>
+</body>
+
+
+<!--   Core JS Files   -->
+<!-- 	<script src="assets/js/jquery-2.2.4.min.js" type="text/javascript"></script> -->
+<script src="./WebContent/pagina/assets/js/bootstrap.min.js" type="text/javascript"></script>
+<script src="./WebContent/pagina/assets/js/jquery.bootstrap.js" type="text/javascript"></script>
+
+<!--  Plugin for the Wizard -->
+<script src="./WebContent/pagina/assets/js/material-bootstrap-wizard.js"></script>
+
+<!--  More information about jquery.validate here: http://jqueryvalidation.org/	 -->
+<script src="./WebContent/pagina/assets/js/jquery.validate.min.js"></script>
+
+</html>
