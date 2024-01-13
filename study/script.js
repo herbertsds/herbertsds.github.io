@@ -85,22 +85,22 @@ function updateMainContent(day) {
 
     switch (day) {
         case 'Segunda':
-            activities = '<div class="line"><a href="https://totale.rosettastone.com/plan" target="_blank">Rosetta Stone (30min)</a><br/></div><div class="line"> <a href="https://www.bbc.co.uk/learningenglish" target="_blank">BBC (30min)</a></div>';
+            activities = '<div class="line"><a href="https://totale.rosettastone.com/plan" target="_blank">Rosetta Stone (30min)</a><br/></div><div class="line"> <a href="https://www.bbc.co.uk/learningenglish" target="_blank">BBC (30min)</a></div><div class="line"> ChatGPT (30min)</div>';
             break;
         case 'Terça':
-            activities = '<div class="line"><a href="https://totale.rosettastone.com/plan" target="_blank">Rosetta Stone (30min)</a><br/></div><div class="line"> CNA/CCAA (30min)</div>';
+            activities = '<div class="line"><a href="https://totale.rosettastone.com/plan" target="_blank">Rosetta Stone (30min)</a><br/></div><div class="line"> CNA/CCAA (30min)</div><div class="line"> ChatGPT (30min)</div>';
             break;
         case 'Quarta':
-            activities = '<div class="line"><a href="https://totale.rosettastone.com/plan" target="_blank">Rosetta Stone (30min)</a><br/></div><div class="line"> <a href="https://www.cambridgeenglish.org/learning-english/activities-for-learners?rows=12" target="_blank">Cambridge (30min)</a></div>';
+            activities = '<div class="line"><a href="https://totale.rosettastone.com/plan" target="_blank">Rosetta Stone (30min)</a><br/></div><div class="line"> <a href="https://www.cambridgeenglish.org/learning-english/activities-for-learners?rows=12" target="_blank">Cambridge (30min)</a></div><div class="line"> ChatGPT (30min)</div>';
             break;
         case 'Quinta':
-            activities = '<div class="line"><a href="https://totale.rosettastone.com/plan" target="_blank">Rosetta Stone (30min)</a><br/></div><div class="line"> CNA/CCAA (30min)</div>';
+            activities = '<div class="line"><a href="https://totale.rosettastone.com/plan" target="_blank">Rosetta Stone (30min)</a><br/></div><div class="line"> CNA/CCAA (30min)</div><div class="line"> ChatGPT (30min)</div>';
             break;
         case 'Sexta':
-            activities = '<div class="line"><a href="https://totale.rosettastone.com/plan" target="_blank">Rosetta Stone (30min)</a><br/></div><div class="line"> Song Class (30min)</div>';
+            activities = '<div class="line"><a href="https://totale.rosettastone.com/plan" target="_blank">Rosetta Stone (30min)</a><br/></div><div class="line"> ChatGPT (30min)</div><div class="line"> Song Class (30min)</div>';
             break;
         case 'Sábado':
-            activities = '<div class="line"><a href="https://totale.rosettastone.com/plan" target="_blank">Rosetta Stone (30min)</a><br/></div><div class="line"> Series Session (40min)<br/></div><div class="line"> Movie Session (extra)</div>';
+            activities = '<div class="line"><a href="https://totale.rosettastone.com/plan" target="_blank">Rosetta Stone (30min)</a><br/></div><div class="line"> ChatGPT (30min)</div><div class="line"> Series Session (40min)<br/></div><div class="line"> Movie Session (extra)</div>';
             break;
         case 'Domingo':
             activities = "Dia de descanso";
