@@ -7,18 +7,24 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <button id="toggleButton">Mudar visualização</button>
     <div id="mainContent">
         <h1 id="dayTitle"></h1>
+        <h4 id="dayDate"></h4>
         <p id="dayActivities"></p>
+        <button id="addButton">Concluir</button>
+        <button id="removeButton" style="display: none;">Remover conclusão</button>
     </div>
+    <div id="diasAnoContent"></div>
     <footer>
-        <div class="day" onclick="updateMainContent('Segunda')"><h2>Segunda</h2> Rosetta Stone<br/> ChatGPT<br/> BBC</div>
-        <div class="day" onclick="updateMainContent('Terça')"><h2>Terça</h2> Rosetta Stone<br/> ChatGPT<br/> CNA/CCAA</div>
-        <div class="day" onclick="updateMainContent('Quarta')"><h2>Quarta</h2> Rosetta Stone<br/> ChatGPT<br/> Cambridge</div>
-        <div class="day" onclick="updateMainContent('Quinta')"><h2>Quinta</h2> Rosetta Stone<br/> ChatGPT<br/> CNA/CCAA</div>
-        <div class="day" onclick="updateMainContent('Sexta')"><h2>Sexta</h2> Rosetta Stone<br/> ChatGPT<br/> Song Class</div>
-        <div class="day" onclick="updateMainContent('Sábado')"><h2>Sábado</h2> Rosetta Stone<br/> ChatGPT<br/> CNA/CCAA<br/> Serie Session<br/> Movie Session</div>
+        <div class="day normal" onclick="updateMainContent('Segunda')"><h2>Segunda</h2><h4 id="dateSegunda"></h4> Rosetta Stone<br/> ChatGPT<br/> BBC</div>
+        <div class="day normal" onclick="updateMainContent('Terça')"><h2>Terça</h2><h4 id="dateTerça"></h4> Rosetta Stone<br/> ChatGPT<br/> CNA/CCAA</div>
+        <div class="day normal" onclick="updateMainContent('Quarta')"><h2>Quarta</h2><h4 id="dateQuarta"></h4> Rosetta Stone<br/> ChatGPT<br/> Cambridge</div>
+        <div class="day normal" onclick="updateMainContent('Quinta')"><h2>Quinta</h2><h4 id="dateQuinta"></h4> Rosetta Stone<br/> ChatGPT<br/> CNA/CCAA</div>
+        <div class="day normal" onclick="updateMainContent('Sexta')"><h2>Sexta</h2><h4 id="dateSexta"></h4> Rosetta Stone<br/> ChatGPT<br/> Song Class</div>
+        <div class="day normal" onclick="updateMainContent('Sábado')"><h2>Sábado</h2><h4 id="dateSábado"></h4> Rosetta Stone<br/> ChatGPT<br/> Series Session<br/> Movie Session</div>
     </footer>
+    <script src="diasAno.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
