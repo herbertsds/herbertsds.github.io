@@ -33,6 +33,7 @@
 
         .carousel-item img {
             max-height: 96vh;
+            max-width: 100%;
             width: auto;
             /* Permite que a largura seja ajustada automaticamente */
             display: block;
@@ -40,12 +41,32 @@
         }
 
         footer {
-            flex-grow: 0.05;
-            /* O footer ocupa 5% da altura */
-            /* Cor de fundo do footer (pode ser personalizada) */
             display: flex;
             justify-content: center;
             align-items: center;
+        }
+
+        @media screen and (max-width: 420px) {
+            .carousel-item img {
+                max-height: 90vh;
+                max-width: 100%;
+                width: auto;
+                /* Permite que a largura seja ajustada automaticamente */
+                display: block;
+                margin: 0 auto;
+            }
+
+            .carousel-container {
+                flex-grow: 1;
+            }
+
+            footer {
+                height: 50px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+            }
         }
 
         #audioPlayer {
