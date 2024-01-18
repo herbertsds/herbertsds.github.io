@@ -149,6 +149,8 @@ function updateDayClasses() {
             days[i].classList.add('semFazer');
         } else if (diasAno[dayDate] && new Date(formattedDate) >= new Date(formattedDateConcluded)) {
             days[i].classList.add('concluido');
+        } else if (diasAno[dayDate] && new Date(formattedDate) < new Date(formattedDateConcluded)) {
+            days[i].classList.add('atraso');
         } else if (diasAno[dayDate] === "Não Aplicável") {
             days[i].classList.add('naoAplicavel');
         }
