@@ -123,27 +123,27 @@
                 "adjusted_merged_page_8": ["Unit 1 - Lesson 4 - Activity 1", "Unit 1 - Lesson 4 - Activity 3", "Unit 1 - Lesson 4 - Activity 4"],
                 "adjusted_merged_page_9": ["Unit 1 - Lesson 5 - Activity 1", "Unit 1 - Lesson 5 - Activity 2"],
                 "adjusted_merged_page_10": [],
-                "adjusted_merged_page_11": [],
-                "adjusted_merged_page_12": [],
-                "adjusted_merged_page_13": [],
-                "adjusted_merged_page_14": [],
-                "adjusted_merged_page_15": [],
+                "adjusted_merged_page_11": ["Unit 2 - Lesson 1 - Activity 1", "Unit 2 - Lesson 1 - Activity 3", "Unit 2 - Lesson 1 - Activity 5"],
+                "adjusted_merged_page_12": ["Unit 2 - Lesson 2 - Activity 2"],
+                "adjusted_merged_page_13": ["Unit 2 - Lesson 3 - Activity 1", "Unit 2 - Lesson 3 - Activity 3", "Unit 2 - Lesson 3 - Activity 4"],
+                "adjusted_merged_page_14": ["Unit 2 - Lesson 4 - Activity 2", "Unit 2 - Lesson 4 - Activity 3"],
+                "adjusted_merged_page_15": ["Unit 2 - Lesson 5 - Activity 1", "Unit 2 - Lesson 5 - Activity 2"],
                 "adjusted_merged_page_16": [],
-                "adjusted_merged_page_17": [],
+                "adjusted_merged_page_17": ["Unit 3 - Review - Activity 2"],
                 "adjusted_merged_page_18": [],
-                "adjusted_merged_page_19": [],
-                "adjusted_merged_page_20": [],
-                "adjusted_merged_page_21": [],
-                "adjusted_merged_page_22": [],
-                "adjusted_merged_page_23": [],
+                "adjusted_merged_page_19": ["Unit 4 - Lesson 1 - Activity 3", "Unit 4 - Lesson 1 - Activity 5"],
+                "adjusted_merged_page_20": ["Unit 4 - Lesson 2 - Activity 1", "Unit 4 - Lesson 2 - Activity 3"],
+                "adjusted_merged_page_21": ["Unit 4 - Lesson 3 - Activity 1", "Unit 4 - Lesson 3 - Activity 3", "Unit 4 - Lesson 3 - Activity 3", "Unit 4 - Lesson 3 - Activity 4"],
+                "adjusted_merged_page_22": ["Unit 4 - Lesson 4 - Activity 2", "Unit 4 - Lesson 4 - Activity 3"],
+                "adjusted_merged_page_23": ["Unit 4 - Lesson 5 - Activity 1", "Unit 4 - Lesson 5 - Activity 2"],
                 "adjusted_merged_page_24": [],
-                "adjusted_merged_page_25": [],
-                "adjusted_merged_page_26": [],
-                "adjusted_merged_page_27": [],
-                "adjusted_merged_page_28": [],
-                "adjusted_merged_page_29": [],
+                "adjusted_merged_page_25": ["Unit 5 - Lesson 1 - Activity 2", "Unit 5 - Lesson 1 - Activity 4"],
+                "adjusted_merged_page_26": ["Unit 5 - Lesson 2 - Activity 1", "Unit 5 - Lesson 2 - Activity 4"],
+                "adjusted_merged_page_27": ["Unit 5 - Lesson 3 - Activity 2", "Unit 5 - Lesson 3 - Activity 3"],
+                "adjusted_merged_page_28": ["Unit 5 - Lesson 4 - Activity 1"],
+                "adjusted_merged_page_29": ["Unit 5 - Lesson 5 - Activity 1", "Unit 5 - Lesson 5 - Activity 2"],
                 "adjusted_merged_page_30": [],
-                "adjusted_merged_page_31": [],
+                "adjusted_merged_page_31": ["Unit 6 - Review - Activity 2"],
                 "adjusted_merged_page_32": [],
                 "adjusted_merged_page_33": [],
                 "adjusted_merged_page_34": [],
@@ -216,9 +216,9 @@
                 // Continue para todas as imagens
             };
 
-            var folder = window.innerWidth > 768 ? "adjusted_merged_pages" : "single_page_images";
-            var prefix = window.innerWidth > 768 ? "adjusted_merged_page_" : "page_";
-            var count = window.innerWidth > 768 ? 34 : 66;
+            var folder = "adjusted_merged_pages";
+            var prefix = "adjusted_merged_page_";
+            var count = 34;
 
             for (var i = 1; i <= count; i++) {
                 var imgPath = folder + "/" + prefix + i + ".jpg";
