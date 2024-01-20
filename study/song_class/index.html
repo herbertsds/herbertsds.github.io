@@ -44,6 +44,11 @@
             /* Use a altura total da viewport */
         }
 
+        #frase{
+            text-align: center;
+            line-height: 1.5;
+        }
+
         .inputWord {
             width: 300px;
             font-size: 1em;
@@ -59,13 +64,13 @@
 <body>
     <div id="initContainer">
         <h1>Song Class</h1>
-        <textarea id="texto" placeholder="Cole a música aqui"></textarea>
-        <button id="iniciar">Iniciar!</button>
+        <textarea id="texto" placeholder="Paste the lyrics here"></textarea>
+        <button id="iniciar">Start!</button>
     </div>
     <div id="fraseContainer">
         <h1 id="frase"></h1>
-        <button id="proxima">Próxima</button>
-        <button id="voltar">Voltar</button>
+        <button id="proxima">Next</button>
+        <button id="voltar">Restart</button>
     </div>
     <script>
         let contador = 0;
@@ -155,7 +160,7 @@
                 }
 
                 // Substitui a palavra aleatória por um input
-                words[randomIndex] = `<input type="text" class="inputWord" id="inputWord${i}"><button id="helpButton${i}" class="help-button">?</button>`;
+                words[randomIndex] = `<input type="text" class="inputWord" id="inputWord${i}"><button id="helpButton${i}" class="help-button" tabindex="-1">?</button>`;
             }
 
             const newFrase = words.join(' ');
