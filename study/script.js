@@ -97,10 +97,10 @@ function updateMainContent(day) {
             activities = '<div class="line"><a href="https://totale.rosettastone.com/plan" target="_blank">Rosetta Stone (30min)</a><br/></div><div class="line"> <a href="./course/" target="_blank">CNA/CCAA (30min)</a></div><div class="line"> ChatGPT (15min)</div>';
             break;
         case 'Sexta':
-            activities = '<div class="line"><a href="https://totale.rosettastone.com/plan" target="_blank">Rosetta Stone (30min)</a><br/></div><div class="line"> ChatGPT (15min)</div><div class="line"> Song Class (30min)</div>';
+            activities = '<div class="line"><a href="https://totale.rosettastone.com/plan" target="_blank">Rosetta Stone (30min)</a><br/></div><div class="line"> ChatGPT (15min)</div><div class="line"><a href="./song_class/" target="_blank"> Song Class</a></div>';
             break;
         case 'Sábado':
-            activities = '<div class="line"><a href="https://totale.rosettastone.com/plan" target="_blank">Rosetta Stone (30min)</a><br/></div><div class="line"> ChatGPT (15min)</div><div class="line"> Series Session (40min)<br/></div><div class="line"> Movie Session (extra)</div>';
+            activities = '<div class="line"><div class="line"> Series Session (40min)<br/></div><div class="line"> Movie Session (extra)</div>';
             break;
         case 'Domingo':
             activities = "Dia de descanso";
