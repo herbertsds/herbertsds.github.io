@@ -85,7 +85,7 @@ function updateMainContent(day) {
 
     switch (day) {
         case 'Segunda':
-            activities = '<div class="line"><a href="https://totale.rosettastone.com/plan" target="_blank">Rosetta Stone (30min)</a><br/></div><div class="line"> <a href="https://www.bbc.co.uk/learningenglish" target="_blank">BBC (30min)</a></div><div class="line"> ChatGPT (15min)</div>';
+            activities = '<div class="line"><a href="https://totale.rosettastone.com/plan" target="_blank">Rosetta Stone (30min)</a><br/></div><div class="line"> <a href="./course/" target="_blank">CNA/CCAA (30min)</a></div><div class="line"> ChatGPT (15min)</div>';
             break;
         case 'Terça':
             activities = '<div class="line"><a href="https://totale.rosettastone.com/plan" target="_blank">Rosetta Stone (30min)</a><br/></div><div class="line"> <a href="./course/" target="_blank">CNA/CCAA (30min)</a></div><div class="line"> ChatGPT (15min)</div>';
