@@ -28,5 +28,35 @@ const references = {
         url: 'https://remotedesktop.google.com/access',
         image: 'remotedesktop.svg',
         title: 'Google Remote Desktop'
+    },
+    clarotvplus:{
+        url: 'https://www.clarotvmais.com.br/ao-vivo',
+        image: 'clarotvplus.svg',
+        title: 'Claro tv+'
+    },
+    hbomax:{
+        url: 'https://play.hbomax.com/page/urn:hbo:page:home',
+        image: 'hbomax.svg',
+        title: 'HBO Max'
+    },
+    starplus:{
+        url: 'https://www.starplus.com/pt-br/home',
+        image: 'starplus.svg',
+        title: 'Star+'
+    },
+    discoveryplus:{
+        url: 'https://www.discoveryplus.com/br/',
+        image: 'discoveryplus.svg',
+        title: 'Discovery+'
+    },
+    primevideo:{
+        url: 'https://www.primevideo.com/',
+        image: 'primevideo.svg',
+        title: 'Prime Video'
+    },
+    disneyplus:{
+        url: 'https://www.disneyplus.com/pt-br/home',
+        image: 'disneyplus.svg',
+        title: 'Disney+'
     }
 }
