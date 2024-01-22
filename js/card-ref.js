@@ -25,7 +25,7 @@ const references = {
         title: 'WhatsApp'
     },
     remotedesktop: {
-        url: 'https://remotedesktop.google.com/',
+        url: 'https://remotedesktop.google.com/access',
         image: 'remotedesktop.svg',
         title: 'Google Remote Desktop'
     }
