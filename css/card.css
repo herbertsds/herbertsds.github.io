@@ -10,4 +10,6 @@
     min-height: 60%;
     max-height: 70%;
     flex-grow: 1;
+    object-fit: contain;
+    height: auto;
 }

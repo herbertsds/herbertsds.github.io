@@ -21,7 +21,8 @@
         .carousel-container {
             flex-grow: 0.95;
             /* O carrossel ocupa 95% da altura */
-            overflow: hidden;
+            overflow-x: hidden;
+            overflow-y: scroll;
             /* Para evitar que o carrossel se estenda para além da altura da página */
         }
 
@@ -32,7 +33,6 @@
         }
 
         .carousel-item img {
-            max-height: 96vh;
             max-width: 100%;
             width: auto;
             /* Permite que a largura seja ajustada automaticamente */
@@ -244,12 +244,20 @@
             carousel.addEventListener('mouseup', function (e) {
                 endX = e.clientX;
 
-                if (startX > endX + 5) {
+                if (startX > endX + 155) {
                     $('.carousel').carousel('next');
-                } else if (startX < endX - 5) {
+                } else if (startX < endX - 155) {
                     $('.carousel').carousel('prev');
                 }
 
+            });
+
+            window.addEventListener('keydown', function (e) {
+                if (e.key === 'ArrowRight') {
+                    $('.carousel').carousel('next');
+                } else if (e.key === 'ArrowLeft') {
+                    $('.carousel').carousel('prev');
+                }
             });
 
             $('#carouselExampleIndicators').on('slide.bs.carousel', function (e) {
@@ -293,6 +301,18 @@
                 audioPlayer.load();
             };
 
+            $('#carouselExampleIndicators').on('slid.bs.carousel', function () {
+                var currentIndex = $('.carousel-item.active').index();
+                localStorage.setItem('carouselIndex', currentIndex);
+            });
+
+        });
+
+        $(document).ready(function () {
+            var carouselIndex = localStorage.getItem('carouselIndex');
+            if (carouselIndex) {
+                $('#carouselExampleIndicators').carousel(parseInt(carouselIndex));
+            }
         });
 
     </script>
