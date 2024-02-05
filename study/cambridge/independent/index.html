@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Cursos</title>
+    <style>
+        .curso-item {
+            margin-bottom: 15px;
+            /* Ajuste a margem conforme necessário */
+            display: flex;
+            /* Usa Flexbox */
+            align-items: center;
+            /* Centraliza verticalmente */
+        }
+    </style>
+    <script src="lista_cursos.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const listaCursosElement = document.getElementById('listaCursos');
+            const cursos = lista_cursos; // Substitua pela variável real do seu arquivo lista_cursos.js
+
+            // Função para carregar os estados dos checkboxes do localStorage
+            function loadCheckboxStates() {
+                return JSON.parse(localStorage.getItem('checkedCursos') || '{}');
+            }
+
+            // Função para salvar os estados dos checkboxes no localStorage
+            function saveCheckboxState(id, isChecked) {
+                const states = loadCheckboxStates();
+                states[id] = isChecked;
+                localStorage.setItem('checkedCursos', JSON.stringify(states));
+            }
+
+            // Inicializar a lista de cursos no HTML
+            cursos.forEach((curso, index) => {
+                const div = document.createElement('div');
+                div.className = 'curso-item';
+
+                const label = document.createElement('label');
+                label.style.display = 'flex'; // Adiciona flexbox ao label também
+                label.style.alignItems = 'center'; // Centraliza verticalmente dentro do label
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = `cursoCheckbox-${index}`;
+                checkbox.checked = loadCheckboxStates()[checkbox.id] || false;
+
+                checkbox.addEventListener('change', function () {
+                    saveCheckboxState(this.id, this.checked);
+                });
+
+                const link = document.createElement('a');
+                link.href = curso.link;
+                link.textContent = curso.name;
+                link.target = '_blank';
+                link.style.marginRight = '10px';
+
+                label.appendChild(checkbox);
+                label.appendChild(link);
+                div.appendChild(label);
+                listaCursosElement.appendChild(div);
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <button onclick="window.location.href = '../index.html'">Voltar</button><br/>
+    <h1>Lista de Cursos</h1>
+    <div id="listaCursos"></div>
+</body>
+
+</html>

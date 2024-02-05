@@ -4,6 +4,9 @@ document.getElementById('toggleButton').addEventListener('click', () => {
     const mainContent = document.getElementById('mainContent');
     const diasAnoContent = document.getElementById('diasAnoContent');
 
+    var returnButton = document.getElementById('returnButton');
+    returnButton.classList.toggle('hidden');
+
     if (isShowingDiasAno) {
         const today = getDayOfWeek();
         updateMainContent(today);
@@ -65,6 +68,11 @@ document.getElementById('removeButton').addEventListener('click', () => {
     updateButtons(dayDate);
 });
 
+document.getElementById('changeViewButton').addEventListener('click', function() {
+    var returnButton = document.getElementById('returnButton');
+    returnButton.classList.toggle('hidden');
+});
+
 function updateButtons(dayDate) {
     const diasAno = JSON.parse(localStorage.getItem('diasAno'));
     const addButton = document.getElementById('addButton');
@@ -85,16 +93,16 @@ function updateMainContent(day) {
 
     switch (day) {
         case 'Segunda':
-            activities = '<div class="line"><a href="https://totale.rosettastone.com/plan" target="_blank">Rosetta Stone (30min)</a><br/></div><div class="line"> <a href="./course/" target="_blank">CNA/CCAA (15min)</a> </div><div class="line"> <a href="https://www.cambridgeenglish.org/learning-english/activities-for-learners?rows=12" target="_blank">Cambridge (15min)</a></div><div class="line"> ChatGPT (15min)</div>';
+            activities = '<div class="line"><a href="https://totale.rosettastone.com/plan" target="_blank">Rosetta Stone (30min)</a><br/></div><div class="line"> <a href="./course/index.html">CNA/CCAA (15min)</a> </div><div class="line"> <a href="./cambridge/index.html">Cambridge (15min)</a></div><div class="line"> ChatGPT (15min)</div>';
             break;
         case 'Terça':
-            activities = '<div class="line"><a href="https://totale.rosettastone.com/plan" target="_blank">Rosetta Stone (30min)</a><br/></div><div class="line"> <a href="./course/" target="_blank">CNA/CCAA (15min)</a> </div><div class="line"> <a href="https://www.cambridgeenglish.org/learning-english/activities-for-learners?rows=12" target="_blank">Cambridge (15min)</a></div><div class="line"> ChatGPT (15min)</div>';
+            activities = '<div class="line"><a href="https://totale.rosettastone.com/plan" target="_blank">Rosetta Stone (30min)</a><br/></div><div class="line"> <a href="./course/index.html">CNA/CCAA (15min)</a> </div><div class="line"> <a href="./cambridge/index.html">Cambridge (15min)</a></div><div class="line"> ChatGPT (15min)</div>';
             break;
         case 'Quarta':
-            activities = '<div class="line"><a href="https://totale.rosettastone.com/plan" target="_blank">Rosetta Stone (30min)</a><br/></div><div class="line"> <a href="./course/" target="_blank">CNA/CCAA (15min)</a> </div><div class="line"> <a href="https://www.cambridgeenglish.org/learning-english/activities-for-learners?rows=12" target="_blank">Cambridge (15min)</a></div><div class="line"> ChatGPT (15min)</div>';
+            activities = '<div class="line"><a href="https://totale.rosettastone.com/plan" target="_blank">Rosetta Stone (30min)</a><br/></div><div class="line"> <a href="./course/index.html">CNA/CCAA (15min)</a> </div><div class="line"> <a href="./cambridge/index.html">Cambridge (15min)</a></div><div class="line"> ChatGPT (15min)</div>';
             break;
         case 'Quinta':
-            activities = '<div class="line"><a href="https://totale.rosettastone.com/plan" target="_blank">Rosetta Stone (30min)</a><br/></div><div class="line"> <a href="./course/" target="_blank">CNA/CCAA (15min)</a> </div><div class="line"> <a href="https://www.cambridgeenglish.org/learning-english/activities-for-learners?rows=12" target="_blank">Cambridge (15min)</a></div><div class="line"> ChatGPT (15min)</div>';
+            activities = '<div class="line"><a href="https://totale.rosettastone.com/plan" target="_blank">Rosetta Stone (30min)</a><br/></div><div class="line"> <a href="./course/index.html">CNA/CCAA (15min)</a> </div><div class="line"> <a href="./cambridge/index.html">Cambridge (15min)</a></div><div class="line"> ChatGPT (15min)</div>';
             break;
         case 'Sexta':
             activities = '<div class="line"><a href="https://totale.rosettastone.com/plan" target="_blank">Rosetta Stone (30min)</a><br/></div><div class="line"> ChatGPT (15min)</div><div class="line"><a href="./song_class/" target="_blank"> Song Class</a></div>';
