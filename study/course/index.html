@@ -7,94 +7,8 @@
     <title>English Course - Teens 1</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.0/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            height: calc(100vh - 54px);
-            margin: 0;
-        }
-
-        .carousel-container {
-            flex-grow: 0.95;
-            /* O carrossel ocupa 95% da altura */
-            overflow-x: hidden;
-            overflow-y: scroll;
-            /* Para evitar que o carrossel se estenda para além da altura da página */
-        }
-
-        .carousel,
-        .carousel-item {
-            height: 100%;
-            /* Carrossel ocupa 100% da altura do container */
-        }
-
-        .carousel-item img {
-            max-width: 100%;
-            width: auto;
-            /* Permite que a largura seja ajustada automaticamente */
-            display: block;
-            margin: 0 auto;
-        }
-
-        footer {
-            position: fixed;
-            height: 54px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            bottom: 0;
-            width: 100%;
-        }
-
-        @media screen and (max-width: 420px) {
-            .carousel-item img {
-                max-height: 90vh;
-                max-width: 100%;
-                width: auto;
-                /* Permite que a largura seja ajustada automaticamente */
-                display: block;
-                margin: 0 auto;
-            }
-
-            .carousel-container {
-                flex-grow: 1;
-            }
-
-            footer {
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                
-            }
-        }
-
-        #audioPlayer {
-            flex-grow: 1;
-        }
-
-        #audioSelect {
-            height: 100%;
-        }
-
-        .botao-play {
-            width: 20px;
-            height: 50px;
-            z-index: 9999;
-            border: none;
-            color: white;
-            font-weight: bold;
-            font-size: 10px;
-            /* Tamanho do ícone */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-    </style>
+    <link rel="stylesheet" href="./css/index.css">
+    
 </head>
 
 <body>
@@ -107,6 +21,11 @@
         </div>
     </div>
 
+    <div class="zoom-container">
+        <div>
+            <input type="range" min="0" max="100" value="100" id="imgWidthSlider">
+        </div>
+    </div>
     <footer>
         <select id="audioSelect">
         </select>
@@ -116,214 +35,13 @@
         </audio>
     </footer>
 
-    <script>
-        var audioAtual = null;
-
-        document.addEventListener("DOMContentLoaded", function () {
-            var audioMappings = {
-                "adjusted_merged_page_1": ["Introduction"],
-                "adjusted_merged_page_2": [],
-                "adjusted_merged_page_3": [],
-                "adjusted_merged_page_4": [],
-                "adjusted_merged_page_5": ["Unit 1 - Lesson 1 - Activity 1", "Unit 1 - Lesson 1 - Activity 3"],
-                "adjusted_merged_page_6": ["Unit 1 - Lesson 2 - Activity 1", "Unit 1 - Lesson 2 - Activity 3"],
-                "adjusted_merged_page_7": ["Unit 1 - Lesson 3 - Activity 1", "Unit 1 - Lesson 3 - Activity 2", "Unit 1 - Lesson 3 - Activity 3"],
-                "adjusted_merged_page_8": ["Unit 1 - Lesson 4 - Activity 1", "Unit 1 - Lesson 4 - Activity 3", "Unit 1 - Lesson 4 - Activity 4"],
-                "adjusted_merged_page_9": ["Unit 1 - Lesson 5 - Activity 1", "Unit 1 - Lesson 5 - Activity 2"],
-                "adjusted_merged_page_10": [],
-                "adjusted_merged_page_11": ["Unit 2 - Lesson 1 - Activity 1", "Unit 2 - Lesson 1 - Activity 3", "Unit 2 - Lesson 1 - Activity 5"],
-                "adjusted_merged_page_12": ["Unit 2 - Lesson 2 - Activity 2"],
-                "adjusted_merged_page_13": ["Unit 2 - Lesson 3 - Activity 1", "Unit 2 - Lesson 3 - Activity 3", "Unit 2 - Lesson 3 - Activity 4"],
-                "adjusted_merged_page_14": ["Unit 2 - Lesson 4 - Activity 2", "Unit 2 - Lesson 4 - Activity 3"],
-                "adjusted_merged_page_15": ["Unit 2 - Lesson 5 - Activity 1", "Unit 2 - Lesson 5 - Activity 2"],
-                "adjusted_merged_page_16": [],
-                "adjusted_merged_page_17": ["Unit 3 - Review - Activity 2"],
-                "adjusted_merged_page_18": [],
-                "adjusted_merged_page_19": ["Unit 4 - Lesson 1 - Activity 3", "Unit 4 - Lesson 1 - Activity 5"],
-                "adjusted_merged_page_20": ["Unit 4 - Lesson 2 - Activity 1", "Unit 4 - Lesson 2 - Activity 3"],
-                "adjusted_merged_page_21": ["Unit 4 - Lesson 3 - Activity 1", "Unit 4 - Lesson 3 - Activity 3", "Unit 4 - Lesson 3 - Activity 4"],
-                "adjusted_merged_page_22": ["Unit 4 - Lesson 4 - Activity 2", "Unit 4 - Lesson 4 - Activity 3"],
-                "adjusted_merged_page_23": ["Unit 4 - Lesson 5 - Activity 1", "Unit 4 - Lesson 5 - Activity 2"],
-                "adjusted_merged_page_24": [],
-                "adjusted_merged_page_25": ["Unit 5 - Lesson 1 - Activity 2", "Unit 5 - Lesson 1 - Activity 4"],
-                "adjusted_merged_page_26": ["Unit 5 - Lesson 2 - Activity 1", "Unit 5 - Lesson 2 - Activity 4"],
-                "adjusted_merged_page_27": ["Unit 5 - Lesson 3 - Activity 2", "Unit 5 - Lesson 3 - Activity 3"],
-                "adjusted_merged_page_28": ["Unit 5 - Lesson 4 - Activity 1"],
-                "adjusted_merged_page_29": ["Unit 5 - Lesson 5 - Activity 1", "Unit 5 - Lesson 5 - Activity 2"],
-                "adjusted_merged_page_30": [],
-                "adjusted_merged_page_31": ["Unit 6 - Review - Activity 2"],
-                "adjusted_merged_page_32": [],
-                "adjusted_merged_page_33": [],
-                "adjusted_merged_page_34": [],
-                "page_1": ["Introduction"],
-                "page_2": [],
-                "page_3": [],
-                "page_4": [],
-                "page_5": [],
-                "page_6": [],
-                "page_7": [],
-                "page_8": ["Unit 1 - Lesson 1 - Activity 1"],
-                "page_9": ["Unit 1 - Lesson 1 - Activity 3"],
-                "page_10": ["Unit 1 - Lesson 2 - Activity 1"],
-                "page_11": ["Unit 1 - Lesson 2 - Activity 3"],
-                "page_12": ["Unit 1 - Lesson 3 - Activity 1", "Unit 1 - Lesson 3 - Activity 2"],
-                "page_13": ["Unit 1 - Lesson 3 - Activity 3"],
-                "page_14": ["Unit 1 - Lesson 4 - Activity 1", "Unit 1 - Lesson 4 - Activity 3"],
-                "page_15": ["Unit 1 - Lesson 4 - Activity 4"],
-                "page_16": ["Unit 1 - Lesson 5 - Activity 1"],
-                "page_17": ["Unit 1 - Lesson 5 - Activity 2"],
-                "page_18": [],
-                "page_19": [],
-                "page_20": [],
-                "page_21": [],
-                "page_22": [],
-                "page_23": [],
-                "page_24": [],
-                "page_25": [],
-                "page_26": [],
-                "page_27": [],
-                "page_28": [],
-                "page_29": [],
-                "page_30": [],
-                "page_31": [],
-                "page_32": [],
-                "page_33": [],
-                "page_34": [],
-                "page_35": [],
-                "page_36": [],
-                "page_37": [],
-                "page_38": [],
-                "page_39": [],
-                "page_40": [],
-                "page_41": [],
-                "page_42": [],
-                "page_43": [],
-                "page_44": [],
-                "page_45": [],
-                "page_46": [],
-                "page_47": [],
-                "page_48": [],
-                "page_49": [],
-                "page_50": [],
-                "page_51": [],
-                "page_52": [],
-                "page_53": [],
-                "page_54": [],
-                "page_55": [],
-                "page_56": [],
-                "page_57": [],
-                "page_58": [],
-                "page_59": [],
-                "page_60": [],
-                "page_61": [],
-                "page_62": [],
-                "page_63": [],
-                "page_64": [],
-                "page_65": [],
-                "page_66": [],
-                // Continue para todas as imagens
-            };
-
-            var folder = "adjusted_merged_pages";
-            var prefix = "adjusted_merged_page_";
-            var count = 34;
-
-            for (var i = 1; i <= count; i++) {
-                var imgPath = folder + "/" + prefix + i + ".jpg";
-                var itemDiv = document.createElement("div");
-                itemDiv.className = "carousel-item" + (i === 1 ? " active" : "");
-
-                var img = document.createElement("img");
-                img.src = imgPath;
-                img.className = "d-block";
-
-                itemDiv.appendChild(img);
-                document.querySelector(".carousel-inner").appendChild(itemDiv);
-            }
-
-            var startX, endX;
-            var carousel = document.getElementById('carouselExampleIndicators');
-
-            carousel.addEventListener('mousedown', function (e) {
-                startX = e.clientX;
-                e.preventDefault();
-            });
-
-            carousel.addEventListener('mouseup', function (e) {
-                endX = e.clientX;
-
-                if (startX > endX + 155) {
-                    $('.carousel').carousel('next');
-                } else if (startX < endX - 155) {
-                    $('.carousel').carousel('prev');
-                }
-
-            });
-
-            window.addEventListener('keydown', function (e) {
-                if (e.key === 'ArrowRight') {
-                    $('.carousel').carousel('next');
-                } else if (e.key === 'ArrowLeft') {
-                    $('.carousel').carousel('prev');
-                }
-            });
-
-            $('#carouselExampleIndicators').on('slide.bs.carousel', function (e) {
-                var proximaImagem = e.relatedTarget.getElementsByTagName('img')[0].src;
-                var nomeArquivoComExtensao = proximaImagem.split('/').pop();
-                var nomeArquivo = nomeArquivoComExtensao.split('.')[0];
-
-
-                // Após atualizar o combobox, atualiza o áudio para a primeira track selecionável
-                var firstTrack = audioMappings[nomeArquivo][0];
-                audioSource.src = "./audio/" + firstTrack + ".mp3";
-                audioPlayer.load();
-
-                atualizarComboboxAudio(nomeArquivo);
-            });
-
-            function atualizarComboboxAudio(imagemAtual) {
-                var opcoes = audioMappings[imagemAtual];
-                var combobox = document.getElementById('audioSelect');
-                combobox.innerHTML = ""; // Limpar opções existentes
-                opcoes.forEach(function (audio) {
-                    var opcao = document.createElement("option");
-                    opcao.value = audio;
-                    opcao.text = audio;
-                    combobox.appendChild(opcao);
-                });
-            }
-
-            atualizarComboboxAudio("adjusted_merged_page_1");
-
-
-            var audioPlayer = document.getElementById('audioPlayer');
-            var audioSource = document.getElementById('audioSource');
-            var audioSelect = document.getElementById('audioSelect');
-
-            audioSource.src = "./audio/" + "Introduction" + ".mp3";
-            audioPlayer.load();
-
-            audioSelect.onchange = function () {
-                audioSource.src = "./audio/" + this.value + ".mp3";
-                audioPlayer.load();
-            };
-
-            $('#carouselExampleIndicators').on('slid.bs.carousel', function () {
-                var currentIndex = $('.carousel-item.active').index();
-                localStorage.setItem('carouselIndex', currentIndex);
-            });
-
-        });
-
-        $(document).ready(function () {
-            var carouselIndex = localStorage.getItem('carouselIndex');
-            if (carouselIndex) {
-                $('#carouselExampleIndicators').carousel(parseInt(carouselIndex));
-            }
-        });
-
-    </script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.0/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="./js/audio_mapping.js"></script>
+    <script src="./js/audio_control.js"></script>
+    <script src="./js/carousel.js"></script>
+    <script src="./js/slider.js"></script>
 </body>
 
 </html>
