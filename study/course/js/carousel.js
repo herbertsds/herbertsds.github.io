@@ -61,6 +61,7 @@ document.addEventListener("DOMContentLoaded", function () {
     var carouselIndex = localStorage.getItem('carouselIndex');
     if (carouselIndex) {
         $('#carouselExampleIndicators').carousel(parseInt(carouselIndex));
+        
     }
 
 });
