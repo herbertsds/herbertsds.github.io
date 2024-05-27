@@ -88,19 +88,19 @@ function updateMainContent(day) {
 
     switch (day) {
         case 'Segunda':
-            activities = '<div class="line"><a href="https://readerslibrary.org/wp-content/uploads/Jurassic-Park.pdf" target="_blank">Leitura (15min)</a><br/></div><div class="line"> <a href="./course/index.html">CNA/CCAA (15min)</a> </div><div class="line"> <a href="./cambridge/index.html">Cambridge (1 lição)</a></div>';
+            activities = '<div class="line"><a href="https://readerslibrary.org/wp-content/uploads/Jurassic-Park.pdf" target="_blank">Leitura (15min)</a><br/></div><div class="line"> <a href="./course/index.html">CNA/CCAA (15min)</a> </div><div class="line"> <a href="./cambridge/index.html">Cambridge (1 lição)</a> <a href="./cambridge/index.html">Cambridge (1 lição)</a></div><div class="line">Français (1 lição))</div>';
             break;
         case 'Terça':
-            activities = '<div class="line"><a href="https://readerslibrary.org/wp-content/uploads/Jurassic-Park.pdf" target="_blank">Leitura (15min)</a><br/></div><div class="line"> <a href="./cambridge/index.html">Cambridge (1 lição)</a></div><div class="line"> ChatGPT (15min)</div>';
+            activities = '<div class="line"><a href="https://readerslibrary.org/wp-content/uploads/Jurassic-Park.pdf" target="_blank">Leitura (15min)</a><br/></div><div class="line"> <a href="./cambridge/index.html">Cambridge (1 lição)</a></div><div class="line"> ChatGPT (15min)</div><div class="line">Français (1 lição))</div>';
             break;
         case 'Quarta':
-            activities = '<div class="line"><a href="https://readerslibrary.org/wp-content/uploads/Jurassic-Park.pdf" target="_blank">Leitura (15min)</a><br/></div><div class="line"> <a href="./course/index.html">CNA/CCAA (15min)</a> </div><div class="line"> <a href="./cambridge/index.html">Cambridge (1 lição)</a></div>';
+            activities = '<div class="line"><a href="https://readerslibrary.org/wp-content/uploads/Jurassic-Park.pdf" target="_blank">Leitura (15min)</a><br/></div><div class="line"> <a href="./course/index.html">CNA/CCAA (15min)</a> </div><div class="line"> <a href="./cambridge/index.html">Cambridge (1 lição)</a></div><div class="line">Français (1 lição))</div>';
             break;
         case 'Quinta':
-            activities = '<div class="line"><a href="https://readerslibrary.org/wp-content/uploads/Jurassic-Park.pdf" target="_blank">Leitura (15min)</a><br/></div><div class="line"> <a href="./cambridge/index.html">Cambridge (1 lição)</a></div><div class="line"> ChatGPT (15min)</div>';
+            activities = '<div class="line"><a href="https://readerslibrary.org/wp-content/uploads/Jurassic-Park.pdf" target="_blank">Leitura (15min)</a><br/></div><div class="line"> <a href="./cambridge/index.html">Cambridge (1 lição)</a></div><div class="line"> ChatGPT (15min)</div><div class="line">Français (1 lição))</div>';
             break;
         case 'Sexta':
-            activities = '<div class="line"><a href="https://readerslibrary.org/wp-content/uploads/Jurassic-Park.pdf" target="_blank">Leitura (15min)</a><br/></div><div class="line"> ChatGPT (15min)</div><div class="line"><a href="./song_class/" target="_blank"> Song Class</a></div>';
+            activities = '<div class="line"><a href="https://readerslibrary.org/wp-content/uploads/Jurassic-Park.pdf" target="_blank">Leitura (15min)</a><br/></div><div class="line"> ChatGPT (15min)</div><div class="line"><a href="./song_class/" target="_blank"> Song Class</a></div><div class="line">Français (1 lição))</div>';
             break;
         case 'Sábado':
             activities = '<div class="line"><div class="line"> Series Session (40min)<br/></div><div class="line"> Movie Session (extra)</div>';
