@@ -5,7 +5,7 @@ document.getElementById('toggleButton').addEventListener('click', () => {
     const diasAnoContent = document.getElementById('diasAnoContent');
 
     var returnButton = document.getElementById('returnButton');
-    returnButton.classList.toggle('hidden');
+    returnButton?.classList?.toggle('hidden');
 
     if (isShowingDiasAno) {
         const today = getDayOfWeek();
@@ -91,7 +91,7 @@ function updateMainContent(day) {
             activities = '<div class="line"><a href="https://readerslibrary.org/wp-content/uploads/Jurassic-Park.pdf" target="_blank">Leitura (15min)</a><br/></div><div class="line"> <a href="./course/index.html">CNA/CCAA (15min)</a> </div><div class="line"> <a href="./cambridge/index.html">Cambridge (1 lição)</a></div><div class="line">Français (Leitura da lição)</div>';
             break;
         case 'Terça':
-            activities = '<div class="line"><a href="https://readerslibrary.org/wp-content/uploads/Jurassic-Park.pdf" target="_blank">Leitura (15min)</a><br/></div><div class="line"> <a href="./course/index.html">CNA/CCAA (15min)</a> </div><div class="line"> <a href="./cambridge/index.html">Cambridge (1 lição)</a></div><div class="line">Français (Escrita 1/3))</div>';
+            activities = '<div class="line"><a href="https://readerslibrary.org/wp-content/uploads/Jurassic-Park.pdf" target="_blank">Leitura (15min)</a><br/></div><div class="line"> <a href="./course/index.html">CNA/CCAA (15min)</a> </div><div class="line"> <a href="./cambridge/index.html">Cambridge (1 lição)</a></div><div class="line">Français (Escrita 1/3)</div>';
             break;
         case 'Quarta':
             activities = '<div class="line"><a href="https://readerslibrary.org/wp-content/uploads/Jurassic-Park.pdf" target="_blank">Leitura (15min)</a><br/></div><div class="line"> <a href="./course/index.html">CNA/CCAA (15min)</a> </div><div class="line"> <a href="./cambridge/index.html">Cambridge (1 lição)</a></div><div class="line">Français (Escrita 1/3)</div>';
@@ -140,6 +140,7 @@ function updateDayClasses() {
     const days = document.getElementsByClassName('day');
     for (let i = 0; i < days.length; i++) {
         const dayDate = days[i].querySelector('h4').textContent;
+        console.log(dayDate, diasAno[dayDate])
         days[i].classList.remove('semFazer', 'atraso', 'concluido'); // Remove all possible classes
 
         const [day, month, year] = dayDate.split('/');
