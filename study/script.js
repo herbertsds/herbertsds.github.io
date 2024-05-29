@@ -88,7 +88,7 @@ function updateMainContent(day) {
 
     switch (day) {
         case 'Segunda':
-            activities = '<div class="line"><a href="https://readerslibrary.org/wp-content/uploads/Jurassic-Park.pdf" target="_blank">Leitura (15min)</a><br/></div><div class="line"> <a href="./course/index.html">CNA/CCAA (15min)</a> </div><div class="line"> <a href="./cambridge/index.html">Cambridge (1 lição)</a> <a href="./cambridge/index.html">Cambridge (1 lição)</a></div><div class="line">Français (1 lição)</div>';
+            activities = '<div class="line"><a href="https://readerslibrary.org/wp-content/uploads/Jurassic-Park.pdf" target="_blank">Leitura (15min)</a><br/></div><div class="line"> <a href="./course/index.html">CNA/CCAA (15min)</a> </div><div class="line"> <a href="./cambridge/index.html">Cambridge (1 lição)</a></div><div class="line">Français (1 lição)</div>';
             break;
         case 'Terça':
             activities = '<div class="line"><a href="https://readerslibrary.org/wp-content/uploads/Jurassic-Park.pdf" target="_blank">Leitura (15min)</a><br/></div><div class="line"> <a href="./cambridge/index.html">Cambridge (1 lição)</a></div><div class="line"> ChatGPT (15min)</div><div class="line">Français (1 lição)</div>';
