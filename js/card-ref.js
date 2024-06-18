@@ -35,7 +35,7 @@ const references = {
         title: 'Claro tv+'
     },
     hbomax:{
-        url: 'https://play.hbomax.com/page/urn:hbo:page:home',
+        url: 'https://play.max.com/',
         image: 'hbomax.svg',
         title: 'HBO Max'
     },
