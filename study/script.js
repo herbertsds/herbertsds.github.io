@@ -88,22 +88,140 @@ function updateMainContent(day) {
 
     switch (day) {
         case 'Segunda':
-            activities = '<div class="line"><a href="https://readerslibrary.org/wp-content/uploads/Jurassic-Park.pdf" target="_blank">Leitura (15min)</a><br/></div><div class="line"> <a href="./course/index.html">CNA/CCAA (15min)</a> </div><div class="line"> <a href="./cambridge/index.html">Cambridge (1 lição)</a></div><div class="line">Français (Leitura da lição)</div>';
+            activities = `
+            <div class="line">
+                <a href="./course/index.html">
+                    Livro CNA/CCAA (1 Unidade)
+                </a> 
+            </div>
+            <div class="line"> 
+                <a href="./cambridge/index.html">
+                    Cambridge (1 lição)
+                </a>
+            </div>
+            <div class="line">
+                <a href="https://student.openenglish.com/" target="_blank">
+                    Open English (5+ lições)
+                </a>
+            </div>
+            <div class="line">
+                <a href="https://student.openenglish.com/" target="_blank">
+                    Aulas em Grupo (2+ aulas)
+                </a>
+            </div>
+            `;
             break;
         case 'Terça':
-            activities = '<div class="line"><a href="https://readerslibrary.org/wp-content/uploads/Jurassic-Park.pdf" target="_blank">Leitura (15min)</a><br/></div><div class="line"> <a href="./course/index.html">CNA/CCAA (15min)</a> </div><div class="line"> <a href="./cambridge/index.html">Cambridge (1 lição)</a></div><div class="line">Français (Escrita 1/3)</div>';
+            activities = `
+            <div class="line">
+                <a href="https://student.openenglish.com/" target="_blank">
+                    Open English (2+ Exercícios)
+                </a>
+            </div>
+            <div class="line">
+                <a href="https://student.openenglish.com/" target="_blank">
+                    Aulas em Grupo (2+ aulas)
+                </a>
+            </div>
+            <div class="line">
+                <a href="https://zoom.us/my/ccaa.vip01" target="_blank">
+                    Paragraph Class (Presencial)
+                </a>
+            </div>
+            <div class="line">
+                <a href="./song_class/" target="_blank"> 
+                    Song Class
+                </a>
+            </div>
+            `
             break;
         case 'Quarta':
-            activities = '<div class="line"><a href="https://readerslibrary.org/wp-content/uploads/Jurassic-Park.pdf" target="_blank">Leitura (15min)</a><br/></div><div class="line"> <a href="./course/index.html">CNA/CCAA (15min)</a> </div><div class="line"> <a href="./cambridge/index.html">Cambridge (1 lição)</a></div><div class="line">Français (Escrita 1/3)</div>';
+            activities = `
+            <div class="line">
+                <a href="./course/index.html">
+                    Livro CNA/CCAA (1 Unidade)
+                </a> 
+            </div>
+            <div class="line"> 
+                <a href="./cambridge/index.html">
+                    Cambridge (1 lição)
+                </a>
+            </div>
+            <div class="line">
+                <a href="https://student.openenglish.com/" target="_blank">
+                    Open English (5+ lições)
+                </a>
+            </div>
+            <div class="line">
+                <a href="https://student.openenglish.com/" target="_blank">
+                    Aulas em Grupo (2+ aulas)
+                </a>
+            </div>
+            `;
             break;
         case 'Quinta':
-            activities = '<div class="line"><a href="https://readerslibrary.org/wp-content/uploads/Jurassic-Park.pdf" target="_blank">Leitura (15min)</a><br/></div><div class="line"> <a href="./course/index.html">CNA/CCAA (15min)</a> </div><div class="line"> <a href="./cambridge/index.html">Cambridge (1 lição)</a></div><div class="line">Français (Escrita 1/3)</div>';
+            activities = `
+            <div class="line">
+                <a href="https://student.openenglish.com/" target="_blank">
+                    Open English (2+ Exercícios)
+                </a>
+            </div>
+            <div class="line">
+                <a href="https://student.openenglish.com/" target="_blank">
+                    Aulas em Grupo (2+ aulas)
+                </a>
+            </div>
+            <div class="line">
+                <a href="https://zoom.us/my/ccaa.vip01" target="_blank">
+                    Conversation Class (Remoto)
+                </a>
+            </div>
+            <div class="line">
+                 Series Session
+                 <br/>
+            </div>
+            `;
             break;
         case 'Sexta':
-            activities = '<div class="line"><a href="https://readerslibrary.org/wp-content/uploads/Jurassic-Park.pdf" target="_blank">Leitura (15min)</a><br/></div><div class="line"><a href="./song_class/" target="_blank"> Song Class</a></div><div class="line">Français (Exercises)</div>';
+            activities = `
+            <div class="line">
+                <a href="https://student.openenglish.com/" target="_blank">
+                    Open English (5+ lições)
+                </a>
+            </div>
+            <div class="line">
+                <a href="https://student.openenglish.com/" target="_blank">
+                    Open English (2+ Exercícios)
+                </a>
+            </div>
+            <div class="line">
+                <a href="https://student.openenglish.com/" target="_blank">
+                    Aulas em Grupo (2+ aulas)
+                </a>
+            </div>
+            <div class="line">
+                <a href="./song_class/" target="_blank"> 
+                    Song Class
+                </a>
+            </div>
+            `;
             break;
         case 'Sábado':
-            activities = '<div class="line"><div class="line"> Series Session (40min)<br/></div><div class="line"> Movie Session (extra)</div>';
+            activities = `
+            <div class="line">
+                <a href="https://student.openenglish.com/" target="_blank">
+                    Aulas Particulares (2 aulas)
+                </a>
+            </div>
+            <div class="line">
+                <a href="https://student.openenglish.com/" target="_blank">
+                    Aulas em Grupo (2+ aulas)
+                </a>
+            </div>
+            <div class="line"> 
+                Movie Session (extra)
+            </div>
+            `;
             break;
         case 'Domingo':
             activities = "Dia de descanso";
