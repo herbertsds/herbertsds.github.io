@@ -101,7 +101,7 @@ function updateMainContent(day) {
             </div>
             <div class="line">
                 <a href="https://student.openenglish.com/" target="_blank">
-                    Open English (5+ lições)
+                    Open English (5+ lições/exercícios)
                 </a>
             </div>
             <div class="line">
@@ -115,7 +115,7 @@ function updateMainContent(day) {
             activities = `
             <div class="line">
                 <a href="https://student.openenglish.com/" target="_blank">
-                    Open English (2+ Exercícios)
+                    Open English (2+ exercícios/lições)
                 </a>
             </div>
             <div class="line">
@@ -149,7 +149,7 @@ function updateMainContent(day) {
             </div>
             <div class="line">
                 <a href="https://student.openenglish.com/" target="_blank">
-                    Open English (5+ lições)
+                    Open English (5+ lições/exercícios)
                 </a>
             </div>
             <div class="line">
@@ -163,7 +163,7 @@ function updateMainContent(day) {
             activities = `
             <div class="line">
                 <a href="https://student.openenglish.com/" target="_blank">
-                    Open English (2+ Exercícios)
+                    Open English (2+ exercícios/lições)
                 </a>
             </div>
             <div class="line">
@@ -186,12 +186,12 @@ function updateMainContent(day) {
             activities = `
             <div class="line">
                 <a href="https://student.openenglish.com/" target="_blank">
-                    Open English (5+ lições)
+                    Open English (5+ lições/exercícios)
                 </a>
             </div>
             <div class="line">
                 <a href="https://student.openenglish.com/" target="_blank">
-                    Open English (2+ Exercícios)
+                    Open English (2+ exercícios/lições)
                 </a>
             </div>
             <div class="line">
