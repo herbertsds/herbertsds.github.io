@@ -177,7 +177,7 @@ function updateMainContent(day) {
                 </a>
             </div>
             <div class="line">
-                 <a href="./movie_session/" target="_blank">
+                 <a href="https://docs.google.com/spreadsheets/d/1U65NHZdXJ3AU8E1lzAvdFzLYIRk72VOOSSIYXrezxZQ/edit?gid=0#gid=0" target="_blank">
                     Series Session (extra)
                 </a>
                  <br/>
@@ -221,12 +221,12 @@ function updateMainContent(day) {
                 </a>
             </div>
             <div class="line"> 
-                <a href="./movie_session/" target="_blank">
+                <a href="https://docs.google.com/spreadsheets/d/1U65NHZdXJ3AU8E1lzAvdFzLYIRk72VOOSSIYXrezxZQ/edit?gid=0#gid=0" target="_blank">
                     Series Session (extra)
                 </a>
             </div>
             <div class="line"> 
-                <a href="./movie_session/" target="_blank">
+                <a href="https://docs.google.com/spreadsheets/d/1U65NHZdXJ3AU8E1lzAvdFzLYIRk72VOOSSIYXrezxZQ/edit?gid=0#gid=0" target="_blank">
                     Movie Session (extra)
                 </a>
             </div>
