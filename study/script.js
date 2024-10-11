@@ -125,7 +125,7 @@ function updateMainContent(day) {
             </div>
             <div class="line">
                 <a href="https://zoom.us/my/ccaa.vip01" target="_blank">
-                    Paragraph Class (Presencial)
+                    Paragraph Class (Presencial/Remoto)
                 </a>
             </div>
             <div class="line">
@@ -173,11 +173,13 @@ function updateMainContent(day) {
             </div>
             <div class="line">
                 <a href="https://zoom.us/my/ccaa.vip01" target="_blank">
-                    Conversation Class (Remoto)
+                    Conversation Class (Remoto/Presencial)
                 </a>
             </div>
             <div class="line">
-                 Series Session
+                 <a href="./movie_session/" target="_blank">
+                    Series Session (extra)
+                </a>
                  <br/>
             </div>
             `;
@@ -215,11 +217,18 @@ function updateMainContent(day) {
             </div>
             <div class="line">
                 <a href="https://student.openenglish.com/" target="_blank">
-                    Aulas em Grupo (2+ aulas)
+                    Aulas em Grup (2+ aulas)
                 </a>
             </div>
             <div class="line"> 
-                Movie Session (extra)
+                <a href="./movie_session/" target="_blank">
+                    Series Session (extra)
+                </a>
+            </div>
+            <div class="line"> 
+                <a href="./movie_session/" target="_blank">
+                    Movie Session (extra)
+                </a>
             </div>
             `;
             break;
