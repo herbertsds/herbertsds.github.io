@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <title>Song Logic</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="song.css">
+</head>
+
+<body>
+    <div id="headerContainer" style="display: none;">
+        <h1 id="songTitle"></h2>
+        <h2 id="songArtist"></h4>
+    </div>
+
+    <div id="fraseContainer">
+        <h1 id="frase"></h1>
+        <button id="proxima">Next</button>
+        <button id="voltar">Restart</button>
+    </div>
+
+    <script>
+        let contador = 0;
+        let lines = '';
+        let randomWord = [];
+        let inputsCount;
+
+        // Função para remover caracteres especiais, exceto apóstrofes
+        function normalizarPalavra(palavra) {
+            return palavra
+                .toLowerCase() // Converte para minúscula
+                .replace(/[^a-zA-Z0-9']/g, ''); // Remove caracteres especiais, exceto apóstrofes
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const title = localStorage.getItem('songTitle');
+            const artist = localStorage.getItem('songArtist');
+            const lyrics = localStorage.getItem('songLyrics');
+
+            if (title && artist) {
+                document.getElementById('songTitle').textContent = title;
+                document.getElementById('songArtist').textContent = artist;
+                document.getElementById('headerContainer').style.display = 'block'; // Exibe o título e o artista no topo
+            }
+
+            if (lyrics) {
+                lines = lyrics.split('\n');
+            } else {
+                const text = localStorage.getItem('songLyrics');
+                lines = text.split('\n');
+            }
+
+            exibeFrase();
+        });
+
+        document.getElementById('voltar').addEventListener('click', function () {
+            window.location.href = 'index.html';
+        });
+
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter') {
+                document.getElementById('proxima').click();
+            }
+        });
+
+        document.getElementById('proxima').addEventListener('click', function () {
+            let allMatch = true;
+            for (let i = 0; i < inputsCount; i++) {
+                const inputWord = normalizarPalavra(document.getElementById(`inputWord${i}`).value);
+                const correctWord = normalizarPalavra(randomWord[i]);
+
+                if (inputWord !== correctWord) {
+                    allMatch = false;
+                    document.getElementById(`inputWord${i}`).style.border = '3px solid red';
+                } else {
+                    document.getElementById(`inputWord${i}`).style.border = '';
+                }
+            }
+
+            if (allMatch) {
+                contador++;
+                exibeFrase();
+            }
+        });
+
+        const exibeFrase = () => {
+            const fraseDiv = document.getElementById('frase');
+            const frase = lines[contador];
+            if (!frase) {
+                fraseDiv.innerHTML = '<span style="color: green;">WELL DONE!!!</span>';
+                document.getElementById('proxima').style.display = 'none';
+                document.getElementById('voltar').style.display = 'block';
+                return;
+            }
+            const words = frase.split(' ');
+            const wordCount = words.length;
+
+            if (wordCount < 5) {
+                inputsCount = 1;
+            } else if (wordCount >= 5 && wordCount < 8) {
+                inputsCount = 2;
+            } else if (wordCount >= 8 && wordCount < 12) {
+                inputsCount = 3;
+            } else {
+                inputsCount = 4;
+            }
+
+            for (let i = 0; i < inputsCount; i++) {
+                let randomIndex = Math.floor(Math.random() * wordCount);
+                randomWord[i] = words[randomIndex];
+
+                while (words[randomIndex].startsWith('<input')) {
+                    randomIndex = (randomIndex + 1) % wordCount;
+                    randomWord[i] = words[randomIndex];
+                }
+
+                words[randomIndex] = `<input type="text" class="inputWord" id="inputWord${i}"><button id="helpButton${i}" class="help-button" tabindex="-1">?</button>`;
+            }
+
+            const newFrase = words.join(' ');
+
+            if (lines[contador]) {
+                fraseDiv.innerHTML = newFrase;
+                for (let i = 0; i < inputsCount; i++) {
+                    document.getElementById(`helpButton${i}`).addEventListener('click', function () {
+                        document.getElementById(`inputWord${i}`).value = randomWord[i];
+                    });
+                }
+            } else {
+                fraseDiv.textContent = lines.join('\n');
+            }
+        };
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,191 @@
+body,
+html {
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    padding: 0 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #f4f4f9;
+    font-family: Arial, sans-serif;
+    overflow: hidden; /* Evita o scroll na página */
+}
+
+#mainMenu {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    height: 100%; /* Garantir que ocupe a altura completa */
+}
+
+#mainMenu button {
+    width: 200px;
+    height: 50px;
+    margin: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    background-color: #6200ea;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#mainMenu button:hover {
+    background-color: #3700b3;
+}
+
+#texto {
+    width: 80%; /* Aumenta a largura do textbox para 100% */
+    height: calc(100% - 120px); /* Desconta o tamanho dos botões */
+    padding: 10px;
+    font-size: 18px;
+    border: 2px solid #6200ea;
+    border-radius: 8px;
+    resize: none;
+    overflow-y: auto; /* Rolagem interna no eixo Y */
+    box-sizing: border-box; /* Garante que o padding seja incluído na largura total */
+}
+
+#startButton {
+    width: 200px;
+    height: 50px;
+    margin-top: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    background-color: #03dac5;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#startButton:hover {
+    background-color: #018786;
+}
+
+#musicasContainer {
+    display: none;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+    height: 100%; /* Garantir que ocupe a altura completa */
+    position: relative;
+}
+
+#musicasList {
+    width: 100%;
+    max-height: calc(100vh - 70px); /* Desconta a altura do botão Back to Menu */
+    overflow-y: auto; /* Rolagem dentro da lista no eixo Y */
+    overflow-x: hidden; /* Evita rolagem horizontal */
+    padding: 10px;
+    box-sizing: border-box;
+    margin-top: 70px; /* Espaço para o botão Back to Menu */
+    word-wrap: break-word; /* Quebra palavras longas automaticamente */
+    white-space: normal; /* Garante que o texto dentro dos itens quebre a linha */
+}
+
+.musica-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+    width: 100%;
+    text-align: left;
+    background-color: #f4f4f9;
+}
+
+.musica-item input{
+    margin-right: 50px;
+}
+
+.musica-item:hover {
+    background-color: #e0e0e0;
+}
+
+.musica-text {
+    flex: 1; /* O texto da música vai ocupar o espaço restante */
+    padding-right: 50px;
+    cursor: pointer;
+}
+
+.musica-checkbox {
+    width: 20px; /* Espaço reservado para o checkbox */
+    margin-left: 10px; /* Distância do texto da música */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+#voltarMenu {
+    width: 200px;
+    height: 50px;
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    background-color: #6200ea;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    position: fixed;
+    top: 75px; /* Ajustado para 75px conforme solicitado */
+    left: 10px;
+}
+
+#voltarMenu:hover {
+    background-color: #3700b3;
+}
+
+#voltarMenu {
+    width: 200px;
+    height: 50px;
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    background-color: #6200ea;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    position: fixed;
+    top: 75px; /* Ajustado para 75px conforme solicitado */
+}
+
+#voltarMenu:hover {
+    background-color: #3700b3;
+}
+
+#randomMusicButton {
+    width: 200px;
+    height: 50px;
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    background-color: #03dac5;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    position: fixed;
+    top: 75px; /* Mesma altura do botão voltar */
+    left: 220px; /* Ao lado do botão voltar */
+}
+
+#randomMusicButton:hover {
+    background-color: #018786;
+}
+
+
+#voltarMenu:hover {
+    background-color: #3700b3;
+}

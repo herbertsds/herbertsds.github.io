@@ -1,0 +1,61 @@
+#fraseContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width: 100%;
+    height: 90vh; /* Ocupa 90% da altura da tela */
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+#frase {
+    text-align: center;
+    line-height: 1.5;
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+#proxima, #voltar {
+    width: 200px;
+    height: 50px;
+    margin: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    background-color: #6200ea;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#proxima:hover, #voltar:hover {
+    background-color: #3700b3;
+}
+
+input[type="text"].inputWord {
+    width: 300px;
+    padding: 5px;
+    font-size: 1em;
+    text-align: center;
+    border: 2px solid #6200ea;
+    border-radius: 4px;
+    margin: 5px;
+}
+
+button.help-button {
+    font-size: 1em;
+    color: white;
+    background-color: #03dac5;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button.help-button:hover {
+    background-color: #018786;
+}
