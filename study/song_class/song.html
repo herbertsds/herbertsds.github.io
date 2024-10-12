@@ -8,8 +8,8 @@
 
 <body>
     <div id="headerContainer" style="display: none;">
-        <h1 id="songTitle"></h2>
-        <h2 id="songArtist"></h4>
+        <h1 id="songTitle"></h1>
+        <h2 id="songArtist"></h2>
     </div>
 
     <div id="fraseContainer">
@@ -24,11 +24,21 @@
         let randomWord = [];
         let inputsCount;
 
+        // Lista de palavras a serem ignoradas (stopwords)
+        const stopwords = ['a', 'an', 'the', 'I'];
+
         // Função para remover caracteres especiais, exceto apóstrofes
         function normalizarPalavra(palavra) {
             return palavra
                 .toLowerCase() // Converte para minúscula
                 .replace(/[^a-zA-Z0-9']/g, ''); // Remove caracteres especiais, exceto apóstrofes
+        }
+
+        // Função para marcar a música atual como já vista no localStorage
+        function marcarComoVista(musica) {
+            let checkboxStates = JSON.parse(localStorage.getItem('checkboxStates')) || {};
+            checkboxStates[musica] = true; // Marca a música como vista
+            localStorage.setItem('checkboxStates', JSON.stringify(checkboxStates));
         }
 
         document.addEventListener('DOMContentLoaded', function () {
@@ -85,12 +95,21 @@
         const exibeFrase = () => {
             const fraseDiv = document.getElementById('frase');
             const frase = lines[contador];
+            const title = localStorage.getItem('songTitle'); // Título da música
+
             if (!frase) {
                 fraseDiv.innerHTML = '<span style="color: green;">WELL DONE!!!</span>';
                 document.getElementById('proxima').style.display = 'none';
-                document.getElementById('voltar').style.display = 'block';
+                document.getElementById('voltar').textContent = 'Conclude'; // Troca o texto do botão para "Conclude"
+
+                // Marca a música como vista no localStorage
+                if (title) {
+                    marcarComoVista(title);
+                }
+
                 return;
             }
+
             const words = frase.split(' ');
             const wordCount = words.length;
 
@@ -106,13 +125,17 @@
 
             for (let i = 0; i < inputsCount; i++) {
                 let randomIndex = Math.floor(Math.random() * wordCount);
+                let tentativas = 0; // Contador de tentativas para evitar loop infinito
                 randomWord[i] = words[randomIndex];
 
-                while (words[randomIndex].startsWith('<input')) {
+                // Reescolhe uma palavra até que não seja uma stopword, com limite de tentativas
+                while ((stopwords.includes(normalizarPalavra(randomWord[i])) || words[randomIndex].startsWith('<input')) && tentativas < wordCount) {
                     randomIndex = (randomIndex + 1) % wordCount;
                     randomWord[i] = words[randomIndex];
+                    tentativas++;
                 }
 
+                // Se todas as palavras forem stopwords ou inputs, escolhe a palavra atual mesmo sendo stopword
                 words[randomIndex] = `<input type="text" class="inputWord" id="inputWord${i}"><button id="helpButton${i}" class="help-button" tabindex="-1">?</button>`;
             }
 
