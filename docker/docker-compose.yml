@@ -3,7 +3,7 @@ services:
   pagina_inicial:
     image : httpd:2.4
     container_name: pagina_inicial
-    volumes: 
+    volumes:
       - ../:/usr/local/apache2/htdocs/
     stdin_open: true
     tty: true
@@ -15,3 +15,20 @@ services:
       timeout: 20s
       retries: 2
     restart: always
+
+  # Builda a SPA de contagem_carboidratos: roda uma vez e morre (não é "up", é "run --rm").
+  # Não tem Node/npm instalados no host, então o build inteiro acontece aqui dentro.
+  # Precisa montar a pasta contagem_carboidratos INTEIRA (não só app/), porque o vite.config.js
+  # manda o build sair em ../ (fora de app/, direto em contagem_carboidratos/) — se montasse só
+  # app/, esse "../" cairia fora do volume e o resultado do build se perderia com o container.
+  #   docker compose -f docker/docker-compose.yml run --rm contagem_carboidratos_build
+  contagem_carboidratos_build:
+    image: node:20-alpine
+    container_name: contagem_carboidratos_build
+    working_dir: /site/app
+    volumes:
+      - ../contagem_carboidratos:/site
+    command: >
+      sh -c "npm ci &&
+             rm -rf /site/assets /site/index.html &&
+             npm run build"
