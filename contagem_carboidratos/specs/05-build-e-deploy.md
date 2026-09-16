@@ -56,11 +56,17 @@ Chrome → "Instalar app"/"Adicionar à tela inicial"; iOS: Safari → Compartil
 Tela de Início"), abre sem barra de endereço nem abas, como um app nativo. iOS **ignora o
 manifest** pra isso — precisa das tags à parte em `index.html`
 (`apple-mobile-web-app-capable`, `apple-touch-icon`, etc.), por isso as duas coisas coexistem.
+Nome exibido embaixo do ícone: `manifest.json` (`name`/`short_name`, Android) e
+`apple-mobile-web-app-title` (iOS) — os três valores usam o nome completo "Contagem de
+Carboidratos", não uma versão abreviada.
 
-Os ícones (`icon-192.png`, `icon-512.png`, `apple-touch-icon.png`, em `app/public/`) são PNGs
-simples gerados uma vez com Pillow (fundo verde sólido + "CC" branco, texto dentro da "safe
-zone" central pra sobreviver às máscaras circulares/arredondadas que Android e iOS aplicam por
-cima do ícone quadrado) — não há script de geração no repo, foram só copiados prontos.
+Os ícones (`icon-192.png`, `icon-512.png`, `apple-touch-icon.png`, em `app/public/`) são o
+mesmo emoji 🥗 usado no favicon da aba (`app/index.html`), renderizado uma vez com Pillow: a
+fonte `Apple Color Emoji.ttc` só rasteriza em tamanhos fixos (máximo 160px), então o emoji é
+desenhado a 160px e escalado (`Image.resize`, `LANCZOS`) pra cada tamanho final, centralizado
+num fundo branco sólido com margem generosa (~19% de cada lado) pra sobreviver às máscaras
+circulares/arredondadas que Android e iOS aplicam por cima do ícone quadrado — não há script de
+geração no repo, foram só copiados prontos.
 
 **Sem service worker de propósito**: não é necessário pro "Adicionar à tela de início" abrir
 em `standalone` nem em nenhuma das duas plataformas, e cache offline traria complexidade

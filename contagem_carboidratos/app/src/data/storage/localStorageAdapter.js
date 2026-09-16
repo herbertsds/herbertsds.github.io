@@ -103,6 +103,13 @@ function possuiDadosDaCategoria(categoria) {
   return chavesDaCategoria(categoria).length > 0;
 }
 
+// Apaga tudo o que a categoria guarda (usado pela tela de Backup, com confirmação antes).
+function apagarCategoria(categoria) {
+  for (const chave of chavesDaCategoria(categoria)) {
+    remove(chave);
+  }
+}
+
 export const localStorageAdapter = {
   readJSON,
   writeJSON,
@@ -113,4 +120,5 @@ export const localStorageAdapter = {
   exportarCategoria,
   importarCategoria,
   possuiDadosDaCategoria,
+  apagarCategoria,
 };

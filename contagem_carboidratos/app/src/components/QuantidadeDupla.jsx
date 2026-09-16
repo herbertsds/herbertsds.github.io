@@ -1,4 +1,5 @@
 import { Form } from 'react-bootstrap';
+import { CampoNumerico } from './CampoNumerico';
 import { arredondar } from '../domain/calculos';
 
 // Dois campos ligados: gramas e "quantidade" (múltiplo da medida usual do alimento). Editar
@@ -12,13 +13,7 @@ export function QuantidadeDupla({ alimento, valor, onChange, autoFocus }) {
     return (
       <Form.Group>
         <Form.Label>Quantas porções ({alimento.medida})?</Form.Label>
-        <Form.Control
-          type="number"
-          min="0"
-          value={valor}
-          autoFocus={autoFocus}
-          onChange={(e) => onChange(Number(e.target.value) || 0)}
-        />
+        <CampoNumerico valor={valor} onChange={onChange} autoFocus={autoFocus} />
       </Form.Group>
     );
   }
@@ -29,22 +24,19 @@ export function QuantidadeDupla({ alimento, valor, onChange, autoFocus }) {
     <div className="d-flex gap-2">
       <Form.Group className="flex-fill">
         <Form.Label>Gramas</Form.Label>
-        <Form.Control
-          type="number"
-          min="0"
-          value={arredondar(valor, 1)}
+        <CampoNumerico
+          valor={valor}
+          formatar={(v) => String(arredondar(v, 1))}
+          onChange={onChange}
           autoFocus={autoFocus}
-          onChange={(e) => onChange(Number(e.target.value) || 0)}
         />
       </Form.Group>
       <Form.Group className="flex-fill">
         <Form.Label>Qtd. ({alimento.medida})</Form.Label>
-        <Form.Control
-          type="number"
-          min="0"
-          step="0.1"
-          value={arredondar(quantidadeMedidas, 2)}
-          onChange={(e) => onChange((Number(e.target.value) || 0) * alimento.quantidade_g_ml)}
+        <CampoNumerico
+          valor={quantidadeMedidas}
+          formatar={(v) => String(arredondar(v, 2))}
+          onChange={(n) => onChange(n * alimento.quantidade_g_ml)}
         />
       </Form.Group>
     </div>

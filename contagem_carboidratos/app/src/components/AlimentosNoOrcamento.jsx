@@ -44,7 +44,7 @@ export function AlimentosNoOrcamento({
 
   return (
     <div className="mt-3">
-      <div className="small text-muted mb-1">O que cabe (e o que ultrapassa) na meta desta refeição:</div>
+      <div className="small text-muted mb-1">Adicione novos alimentos na sua refeição:</div>
       <Form.Control
         className="mb-2"
         placeholder="Buscar alimento..."

@@ -25,6 +25,10 @@ export function ImportarExportar() {
   const [conflito, setConflito] = useState(null); // { resultado, conflitos }
   const [escolhas, setEscolhas] = useState({});
 
+  const [selecionadasApagar, setSelecionadasApagar] = useState(() => new Set());
+  const [confirmandoApagar, setConfirmandoApagar] = useState(false);
+  const [apagado, setApagado] = useState(false);
+
   function alternar(chave) {
     setSelecionadas((atual) => {
       const novo = new Set(atual);
@@ -32,6 +36,24 @@ export function ImportarExportar() {
       else novo.add(chave);
       return novo;
     });
+  }
+
+  function alternarApagar(chave) {
+    setSelecionadasApagar((atual) => {
+      const novo = new Set(atual);
+      if (novo.has(chave)) novo.delete(chave);
+      else novo.add(chave);
+      return novo;
+    });
+  }
+
+  function apagar() {
+    selecionadasApagar.forEach((c) => localStorageAdapter.apagarCategoria(c));
+    setConfirmandoApagar(false);
+    setSelecionadasApagar(new Set());
+    setMensagem('Dados apagados.');
+    setErro(null);
+    setApagado(true);
   }
 
   async function exportar() {
@@ -154,7 +176,7 @@ export function ImportarExportar() {
       {mensagem && (
         <Alert variant="success" className="py-2 small mb-2">
           {mensagem}
-          {importado && (
+          {(importado || apagado) && (
             <Button size="sm" variant="success" className="ms-2" onClick={() => window.location.reload()}>
               Recarregar página
             </Button>
@@ -166,6 +188,55 @@ export function ImportarExportar() {
           {erro}
         </Alert>
       )}
+
+      <hr className="my-4" />
+      <h2 className="h6">Apagar dados</h2>
+      <p className="text-muted small">
+        Apaga permanentemente o que estiver salvo aqui neste dispositivo, por categoria. Não tem
+        volta — se quiser manter uma cópia, exporte antes.
+      </p>
+      <Form.Group className="mb-3 d-flex gap-3 flex-wrap">
+        {CATEGORIAS.map((c) => (
+          <Form.Check
+            key={c.chave}
+            type="checkbox"
+            id={`apagar-${c.chave}`}
+            label={c.titulo}
+            checked={selecionadasApagar.has(c.chave)}
+            onChange={() => alternarApagar(c.chave)}
+          />
+        ))}
+      </Form.Group>
+      <Button
+        variant="danger"
+        disabled={selecionadasApagar.size === 0}
+        onClick={() => setConfirmandoApagar(true)}
+      >
+        Apagar selecionados
+      </Button>
+
+      <Modal show={confirmandoApagar} onHide={() => setConfirmandoApagar(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Apagar dados</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Isso vai apagar permanentemente os dados de{' '}
+          <strong>
+            {CATEGORIAS.filter((c) => selecionadasApagar.has(c.chave))
+              .map((c) => c.titulo)
+              .join(', ')}
+          </strong>{' '}
+          salvos neste dispositivo. Essa ação não pode ser desfeita. Continuar?
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setConfirmandoApagar(false)}>
+            Cancelar
+          </Button>
+          <Button variant="danger" onClick={apagar}>
+            Apagar
+          </Button>
+        </Modal.Footer>
+      </Modal>
 
       <Modal show={!!confirmando} onHide={() => setConfirmando(null)} centered>
         <Modal.Header closeButton>

@@ -1,6 +1,6 @@
 {
   "name": "Contagem de Carboidratos",
-  "short_name": "Carboidratos",
+  "short_name": "Contagem de Carboidratos",
   "description": "Plano nutricional e refeições do dia, com contagem de calorias e carboidratos.",
   "start_url": "./index.html",
   "scope": "./",

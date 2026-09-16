@@ -6,6 +6,7 @@ import { AlimentoVariacoesModal } from '../components/AlimentoVariacoesModal';
 import { alimentosRepository } from '../data/repositories/alimentosRepository';
 import { buscarAlimentos } from '../domain/busca';
 import { formatarNumero } from '../domain/calculos';
+import { fecharTecladoNoEnter } from '../utils/teclado';
 
 function linhaResumo(alimento) {
   return `${alimento.medida} (${
@@ -193,6 +194,8 @@ export function Alimentos() {
         placeholder="Buscar alimento para editar..."
         value={consulta}
         onChange={(e) => setConsulta(e.target.value)}
+        enterKeyHint="search"
+        onKeyDown={fecharTecladoNoEnter}
       />
 
       <ListGroup>

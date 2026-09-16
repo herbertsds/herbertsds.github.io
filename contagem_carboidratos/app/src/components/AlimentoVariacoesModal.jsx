@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Modal, Form, Button, ListGroup } from 'react-bootstrap';
+import { CampoNumerico } from './CampoNumerico';
+import { fecharTecladoNoEnter } from '../utils/teclado';
 import { formatarNumero } from '../domain/calculos';
 
 const CAMPOS_VAZIOS = { nomeVariacao: '', medida: '', quantidade_g_ml: '0', calorias_kcal: '0', carboidratos_g: '0' };
@@ -63,6 +65,8 @@ export function AlimentoVariacoesModal({ alimentoBase, variacoes, aberto, onFech
             placeholder="ex: Vigor, Panco..."
             value={campos.nomeVariacao}
             onChange={(e) => setCampos((c) => ({ ...c, nomeVariacao: e.target.value }))}
+            enterKeyHint="done"
+            onKeyDown={fecharTecladoNoEnter}
           />
         </Form.Group>
         <Form.Group className="mb-2">
@@ -71,34 +75,33 @@ export function AlimentoVariacoesModal({ alimentoBase, variacoes, aberto, onFech
             placeholder="ex: 1 fatia"
             value={campos.medida}
             onChange={(e) => setCampos((c) => ({ ...c, medida: e.target.value }))}
+            enterKeyHint="done"
+            onKeyDown={fecharTecladoNoEnter}
           />
         </Form.Group>
         <Form.Group className="mb-2">
           <Form.Label>Peso/volume da medida usual (g ou ml)</Form.Label>
-          <Form.Control
-            type="number"
-            min="0"
-            value={campos.quantidade_g_ml}
-            onChange={(e) => setCampos((c) => ({ ...c, quantidade_g_ml: e.target.value }))}
+          <CampoNumerico
+            valor={campos.quantidade_g_ml}
+            formatar={(v) => v}
+            onChange={(n) => setCampos((c) => ({ ...c, quantidade_g_ml: String(n) }))}
           />
         </Form.Group>
         <div className="d-flex gap-2 mb-2">
           <Form.Group className="flex-fill">
             <Form.Label>Calorias (kcal)</Form.Label>
-            <Form.Control
-              type="number"
-              min="0"
-              value={campos.calorias_kcal}
-              onChange={(e) => setCampos((c) => ({ ...c, calorias_kcal: e.target.value }))}
+            <CampoNumerico
+              valor={campos.calorias_kcal}
+              formatar={(v) => v}
+              onChange={(n) => setCampos((c) => ({ ...c, calorias_kcal: String(n) }))}
             />
           </Form.Group>
           <Form.Group className="flex-fill">
             <Form.Label>Carboidratos (g)</Form.Label>
-            <Form.Control
-              type="number"
-              min="0"
-              value={campos.carboidratos_g}
-              onChange={(e) => setCampos((c) => ({ ...c, carboidratos_g: e.target.value }))}
+            <CampoNumerico
+              valor={campos.carboidratos_g}
+              formatar={(v) => v}
+              onChange={(n) => setCampos((c) => ({ ...c, carboidratos_g: String(n) }))}
             />
           </Form.Group>
         </div>

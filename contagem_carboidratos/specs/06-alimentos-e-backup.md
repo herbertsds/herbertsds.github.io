@@ -136,3 +136,35 @@ Pra cada `categoria` do payload:
 Depois de importar, é preciso recarregar a página — os hooks já montados (plano, alimentos,
 refeições do dia) têm o dado antigo em memória e não ficam observando o localStorage; o botão
 "Recarregar página" só aparece depois de uma importação de verdade (não depois de exportar).
+
+### Apagar dados
+
+Mesma tela, seção separada, com o mesmo conjunto de categorias (Planos/Refeições/Alimentos) —
+mas com **seleção própria** (`selecionadasApagar`, tudo desmarcado por padrão, diferente dos
+toggles de exportar que já vêm todos marcados) e um botão vermelho ("Apagar selecionados") só
+habilitado com pelo menos uma categoria marcada. `localStorageAdapter.apagarCategoria(categoria)`
+remove todas as chaves daquela categoria (reaproveita `chavesDaCategoria`, a mesma função usada
+por exportar/importar). Sempre pede confirmação num modal antes (nomeando as categorias
+selecionadas), porque não tem volta — nenhum "desfazer". Depois de apagar, mesmo botão
+"Recarregar página" do fluxo de importação (os hooks têm o dado antigo em memória).
+
+## Campos de entrada em mobile
+
+Dois ajustes que valem para qualquer input de texto/número do app (busca, formulário de
+alimento, quantidade de uma refeição):
+
+- **Fechar o teclado ao confirmar**: `enterKeyHint` (`"done"` nos campos comuns, `"search"` nas
+  buscas) faz o teclado virtual mostrar um botão de confirmação em vez de "próximo"/nada; o
+  handler `fecharTecladoNoEnter` (`src/utils/teclado.js`) tira o foco do campo (`blur()`) quando
+  esse Enter é pressionado, fechando o teclado. Não é aplicado no Typeahead de busca de
+  alimento (`AlimentoBuscaInput`) além do `enterKeyHint` — lá o Enter já tem uma função (escolher
+  o item destacado no menu) que não pode ser sobrescrita.
+- **Campo numérico sem "0" preso**: `CampoNumerico` (`src/components/CampoNumerico.jsx`)
+  substitui `<Form.Control type="number">` nos campos de gramas/quantidade/calorias/
+  carboidratos. Usa `type="text"` + `inputMode="decimal"` em vez de `type="number"` (no iOS o
+  teclado numérico de `type=number` não tem um jeito nativo de fechar; `inputMode` dá o mesmo
+  teclado, mas com a barra "Concluído"). Guarda o texto digitado num estado próprio, separado do
+  valor numérico do componente pai: apagar tudo deixa o campo vazio (não reexibe "0" na hora), e
+  só quando o campo perde o foco (ou quando o valor muda por fora — ex: o campo de "Gramas" e o
+  de "Qtd." em `QuantidadeDupla` se recalculando um ao outro) o texto é resincronizado com o
+  valor formatado. Usado em `QuantidadeDupla`, `AlimentoFormModal` e `AlimentoVariacoesModal`.

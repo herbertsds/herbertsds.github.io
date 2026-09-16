@@ -3,6 +3,7 @@ import { Form } from 'react-bootstrap';
 import { buscarAlimentos } from '../domain/busca';
 import { formatarNumero } from '../domain/calculos';
 import { ListaPaginada } from './ListaPaginada';
+import { fecharTecladoNoEnter } from '../utils/teclado';
 
 // Busca + lista paginada sempre visível (igual à de Refeições), sem classificação de
 // orçamento — o Plano não tem "meta vs. consumido", ele É a meta.
@@ -17,6 +18,8 @@ export function BuscaAlimentosPlano({ alimentos, onAdicionar }) {
         placeholder="Buscar alimento..."
         value={consulta}
         onChange={(e) => setConsulta(e.target.value)}
+        enterKeyHint="search"
+        onKeyDown={fecharTecladoNoEnter}
       />
       <ListaPaginada
         itens={itens}

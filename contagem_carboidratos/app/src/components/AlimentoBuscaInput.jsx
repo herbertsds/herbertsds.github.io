@@ -25,6 +25,7 @@ export function AlimentoBuscaInput({ alimentos, onSelecionar, placeholder = 'Bus
       filterBy={() => true}
       placeholder={placeholder}
       minLength={1}
+      inputProps={{ enterKeyHint: 'search' }}
       renderMenuItemChildren={(alimento) => (
         <div>
           <div>{alimento.alimento}</div>
