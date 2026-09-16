@@ -25,17 +25,22 @@ export function BuscaAlimentosPlano({ alimentos, onAdicionar }) {
         itens={itens}
         itensPorPagina={5}
         resetKey={consulta}
-        renderItem={(a) => (
+        renderItem={(a) => {
+          const adicionar = () => {
+            onAdicionar(a.id, a.quantidade_indefinida ? 1 : a.quantidade_g_ml);
+            setConsulta('');
+          };
+          return (
           <div
             className="item-alimento-editavel clicavel"
             role="button"
             tabIndex={0}
             key={a.id}
-            onClick={() => onAdicionar(a.id, a.quantidade_indefinida ? 1 : a.quantidade_g_ml)}
+            onClick={adicionar}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
-                onAdicionar(a.id, a.quantidade_indefinida ? 1 : a.quantidade_g_ml);
+                adicionar();
               }
             }}
           >
@@ -45,7 +50,8 @@ export function BuscaAlimentosPlano({ alimentos, onAdicionar }) {
               {Math.round(a.calorias_kcal)} kcal · {formatarNumero(a.carboidratos_g)} g CHO
             </small>
           </div>
-        )}
+          );
+        }}
       />
     </div>
   );

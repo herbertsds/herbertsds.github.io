@@ -67,7 +67,10 @@ export function AlimentosNoOrcamento({
           <CandidatoOrcamentoItem
             key={c.alimento.id}
             candidato={c}
-            onSelecionar={(alimento, quantidade) => onAdicionar(alimento.id, quantidade)}
+            onSelecionar={(alimento, quantidade) => {
+              onAdicionar(alimento.id, quantidade);
+              setConsulta('');
+            }}
           />
         )}
       />

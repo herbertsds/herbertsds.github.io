@@ -343,3 +343,41 @@ body {
   font-size: 0.9rem;
   flex: 0 0 auto;
 }
+
+/* Impressão do Plano Nutricional (botão "Imprimir"): escondido na tela, só aparece no
+   diálogo de impressão/PDF do navegador — a UI normal da página (`.no-imprimir`) some junto
+   com o chrome do app (header, nav inferior), sobrando só a lista enxuta de refeições. */
+.somente-impressao {
+  display: none;
+}
+
+@media print {
+  .app-header,
+  .app-nav-inferior,
+  .no-imprimir,
+  /* O modal "Imprimir plano" (react-bootstrap) renderiza fora de `.no-imprimir` (via portal
+     direto no body), então esconder só esse wrapper não bastava — o modal aparecia por cima
+     da impressão. Escondido por classe direto (`.modal`/`.modal-backdrop`) em vez de depender
+     do estado React já ter fechado a tempo do `window.print()`. */
+  .modal,
+  .modal-backdrop {
+    display: none !important;
+  }
+
+  /* O shell normal é altura fixa + scroll interno (`overflow: hidden`), o que cortaria a
+     impressão na altura de uma tela; em modo impressão o fluxo precisa ser livre. */
+  .app-shell,
+  .app-conteudo {
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .somente-impressao {
+    display: block !important;
+  }
+
+  .somente-impressao .resumo-nutricional {
+    margin-bottom: 0.75rem;
+    break-inside: avoid;
+  }
+}

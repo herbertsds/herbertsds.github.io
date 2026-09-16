@@ -15,6 +15,14 @@ quanto dentro de cada card de refeição — antes até da lista de itens.
 - `ResumoNutricional` (`src/components/ResumoNutricional.jsx`): título + os dois medidores
   (Calorias, Carboidratos) lado a lado. Prop `tamanho="grande"` deixa o número ainda maior —
   usada só no total do dia (o "hero" da página); os demais usos ficam no tamanho padrão.
+- `ResumoMetaRefeicao` (`src/components/ResumoMetaRefeicao.jsx`): a versão "só meta" — usada
+  onde não existe "consumido" pra comparar (Plano Nutricional, impressão do plano). Reaproveita
+  as mesmas classes CSS (`.resumo-nutricional`, `.medidor-numero`...) pra ficar do mesmo
+  tamanho/peso visual do `ResumoNutricional`, mas sem número duplo, sem % e sem barra — só o
+  valor da meta em si, grande. Props opcionais `mostrarKcal`/`mostrarCho` (default `true` nos
+  dois) escondem um dos dois eixos — só usadas pela impressão (ver abaixo).
+- `ImprimirPlanoModal` (`src/components/ImprimirPlanoModal.jsx`): modal que junta nome da
+  pessoa + os dois toggles de eixo antes de imprimir o plano (ver "Impressão do plano" abaixo).
 
 ## Escala de cor (contínua, não por faixas)
 
@@ -40,13 +48,15 @@ visualmente (`Math.min(percentual, 1)`), mesmo quando o valor real passa disso.
 
 - **Total do dia** (`RefeicoesDoDia.jsx`): logo abaixo da navegação de data, antes de
   "Refeições do dia" — o primeiro bloco da página, tamanho grande.
-- **Meta da refeição** (dentro de cada `RefeicaoCard`, só nas Refeições do Dia): prop `resumo`
-  do `RefeicaoCard`, renderizado logo após o cabeçalho (só o tipo) — a única coisa que
-  continua visível mesmo com a refeição colapsada (ver [08](08-refeicoes-do-dia.md)). Também é
-  onde mora o horário registrado da refeição, via a prop `extra` (ver abaixo) — não no
-  cabeçalho do card, pra esse poder ser clicado em qualquer ponto pra colapsar.
-  No Plano Nutricional esse prop não é usado — lá não existe "consumido", só a meta em si (a
-  linha de total simples que já existia continua, via `totalLabel`).
+- **Meta da refeição** (dentro de cada `RefeicaoCard`, nas duas telas): prop `resumo` do
+  `RefeicaoCard`, renderizado logo após o cabeçalho (só o tipo) — a única coisa que continua
+  visível mesmo com a refeição colapsada (ver [08](08-refeicoes-do-dia.md)). Também é onde mora
+  o horário, via a prop `extra` (ver abaixo) — não no cabeçalho do card, pra esse poder ser
+  clicado em qualquer ponto pra colapsar. Nas Refeições do Dia é `ResumoNutricional`
+  (consumido vs. meta); no Plano Nutricional é `ResumoMetaRefeicao` (só a meta — não existe
+  "consumido" ali, o plano **é** a meta) com o horário fixo do plano em `extra`.
+- **Total do plano** (`PlanoNutricional.jsx`): mesmo lugar/tamanho que o "Total do dia" das
+  Refeições (primeiro bloco da página, `tamanho="grande"`), também com `ResumoMetaRefeicao`.
 - **Cesta / orçamento da substituição** (dentro do modal de Sugestão de Substituição, ver
   [04](04-substituicao.md)): mesmo componente, `tamanho="compacto"`, mas com uma frase
   explicativa diferente (ver abaixo) — não é "consumido vs. meta", é "soma dos alimentos já
@@ -72,8 +82,9 @@ contexto:
   substituição.
 
 As duas props (`contexto`/`textoExplicativo`) passam de `ResumoNutricional` direto pros dois
-`MedidorNutricional` internos (um por eixo) — sem frase nenhuma quando nem uma nem outra é
-passada (ex: "Total da refeição (meta)" no Plano, que nem usa `ResumoNutricional`).
+`MedidorNutricional` internos (um por eixo). `ResumoMetaRefeicao` (Plano) não usa nada disso —
+não tem frase explicativa nenhuma, porque não há "quanto falta" a explicar quando o número
+exibido já é a própria meta.
 
 ## `extra` — conteúdo livre ao lado do título
 
@@ -85,6 +96,48 @@ cabeçalho do `RefeicaoCard` mudou pra cá quando o cabeçalho virou colapsável
 disputar o clique com o colapso, então saiu de lá. Como o card de Meta fica **fora** do
 `Collapse` (sempre visível), o horário continua sempre alcançável mesmo com a refeição
 recolhida.
+
+## Impressão do plano (botão "Imprimir")
+
+`PlanoNutricional.jsx` tem um botão "Imprimir" que abre `ImprimirPlanoModal` (não imprime
+direto) perguntando duas coisas antes:
+- **Nome da pessoa** (opcional): vira o título impresso "Plano Nutricional - {nome}" (sem o "-
+  nome" quando fica em branco).
+- **O que mostrar nos números**: dois `Form.Check type="switch"` independentes — Calorias e
+  Carboidratos — não checkbox, pra combinar com o resto do app (Respeitar
+  calorias/carboidratos na Substituição). Pelo menos um dos dois tem que ficar ligado (botão
+  "Imprimir" do modal fica desabilitado com os dois desligados, com um aviso). Os dois vêm
+  ligados por padrão.
+
+Confirmando no modal, dispara `window.print()` — sem geração de PDF própria, é o diálogo
+nativo do navegador (que em qualquer desktop/mobile moderno tem a opção "Salvar como PDF") — e
+fecha o modal em seguida. **Não dá pra contar com o fechamento do modal pra tirar ele da
+impressão**: `setState` é assíncrono, então `window.print()` roda com o modal ainda de verdade
+no DOM (bug real, pego durante o desenvolvimento — a primeira versão tentava fechar antes de
+imprimir via um estado auxiliar + `useEffect`, mas `window.print()` disparava antes do React
+re-renderizar sem o modal, e ele saía na impressão por cima do conteúdo). A correção é em CSS,
+não em timing: `.modal`/`.modal-backdrop` (classes do próprio react-bootstrap `Modal`, que
+renderiza num portal direto no `<body>` — fora do `.no-imprimir` da página) somem via
+`display: none !important` dentro do `@media print`, incondicionalmente, então não importa se
+o modal ainda está tecnicamente aberto no estado React no instante em que a impressão
+acontece.
+
+O que sai impresso não é a tela normal (cheia de botões de editar/buscar/adicionar, que não
+fazem sentido no papel): é um bloco à parte (`.somente-impressao`), escondido na tela
+(`display: none`) e só mostrado via `@media print`, com exatamente o pedido — por refeição,
+tipo + horário + os números grandes de meta (`ResumoMetaRefeicao`, sem "consumido", filtrado
+pelos dois toggles via as props `mostrarKcal`/`mostrarCho`) — e o total do dia no fim, em
+`tamanho="grande"`. Os toggles só afetam essa versão impressa; os mesmos números na tela
+(`ResumoMetaRefeicao` do "Total do plano" e de cada "Meta da refeição") sempre mostram os dois
+eixos, sem chamar essas props.
+
+A troca de visibilidade acontece toda em CSS (`index.css`, seção "Impressão do Plano
+Nutricional"): `.no-imprimir` (a tela normal, incluindo o cabeçalho `.app-header` e a navegação
+inferior `.app-nav-inferior` do app inteiro) some, `.somente-impressao` aparece. Um detalhe que
+quebraria a impressão se esquecido: o shell do app é `height: 100vh` + `overflow: hidden` com
+scroll só na área de conteúdo (pensado pra tela, não pra papel) — em `@media print` isso vira
+`height: auto` + `overflow: visible`, senão a impressão cortaria na altura de uma tela em vez
+de sair a lista inteira.
 
 ## Por que não é um "hero" único por tela (como a regra de data-viz sugeriria)
 

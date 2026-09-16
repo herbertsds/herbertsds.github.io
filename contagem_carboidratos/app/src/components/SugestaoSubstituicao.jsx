@@ -165,6 +165,7 @@ export function SugestaoSubstituicao({ refeicao, itensPrevistos, alimentos, alim
   function adicionarNaCesta(alimento, quantidadeTeste) {
     setCesta((atual) => [...atual, { alimentoId: alimento.id, quantidadeG: quantidadeTeste }]);
     setRecemAdicionadoId(alimento.id);
+    setConsultaCatalogo('');
   }
 
   function atualizarQuantidadeCesta(alimentoId, novaQuantidade) {
