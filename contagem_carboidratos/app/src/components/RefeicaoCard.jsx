@@ -37,6 +37,7 @@ export function RefeicaoCard({
   onRemoverItem,
   onEditarQuantidadeItem,
   ocultarBuscaLivre = false,
+  recemAdicionadoId,
   meta,
   respeitarCalorias,
   respeitarCarboidratos,
@@ -81,6 +82,8 @@ export function RefeicaoCard({
                 return (
                   <ItemAlimentoEditavel
                     key={item.id}
+                    id={`item-${item.id}`}
+                    destacarNovo={item.id === recemAdicionadoId}
                     alimento={alimento}
                     alimentosPorId={alimentosPorId}
                     quantidade={item.quantidadeG}
@@ -100,7 +103,7 @@ export function RefeicaoCard({
                 ? `${formatarNumero(item.quantidadeG, 2)}x ${alimento.medida}`
                 : `${formatarNumero(item.quantidadeG)} g`;
               return (
-                <div key={item.id} className="item-alimento-editavel">
+                <div key={item.id} id={`item-${item.id}`} className="item-alimento-editavel">
                   <div className="d-flex justify-content-between align-items-start gap-2">
                     <div className="item-alimento-nome">
                       {alimento ? alimento.alimento : 'Alimento removido do catálogo'}

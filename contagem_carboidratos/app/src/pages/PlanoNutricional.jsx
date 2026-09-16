@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Button, Alert, Spinner } from 'react-bootstrap';
 import { usePlanoNutricional } from '../hooks/usePlanoNutricional';
 import { useAlimentos } from '../hooks/useAlimentos';
@@ -22,6 +22,21 @@ export function PlanoNutricional() {
 
   const [modalAberto, setModalAberto] = useState(false);
   const [refeicaoEditando, setRefeicaoEditando] = useState(null);
+
+  // Id do último item adicionado (em qualquer refeição) — pra destacar o cartão e rolar até
+  // ele. Um só por vez: adicionar outro substitui; some sozinho depois de 1 minuto.
+  const [recemAdicionadoId, setRecemAdicionadoId] = useState(null);
+  useEffect(() => {
+    if (!recemAdicionadoId) return;
+    const frame = requestAnimationFrame(() => {
+      document.getElementById(`item-${recemAdicionadoId}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+    const timer = setTimeout(() => setRecemAdicionadoId(null), 60000);
+    return () => {
+      cancelAnimationFrame(frame);
+      clearTimeout(timer);
+    };
+  }, [recemAdicionadoId]);
 
   const alimentosPorId = useMemo(
     () => new Map(todosOsAlimentos.map((a) => [a.id, a])),
@@ -79,7 +94,12 @@ export function PlanoNutricional() {
       {plano.refeicoes
         .slice()
         .sort((a, b) => a.horario.localeCompare(b.horario))
-        .map((refeicao) => (
+        .map((refeicao) => {
+          const adicionarComDestaque = (alimentoId, quantidade) => {
+            const novoId = adicionarItem(refeicao.id, alimentoId, quantidade);
+            setRecemAdicionadoId(novoId);
+          };
+          return (
           <RefeicaoCard
             key={refeicao.id}
             refeicao={refeicao}
@@ -87,15 +107,11 @@ export function PlanoNutricional() {
             alimentosPorId={alimentosPorId}
             colapsavel
             ocultarBuscaLivre
-            onAdicionarItem={(alimentoId, quantidade) => adicionarItem(refeicao.id, alimentoId, quantidade)}
+            recemAdicionadoId={recemAdicionadoId}
+            onAdicionarItem={adicionarComDestaque}
             onRemoverItem={(itemId) => removerItem(refeicao.id, itemId)}
             onEditarQuantidadeItem={(itemId, quantidadeG) => editarQuantidadeItem(refeicao.id, itemId, quantidadeG)}
-            rodape={
-              <BuscaAlimentosPlano
-                alimentos={alimentos}
-                onAdicionar={(alimentoId, quantidade) => adicionarItem(refeicao.id, alimentoId, quantidade)}
-              />
-            }
+            rodape={<BuscaAlimentosPlano alimentos={alimentos} onAdicionar={adicionarComDestaque} />}
             onEditar={() => {
               setRefeicaoEditando(refeicao);
               setModalAberto(true);
@@ -103,7 +119,8 @@ export function PlanoNutricional() {
             onExcluir={() => excluirRefeicao(refeicao.id)}
             totalLabel="Total da refeição (meta)"
           />
-        ))}
+          );
+        })}
 
       <Alert variant="light" className="border mt-3 mb-0 d-flex justify-content-between">
         <span>Total do plano</span>

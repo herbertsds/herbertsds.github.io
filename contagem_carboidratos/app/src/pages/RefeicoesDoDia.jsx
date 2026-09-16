@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Button, Spinner } from 'react-bootstrap';
 import { useDataSelecionada } from '../context/DataSelecionadaContext';
 import { useRefeicoesDoDia } from '../hooks/useRefeicoesDoDia';
@@ -30,6 +30,21 @@ export function RefeicoesDoDia() {
     () => new Map(todosOsAlimentos.map((a) => [a.id, a])),
     [todosOsAlimentos],
   );
+
+  // Id do último item adicionado (em qualquer refeição) — pra destacar o cartão e rolar até
+  // ele. Um só por vez: adicionar outro substitui; some sozinho depois de 1 minuto.
+  const [recemAdicionadoId, setRecemAdicionadoId] = useState(null);
+  useEffect(() => {
+    if (!recemAdicionadoId) return;
+    const frame = requestAnimationFrame(() => {
+      document.getElementById(`item-${recemAdicionadoId}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+    const timer = setTimeout(() => setRecemAdicionadoId(null), 60000);
+    return () => {
+      cancelAnimationFrame(frame);
+      clearTimeout(timer);
+    };
+  }, [recemAdicionadoId]);
 
   // Variações (marcas) de cada alimento, agrupadas pelo id do alimento base — só entram no
   // seletor de variação ao adicionar algo aqui no dia, nunca no Plano.
@@ -167,9 +182,11 @@ export function RefeicoesDoDia() {
               alimentos={alimentos}
               alimentosPorId={alimentosPorId}
               variacoesPorBase={variacoesPorBase}
-              onAdicionarItem={(alimentoId, quantidade, origem = 'extra') =>
-                adicionarItem(refeicao.id, alimentoId, quantidade, origem, criarSeNaoExistir)
-              }
+              recemAdicionadoId={recemAdicionadoId}
+              onAdicionarItem={(alimentoId, quantidade, origem = 'extra') => {
+                const novoId = adicionarItem(refeicao.id, alimentoId, quantidade, origem, criarSeNaoExistir);
+                setRecemAdicionadoId(novoId);
+              }}
               onRemoverItem={(itemId) => removerItem(refeicao.id, itemId)}
               onEditarQuantidadeItem={(itemId, quantidadeG) =>
                 editarQuantidadeItem(refeicao.id, itemId, quantidadeG)

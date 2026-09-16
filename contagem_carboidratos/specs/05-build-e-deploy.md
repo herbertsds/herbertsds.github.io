@@ -48,6 +48,24 @@ Vite copia arquivos de `public/` para a raiz do `outDir` durante o build — com
 `contagem_carboidratos/`, o resultado é `contagem_carboidratos/alimentos.json`, carregado em
 runtime via `fetch` (não bundled no JS) por `alimentosRepository`.
 
+## PWA — "Adicionar à tela de início" abre em tela cheia
+
+`app/index.html` referencia um `manifest.json` (em `app/public/`, copiado pro `outDir` do
+mesmo jeito que `alimentos.json`) com `"display": "standalone"` — instalado (Android: menu do
+Chrome → "Instalar app"/"Adicionar à tela inicial"; iOS: Safari → Compartilhar → "Adicionar à
+Tela de Início"), abre sem barra de endereço nem abas, como um app nativo. iOS **ignora o
+manifest** pra isso — precisa das tags à parte em `index.html`
+(`apple-mobile-web-app-capable`, `apple-touch-icon`, etc.), por isso as duas coisas coexistem.
+
+Os ícones (`icon-192.png`, `icon-512.png`, `apple-touch-icon.png`, em `app/public/`) são PNGs
+simples gerados uma vez com Pillow (fundo verde sólido + "CC" branco, texto dentro da "safe
+zone" central pra sobreviver às máscaras circulares/arredondadas que Android e iOS aplicam por
+cima do ícone quadrado) — não há script de geração no repo, foram só copiados prontos.
+
+**Sem service worker de propósito**: não é necessário pro "Adicionar à tela de início" abrir
+em `standalone` nem em nenhuma das duas plataformas, e cache offline traria complexidade
+(invalidação a cada deploy) sem necessidade real aqui — o app já funciona só com rede.
+
 ## Verificação local sem GitHub Pages
 
 ```bash

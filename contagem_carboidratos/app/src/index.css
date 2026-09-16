@@ -160,6 +160,23 @@ body {
   padding: 0.75rem;
 }
 
+/* Cartão de candidato (lista pra adicionar) — mesmo cartão de item já lançado, só clicável. */
+.item-alimento-editavel.clicavel {
+  cursor: pointer;
+}
+
+.item-alimento-editavel.clicavel:hover,
+.item-alimento-editavel.clicavel:focus-visible {
+  background-color: #eef2ff;
+  border-color: #adb5bd;
+}
+
+/* Item recém-adicionado: destaque temporário (some sozinho, ou ao adicionar outro). */
+.item-alimento-novo {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.25);
+}
+
 .item-alimento-nome {
   font-weight: 700;
   font-size: 1rem;

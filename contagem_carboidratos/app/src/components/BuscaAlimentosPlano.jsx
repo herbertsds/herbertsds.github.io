@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Form, ListGroup } from 'react-bootstrap';
+import { Form } from 'react-bootstrap';
 import { buscarAlimentos } from '../domain/busca';
 import { formatarNumero } from '../domain/calculos';
 import { ListaPaginada } from './ListaPaginada';
@@ -18,26 +18,32 @@ export function BuscaAlimentosPlano({ alimentos, onAdicionar }) {
         value={consulta}
         onChange={(e) => setConsulta(e.target.value)}
       />
-      <div className="subsecao">
-        <ListaPaginada
-          itens={itens}
-          itensPorPagina={5}
-          resetKey={consulta}
-          renderItem={(a) => (
-            <ListGroup.Item
-              action
-              key={a.id}
-              onClick={() => onAdicionar(a.id, a.quantidade_indefinida ? 1 : a.quantidade_g_ml)}
-            >
-              <div className="fw-semibold">{a.alimento}</div>
-              <small className="text-muted d-block">({a.medida})</small>
-              <small className="text-muted d-block mt-1">
-                {Math.round(a.calorias_kcal)} kcal · {formatarNumero(a.carboidratos_g)} g CHO
-              </small>
-            </ListGroup.Item>
-          )}
-        />
-      </div>
+      <ListaPaginada
+        itens={itens}
+        itensPorPagina={5}
+        resetKey={consulta}
+        renderItem={(a) => (
+          <div
+            className="item-alimento-editavel clicavel"
+            role="button"
+            tabIndex={0}
+            key={a.id}
+            onClick={() => onAdicionar(a.id, a.quantidade_indefinida ? 1 : a.quantidade_g_ml)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onAdicionar(a.id, a.quantidade_indefinida ? 1 : a.quantidade_g_ml);
+              }
+            }}
+          >
+            <div className="fw-semibold">{a.alimento}</div>
+            <small className="text-muted d-block">({a.medida})</small>
+            <small className="text-muted d-block mt-1">
+              {Math.round(a.calorias_kcal)} kcal · {formatarNumero(a.carboidratos_g)} g CHO
+            </small>
+          </div>
+        )}
+      />
     </div>
   );
 }

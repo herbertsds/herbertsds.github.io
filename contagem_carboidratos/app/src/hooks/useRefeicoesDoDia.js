@@ -63,21 +63,24 @@ export function useRefeicoesDoDia(data) {
     [diaRegistro, persistir],
   );
 
+  // Devolve os itens com id já preenchido de forma síncrona (a gravação em si roda por trás,
+  // async) — quem chama usa esse id na hora pra destacar/rolar até o item recém-adicionado.
   const adicionarItens = useCallback(
     (refeicaoId, novosItens, criarSeNaoExistir) => {
       const comId = novosItens.map((item) => ({ id: gerarId('item'), ...item }));
       const { refeicoes, id } = comRefeicaoGarantida(diaRegistro.refeicoes, refeicaoId, criarSeNaoExistir);
-      return persistir({
+      persistir({
         ...diaRegistro,
         refeicoes: refeicoes.map((r) => (r.id === id ? { ...r, itens: [...r.itens, ...comId] } : r)),
       });
+      return comId;
     },
     [diaRegistro, persistir],
   );
 
   const adicionarItem = useCallback(
     (refeicaoId, alimentoId, quantidadeG, origem = 'extra', criarSeNaoExistir) =>
-      adicionarItens(refeicaoId, [{ alimentoId, quantidadeG, origem }], criarSeNaoExistir),
+      adicionarItens(refeicaoId, [{ alimentoId, quantidadeG, origem }], criarSeNaoExistir)[0].id,
     [adicionarItens],
   );
 

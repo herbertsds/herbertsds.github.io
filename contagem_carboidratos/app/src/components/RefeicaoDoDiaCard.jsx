@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Form, ListGroup } from 'react-bootstrap';
+import { Form } from 'react-bootstrap';
 import { RefeicaoCard } from './RefeicaoCard';
 import { ResumoNutricional } from './ResumoNutricional';
 import { AlimentosNoOrcamento } from './AlimentosNoOrcamento';
@@ -22,6 +22,7 @@ export function RefeicaoDoDiaCard({
   onEditarQuantidadeItem,
   onHorarioRegistradoChange,
   onSubstituir,
+  recemAdicionadoId,
 }) {
   const [respeitarCalorias, setRespeitarCalorias] = useState(true);
   const [respeitarCarboidratos, setRespeitarCarboidratos] = useState(true);
@@ -38,6 +39,7 @@ export function RefeicaoDoDiaCard({
       onAdicionarItem={onAdicionarItem}
       onRemoverItem={onRemoverItem}
       onEditarQuantidadeItem={onEditarQuantidadeItem}
+      recemAdicionadoId={recemAdicionadoId}
       meta={meta}
       respeitarCalorias={respeitarCalorias}
       respeitarCarboidratos={respeitarCarboidratos}
@@ -89,17 +91,25 @@ export function RefeicaoDoDiaCard({
         sugestoesRestantes.length > 0 && (
           <div className="mb-3">
             <div className="small text-muted mb-1">Sugestões do plano:</div>
-            <ListGroup className="subsecao">
+            <div className="lista-itens-refeicao">
               {sugestoesRestantes.map((item) => {
                 const alimento = alimentosPorId.get(item.alimentoId);
                 if (!alimento) return null;
                 const { kcal, cho } = calcularItem(item, alimentosPorId);
+                const adicionar = () => onAdicionarItem(item.alimentoId, item.quantidadeG, 'sugestao-plano');
                 return (
-                  <ListGroup.Item
+                  <div
                     key={item.id}
-                    action
-                    className="d-flex justify-content-between align-items-center gap-2"
-                    onClick={() => onAdicionarItem(item.alimentoId, item.quantidadeG, 'sugestao-plano')}
+                    className="item-alimento-editavel clicavel d-flex justify-content-between align-items-center gap-2"
+                    role="button"
+                    tabIndex={0}
+                    onClick={adicionar}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        adicionar();
+                      }
+                    }}
                   >
                     <span className="fw-semibold">{alimento.alimento}</span>
                     <small className="text-muted text-nowrap">
@@ -107,10 +117,10 @@ export function RefeicaoDoDiaCard({
                       {alimento.quantidade_indefinida ? 'x' : 'g'} · {Math.round(kcal)} kcal ·{' '}
                       {formatarNumero(cho)} g CHO
                     </small>
-                  </ListGroup.Item>
+                  </div>
                 );
               })}
-            </ListGroup>
+            </div>
           </div>
         )
       }

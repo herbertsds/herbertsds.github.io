@@ -59,20 +59,18 @@ export function AlimentosNoOrcamento({
         direcao={direcao}
         onDirecaoChange={setDirecao}
       />
-      <div className="subsecao">
-        <ListaPaginada
-          itens={candidatos}
-          itensPorPagina={5}
-          resetKey={`${consulta}|${filtro}|${ordenarPor}|${direcao}`}
-          renderItem={(c) => (
-            <CandidatoOrcamentoItem
-              key={c.alimento.id}
-              candidato={c}
-              onSelecionar={(alimento, quantidade) => onAdicionar(alimento.id, quantidade)}
-            />
-          )}
-        />
-      </div>
+      <ListaPaginada
+        itens={candidatos}
+        itensPorPagina={5}
+        resetKey={`${consulta}|${filtro}|${ordenarPor}|${direcao}`}
+        renderItem={(c) => (
+          <CandidatoOrcamentoItem
+            key={c.alimento.id}
+            candidato={c}
+            onSelecionar={(alimento, quantidade) => onAdicionar(alimento.id, quantidade)}
+          />
+        )}
+      />
     </div>
   );
 }

@@ -209,12 +209,35 @@ até 40,4 g antes de passar, mas está lançado com 64 g.
 Card (branco) contendo sugestões do plano, itens já lançados e a lista de candidatos por
 orçamento ficava "branco sobre branco" — difícil notar onde uma seção acaba e a outra começa,
 e pior ainda quando havia mais de um alimento na mesma lista (sem nada os separando com
-clareza). Duas camadas de correção, em `index.css`:
+clareza). A correção, em `index.css`: **toda** lista de alimentos — itens já lançados, cesta,
+sugestões do plano e a lista de candidatos por orçamento (`ListaPaginada`, ver
+[04](04-substituicao.md)) — usa o mesmo par de classes. `.lista-itens-refeicao` é o fundo
+cinza-claro com borda que isola o bloco do card/modal branco por trás; dentro dele, cada
+alimento é seu próprio **cartão branco** (`.item-alimento-editavel`, com borda e cantos
+arredondados), em coluna com espaço entre eles — nunca linhas de uma `ListGroup`. Um cartão
+branco sobre fundo cinza deixa óbvio, de relance, quantos alimentos existem na fila, mesmo sem
+ler o conteúdo. Os cartões clicáveis (sugestões, candidatos) só ganham a classe extra
+`.clicavel` (cursor + destaque de hover) — mesmo cartão, mesma base visual dos que já foram
+lançados. `.subsecao` continua existindo só pros grupos "Alimentos do plano"/"Alimentos
+adicionados" do passo 1 da Substituição (esses continuam `ListGroup`, com um toggle por linha,
+não um cartão clicável inteiro).
 
-- `.subsecao` (sugestões, grupos e candidatos — ainda `ListGroup`) e `.lista-itens-refeicao`
-  (itens já lançados e a cesta — ver abaixo) dão um fundo cinza-claro com borda a cada bloco,
-  isolando-o visualmente do card/modal branco por trás.
-- Dentro de `.lista-itens-refeicao`, cada `ItemAlimentoEditavel` é seu próprio **cartão
-  branco** (`.item-alimento-editavel`, com borda e cantos arredondados), em coluna com espaço
-  entre eles — não mais linhas de uma `ListGroup`. Um cartão branco sobre fundo cinza deixa
-  óbvio, de relance, quantos alimentos existem na fila, mesmo sem ler o conteúdo.
+## Item recém-adicionado: destaque + rolagem
+
+Depois de clicar num candidato (ou numa sugestão do plano), o cartão correspondente na lista
+de itens já lançados (ou na cesta, na Substituição) ganha um badge **"novo"** e uma borda azul
+(`.item-alimento-novo`), e a página rola até ele (`scrollIntoView({ behavior: 'smooth', block:
+'center' })`) — sem isso, adicionar algo enquanto a lista de itens já está longa deixava o
+usuário sem saber onde o item foi parar, ou se o clique tinha funcionado.
+
+Só um por vez ("`recemAdicionadoId`") e some sozinho depois de 1 minuto: os dois hooks de
+"adicionar item" (`useRefeicoesDoDia.adicionarItem`/`adicionarItens`,
+`usePlanoNutricional.adicionarItem`) passaram a devolver o id do item **de forma síncrona**
+(gerado antes de chamar `persistir`, que continua assíncrono por baixo) — só assim quem chama
+sabe qual id destacar sem esperar a gravação terminar. O estado `recemAdicionadoId` mora na
+**página** (`RefeicoesDoDia.jsx`/`PlanoNutricional.jsx`), não no card de cada refeição, porque
+só pode existir um destaque na tela inteira, não um por refeição — um único `useEffect`
+(`setTimeout` de 60s + `scrollIntoView` num `requestAnimationFrame`) cuida dos dois casos:
+sua própria limpeza cancela o timer anterior sempre que o id muda, o que já resolve "só um por
+vez" de graça. Na Substituição, o mesmo padrão vive local ao componente (a cesta é interna ao
+modal), destacando por `alimentoId` em vez de `id` de item (a cesta não tem id próprio).

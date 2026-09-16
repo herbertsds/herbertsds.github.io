@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Button, ListGroup } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 
 // Lista paginada genérica: em vez de cortar o resultado num limite arbitrário com scroll
 // (a lista deixava de ser exaustiva — itens relevantes ficavam de fora), pagina o resultado
@@ -20,10 +20,10 @@ export function ListaPaginada({ itens, renderItem, itensPorPagina = 3, resetKey,
 
   return (
     <div className="mb-3">
-      <ListGroup>
+      <div className="lista-itens-refeicao">
         {itensDaPagina.map(renderItem)}
-        {itens.length === 0 && <ListGroup.Item className="text-muted small">{semResultados}</ListGroup.Item>}
-      </ListGroup>
+        {itens.length === 0 && <div className="text-muted small">{semResultados}</div>}
+      </div>
       {totalPaginas > 1 && (
         <div className="d-flex justify-content-between align-items-center mt-1">
           <Button

@@ -14,6 +14,7 @@ import { quantidadeMaximaParaItem, textoQuantidadeMaxima, fraseRespeitar } from 
 // branco: o fundo por trás (`.subsecao`/`.lista-itens-refeicao`) é cinza, então vários
 // cartões brancos em fila deixam claro que existe mais de um alimento ali.
 export function ItemAlimentoEditavel({
+  id,
   alimento,
   alimentosPorId,
   quantidade,
@@ -24,10 +25,11 @@ export function ItemAlimentoEditavel({
   usoOutros,
   respeitarCalorias,
   respeitarCarboidratos,
+  destacarNovo = false,
 }) {
   if (!alimento) {
     return (
-      <div className="item-alimento-editavel">
+      <div id={id} className="item-alimento-editavel">
         <div className="d-flex justify-content-between align-items-center gap-2">
           <span className="text-muted">Alimento removido do catálogo</span>
           <Button size="sm" variant="link" className="text-danger p-0" onClick={onRemover}>
@@ -70,13 +72,18 @@ export function ItemAlimentoEditavel({
   }
 
   return (
-    <div className="item-alimento-editavel">
+    <div id={id} className={`item-alimento-editavel${destacarNovo ? ' item-alimento-novo' : ''}`}>
       <div className="d-flex justify-content-between align-items-start gap-2 mb-1">
         <div className="item-alimento-nome">
           {alimento.alimento}
           {rotulo && (
             <Badge bg={rotulo.bg} text={rotulo.text} className="ms-2">
               {rotulo.texto}
+            </Badge>
+          )}
+          {destacarNovo && (
+            <Badge bg="primary" className="ms-2">
+              novo
             </Badge>
           )}
         </div>

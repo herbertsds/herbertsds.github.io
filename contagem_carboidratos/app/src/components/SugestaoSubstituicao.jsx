@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Form, Button, ListGroup, Alert, Modal, Collapse } from 'react-bootstrap';
 import { ResumoNutricional } from './ResumoNutricional';
 import { ListaPaginada } from './ListaPaginada';
@@ -88,6 +88,21 @@ export function SugestaoSubstituicao({ refeicao, itensPrevistos, alimentos, alim
   const [ordenarPor, setOrdenarPor] = useState(null);
   const [direcao, setDirecao] = useState('asc');
   const [mensagem, setMensagem] = useState(null);
+  const [recemAdicionadoId, setRecemAdicionadoId] = useState(null);
+
+  // Some sozinho depois de 1 minuto, ou na hora se outro item for adicionado (o efeito
+  // anterior é cancelado antes desse rodar) — e rola até o cartão assim que ele existe.
+  useEffect(() => {
+    if (!recemAdicionadoId) return;
+    const frame = requestAnimationFrame(() => {
+      document.getElementById(`cesta-${recemAdicionadoId}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+    const timer = setTimeout(() => setRecemAdicionadoId(null), 60000);
+    return () => {
+      cancelAnimationFrame(frame);
+      clearTimeout(timer);
+    };
+  }, [recemAdicionadoId]);
 
   const grupos = useMemo(
     () => montarGrupos(itensPrevistos, refeicao.itens),
@@ -149,6 +164,7 @@ export function SugestaoSubstituicao({ refeicao, itensPrevistos, alimentos, alim
 
   function adicionarNaCesta(alimento, quantidadeTeste) {
     setCesta((atual) => [...atual, { alimentoId: alimento.id, quantidadeG: quantidadeTeste }]);
+    setRecemAdicionadoId(alimento.id);
   }
 
   function atualizarQuantidadeCesta(alimentoId, novaQuantidade) {
@@ -169,6 +185,7 @@ export function SugestaoSubstituicao({ refeicao, itensPrevistos, alimentos, alim
     setCesta([]);
     setIdsParaSubstituir(new Set());
     setEtapa('escolher');
+    setRecemAdicionadoId(null);
   }
 
   function fechar() {
@@ -178,6 +195,7 @@ export function SugestaoSubstituicao({ refeicao, itensPrevistos, alimentos, alim
     setIdsParaSubstituir(new Set());
     setConsultaCatalogo('');
     setMensagem(null);
+    setRecemAdicionadoId(null);
   }
 
   function renderGrupo(grupo) {
@@ -302,6 +320,8 @@ export function SugestaoSubstituicao({ refeicao, itensPrevistos, alimentos, alim
                         return (
                           <ItemAlimentoEditavel
                             key={c.alimentoId}
+                            id={`cesta-${c.alimentoId}`}
+                            destacarNovo={c.alimentoId === recemAdicionadoId}
                             alimento={alimento}
                             alimentosPorId={alimentosPorId}
                             quantidade={c.quantidadeG}
@@ -333,20 +353,18 @@ export function SugestaoSubstituicao({ refeicao, itensPrevistos, alimentos, alim
                     onDirecaoChange={setDirecao}
                   />
 
-                  <div className="subsecao">
-                    <ListaPaginada
-                      itens={candidatos}
-                      itensPorPagina={5}
-                      resetKey={`${consultaCatalogo}|${filtro}|${ordenarPor}|${direcao}`}
-                      renderItem={(c) => (
-                        <CandidatoOrcamentoItem
-                          key={c.alimento.id}
-                          candidato={c}
-                          onSelecionar={(alimento, quantidade) => adicionarNaCesta(alimento, quantidade)}
-                        />
-                      )}
-                    />
-                  </div>
+                  <ListaPaginada
+                    itens={candidatos}
+                    itensPorPagina={5}
+                    resetKey={`${consultaCatalogo}|${filtro}|${ordenarPor}|${direcao}`}
+                    renderItem={(c) => (
+                      <CandidatoOrcamentoItem
+                        key={c.alimento.id}
+                        candidato={c}
+                        onSelecionar={(alimento, quantidade) => adicionarNaCesta(alimento, quantidade)}
+                      />
+                    )}
+                  />
 
                   {meta && (idsParaRemoverPreview.length > 0 || cesta.length > 0) && (
                     <div className="mt-3 pt-3 border-top">

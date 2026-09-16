@@ -50,15 +50,16 @@ export function usePlanoNutricional() {
     [plano, persistir],
   );
 
+  // Devolve o id do item de forma síncrona — quem chama usa pra destacar/rolar até ele.
   const adicionarItem = useCallback(
     (refeicaoId, alimentoId, quantidadeG) => {
-      return persistir({
+      const novoId = gerarId('item');
+      persistir({
         refeicoes: plano.refeicoes.map((r) =>
-          r.id === refeicaoId
-            ? { ...r, itens: [...r.itens, { id: gerarId('item'), alimentoId, quantidadeG }] }
-            : r,
+          r.id === refeicaoId ? { ...r, itens: [...r.itens, { id: novoId, alimentoId, quantidadeG }] } : r,
         ),
       });
+      return novoId;
     },
     [plano, persistir],
   );
