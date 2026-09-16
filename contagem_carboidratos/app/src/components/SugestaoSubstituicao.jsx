@@ -1,16 +1,24 @@
 import { useMemo, useState } from 'react';
-import { Form, Button, ListGroup, Badge, Alert, Modal } from 'react-bootstrap';
-import { QuantidadeDupla } from './QuantidadeDupla';
+import { Form, Button, ListGroup, Alert, Modal, Collapse } from 'react-bootstrap';
 import { ResumoNutricional } from './ResumoNutricional';
-import { calcularItem, arredondar } from '../domain/calculos';
-import { calcularOrcamento, calcularUsoCesta, classificarCandidato } from '../domain/substituicao';
+import { ListaPaginada } from './ListaPaginada';
+import { CandidatoOrcamentoItem } from './CandidatoOrcamentoItem';
+import { FiltroOrdenacaoCandidatos } from './FiltroOrdenacaoCandidatos';
+import { ItemAlimentoEditavel } from './ItemAlimentoEditavel';
+import { calcularItem, calcularTotalItens, formatarNumero } from '../domain/calculos';
+import {
+  calcularOrcamento,
+  calcularUsoCesta,
+  classificarCandidato,
+  filtrarEOrdenarCandidatos,
+} from '../domain/substituicao';
 import { buscarAlimentos } from '../domain/busca';
 
 function textoQuantidade(alimento, quantidade) {
   if (!alimento) return '';
   return alimento.quantidade_indefinida
-    ? `${arredondar(quantidade, 2)}x ${alimento.medida}`
-    : `${arredondar(quantidade, 1)} g`;
+    ? `${formatarNumero(quantidade, 2)}x ${alimento.medida}`
+    : `${formatarNumero(quantidade, 1)} g`;
 }
 
 // Monta os grupos de "o que dá pra substituir": um por alimento, nunca um lançamento por vez
@@ -57,15 +65,28 @@ function montarGrupos(itensPrevistos, itensLogados) {
   return Array.from(porAlimento.values());
 }
 
+const textoExplicativoCesta = ({ unidade }) =>
+  `Soma ${unidade === 'kcal' ? 'das calorias' : 'dos carboidratos'} dos alimentos já colocados na cesta.`;
+
 // Botão que abre um modal para substituir alimentos dessa refeição (do plano ou lançados
-// avulsos) por outros do catálogo, sem estourar o orçamento dos marcados.
-export function SugestaoSubstituicao({ refeicao, itensPrevistos, alimentos, alimentosPorId, onAplicar }) {
+// avulsos) por outros do catálogo, sem estourar o orçamento dos marcados. Fluxo em dois
+// passos (dois `Collapse` dentro do mesmo `Modal.Body` — nunca os dois abertos ao mesmo
+// tempo): primeiro escolher QUAIS alimentos substituir, depois — já com os toggles Respeitar
+// calorias/carboidratos como primeira coisa — buscar substitutos e montar a cesta. O footer
+// com os botões de aplicar fica sempre visível nos dois passos, só habilitado de verdade a
+// partir do momento que a cesta tem algo. `meta` (a meta da refeição inteira, não o orçamento
+// da substituição) alimenta a prévia no fim do passo 2.
+export function SugestaoSubstituicao({ refeicao, itensPrevistos, alimentos, alimentosPorId, meta, onAplicar }) {
   const [aberto, setAberto] = useState(false);
+  const [etapa, setEtapa] = useState('escolher'); // 'escolher' | 'substitutos'
   const [idsParaSubstituir, setIdsParaSubstituir] = useState(new Set());
   const [respeitarCalorias, setRespeitarCalorias] = useState(true);
   const [respeitarCarboidratos, setRespeitarCarboidratos] = useState(true);
   const [cesta, setCesta] = useState([]);
   const [consultaCatalogo, setConsultaCatalogo] = useState('');
+  const [filtro, setFiltro] = useState('todos');
+  const [ordenarPor, setOrdenarPor] = useState(null);
+  const [direcao, setDirecao] = useState('asc');
   const [mensagem, setMensagem] = useState(null);
 
   const grupos = useMemo(
@@ -80,8 +101,10 @@ export function SugestaoSubstituicao({ refeicao, itensPrevistos, alimentos, alim
   const usoCesta = calcularUsoCesta(cesta, alimentosPorId);
 
   const candidatos = useMemo(() => {
-    const filtrados = buscarAlimentos(alimentos, consultaCatalogo, 60);
-    return filtrados
+    // Sem limite artificial: a lista completa que bate com a busca entra na paginação,
+    // exaustiva de verdade (não só os N melhores resultados).
+    const filtrados = buscarAlimentos(alimentos, consultaCatalogo, alimentos.length);
+    const classificados = filtrados
       .filter((alimento) => !cesta.some((c) => c.alimentoId === alimento.id))
       .map((alimento) =>
         classificarCandidato(alimento, usoCesta, orcamento, {
@@ -89,10 +112,29 @@ export function SugestaoSubstituicao({ refeicao, itensPrevistos, alimentos, alim
           carboidratos: respeitarCarboidratos,
         }),
       );
-  }, [alimentos, consultaCatalogo, cesta, usoCesta, orcamento, respeitarCalorias, respeitarCarboidratos]);
+    return filtrarEOrdenarCandidatos(classificados, { filtro, ordenarPor, direcao });
+  }, [
+    alimentos,
+    consultaCatalogo,
+    cesta,
+    usoCesta,
+    orcamento,
+    respeitarCalorias,
+    respeitarCarboidratos,
+    filtro,
+    ordenarPor,
+    direcao,
+  ]);
 
-  const dentroDoLimite = candidatos.filter((c) => !c.excede);
-  const foraDoLimite = candidatos.filter((c) => c.excede);
+  // Prévia de como a refeição ficaria — assumindo o clique em "Substituir os itens
+  // marcados" (o cenário mais informativo: remove os originais marcados E soma a cesta).
+  const idsParaRemoverPreview = gruposSelecionados.flatMap((g) => g.itemIds);
+  const itensRestantesPreview = refeicao.itens.filter((i) => !idsParaRemoverPreview.includes(i.id));
+  const totalRestantesPreview = calcularTotalItens(itensRestantesPreview, alimentosPorId);
+  const totalPreview = {
+    kcal: totalRestantesPreview.kcal + usoCesta.kcal,
+    cho: totalRestantesPreview.cho + usoCesta.cho,
+  };
 
   function alternarGrupo(alimentoId) {
     setIdsParaSubstituir((atual) => {
@@ -126,10 +168,12 @@ export function SugestaoSubstituicao({ refeicao, itensPrevistos, alimentos, alim
     setMensagem(substituir ? 'Itens substituídos.' : 'Itens adicionados.');
     setCesta([]);
     setIdsParaSubstituir(new Set());
+    setEtapa('escolher');
   }
 
   function fechar() {
     setAberto(false);
+    setEtapa('escolher');
     setCesta([]);
     setIdsParaSubstituir(new Set());
     setConsultaCatalogo('');
@@ -143,15 +187,16 @@ export function SugestaoSubstituicao({ refeicao, itensPrevistos, alimentos, alim
       <ListGroup.Item key={grupo.alimentoId}>
         <Form.Check
           type="switch"
-          id={`sub-${grupo.alimentoId}`}
+          id={`sub-${refeicao.id}-${grupo.alimentoId}`}
           checked={idsParaSubstituir.has(grupo.alimentoId)}
           onChange={() => alternarGrupo(grupo.alimentoId)}
           label={
             alimento ? (
               <>
-                {alimento.alimento} ({textoQuantidade(alimento, grupo.quantidadeG)}){' '}
+                <span className="fw-semibold">{alimento.alimento}</span> (
+                {textoQuantidade(alimento, grupo.quantidadeG)}){' '}
                 <span className="text-muted">
-                  — {Math.round(kcal)} kcal · {arredondar(cho)} g CHO
+                  — {Math.round(kcal)} kcal · {formatarNumero(cho)} g CHO
                 </span>
               </>
             ) : (
@@ -180,136 +225,159 @@ export function SugestaoSubstituicao({ refeicao, itensPrevistos, alimentos, alim
             </div>
           ) : (
             <>
-              {gruposDoPlano.length > 0 && (
-                <>
-                  <div className="fw-semibold small mb-1">Alimentos do plano</div>
-                  <ListGroup className="mb-3">{gruposDoPlano.map(renderGrupo)}</ListGroup>
-                </>
-              )}
-              {gruposAdicionados.length > 0 && (
-                <>
-                  <div className="fw-semibold small mb-1">Alimentos adicionados</div>
-                  <ListGroup className="mb-3">{gruposAdicionados.map(renderGrupo)}</ListGroup>
-                </>
-              )}
-            </>
-          )}
+              <Collapse in={etapa === 'escolher'}>
+                <div>
+                  <div className="small text-muted mb-2">Passo 1 de 2 — o que substituir</div>
+                  {gruposDoPlano.length > 0 && (
+                    <>
+                      <div className="fw-semibold small mb-1">Alimentos do plano</div>
+                      <ListGroup className="subsecao mb-3">{gruposDoPlano.map(renderGrupo)}</ListGroup>
+                    </>
+                  )}
+                  {gruposAdicionados.length > 0 && (
+                    <>
+                      <div className="fw-semibold small mb-1">Alimentos adicionados</div>
+                      <ListGroup className="subsecao mb-3">{gruposAdicionados.map(renderGrupo)}</ListGroup>
+                    </>
+                  )}
 
-          {idsParaSubstituir.size > 0 && (
-            <>
-              <div className="d-flex gap-4 mb-2 flex-wrap">
-                <Form.Check
-                  type="switch"
-                  id="respeitar-calorias"
-                  label="Respeitar calorias"
-                  checked={respeitarCalorias}
-                  onChange={(e) => setRespeitarCalorias(e.target.checked)}
-                />
-                <Form.Check
-                  type="switch"
-                  id="respeitar-carboidratos"
-                  label="Respeitar carboidratos"
-                  checked={respeitarCarboidratos}
-                  onChange={(e) => setRespeitarCarboidratos(e.target.checked)}
-                />
-              </div>
-
-              <div className="mb-2">
-                <ResumoNutricional
-                  titulo="Cesta / orçamento da substituição"
-                  consumidoKcal={usoCesta.kcal}
-                  consumidoCho={usoCesta.cho}
-                  metaKcal={orcamento.kcal}
-                  metaCho={orcamento.cho}
-                  tamanho="compacto"
-                />
-              </div>
-
-              {cesta.length > 0 && (
-                <ListGroup className="mb-2">
-                  {cesta.map((c) => {
-                    const alimento = alimentosPorId.get(c.alimentoId);
-                    return (
-                      <ListGroup.Item key={c.alimentoId}>
-                        <div className="d-flex justify-content-between align-items-center gap-2 mb-2">
-                          <span>{alimento?.alimento}</span>
-                          <Button
-                            size="sm"
-                            variant="link"
-                            className="text-danger p-0"
-                            onClick={() => removerDaCesta(c.alimentoId)}
-                          >
-                            remover
-                          </Button>
-                        </div>
-                        <QuantidadeDupla
-                          alimento={alimento}
-                          valor={c.quantidadeG}
-                          onChange={(novaQuantidade) => atualizarQuantidadeCesta(c.alimentoId, novaQuantidade)}
-                        />
-                      </ListGroup.Item>
-                    );
-                  })}
-                </ListGroup>
-              )}
-
-              <Form.Control
-                className="mb-2"
-                placeholder="Buscar alimento substituto..."
-                value={consultaCatalogo}
-                onChange={(e) => setConsultaCatalogo(e.target.value)}
-              />
-
-              <div className="fw-semibold small text-success">Cabem no limite</div>
-              <ListGroup className="mb-3" style={{ maxHeight: 220, overflowY: 'auto' }}>
-                {dentroDoLimite.slice(0, 20).map((c) => (
-                  <ListGroup.Item
-                    key={c.alimento.id}
-                    action
-                    onClick={() => adicionarNaCesta(c.alimento, c.quantidadeTeste)}
-                    className="d-flex justify-content-between align-items-center gap-2"
+                  <Button
+                    disabled={idsParaSubstituir.size === 0}
+                    onClick={() => setEtapa('substitutos')}
                   >
-                    <span>
-                      {c.alimento.alimento} <small className="text-muted">({c.alimento.medida})</small>
-                    </span>
-                    <small className="text-nowrap">
-                      {Math.round(c.acrescimoKcal)} kcal · {arredondar(c.acrescimoCho)} g CHO
-                    </small>
-                  </ListGroup.Item>
-                ))}
-                {dentroDoLimite.length === 0 && (
-                  <ListGroup.Item className="text-muted small">Nada encontrado.</ListGroup.Item>
-                )}
-              </ListGroup>
+                    Avançar
+                  </Button>
+                </div>
+              </Collapse>
 
-              <div className="fw-semibold small text-danger">Ultrapassam o limite</div>
-              <ListGroup className="mb-3" style={{ maxHeight: 220, overflowY: 'auto' }}>
-                {foraDoLimite.slice(0, 20).map((c) => (
-                  <ListGroup.Item
-                    key={c.alimento.id}
-                    action
-                    onClick={() => adicionarNaCesta(c.alimento, c.quantidadeTeste)}
+              <Collapse in={etapa === 'substitutos'}>
+                <div>
+                  <Button
+                    variant="link"
+                    size="sm"
+                    className="p-0 mb-2"
+                    onClick={() => setEtapa('escolher')}
                   >
-                    <div className="d-flex justify-content-between align-items-center gap-2">
-                      <span>{c.alimento.alimento}</span>
-                      <Badge bg="danger" className="text-nowrap">
-                        {c.excedeKcalEm > 0 && `+${Math.round(c.excedeKcalEm)} kcal `}
-                        {c.excedeChoEm > 0 && `+${arredondar(c.excedeChoEm)} g CHO`}
-                      </Badge>
+                    ‹ voltar para escolher os alimentos
+                  </Button>
+                  <div className="small text-muted mb-2">Passo 2 de 2 — buscar substitutos</div>
+
+                  <div className="d-flex gap-4 mb-3 flex-wrap">
+                    <Form.Check
+                      type="switch"
+                      id={`respeitar-calorias-${refeicao.id}`}
+                      label="Respeitar calorias"
+                      checked={respeitarCalorias}
+                      onChange={(e) => setRespeitarCalorias(e.target.checked)}
+                    />
+                    <Form.Check
+                      type="switch"
+                      id={`respeitar-carboidratos-${refeicao.id}`}
+                      label="Respeitar carboidratos"
+                      checked={respeitarCarboidratos}
+                      onChange={(e) => setRespeitarCarboidratos(e.target.checked)}
+                    />
+                  </div>
+
+                  <div className="mb-2">
+                    <ResumoNutricional
+                      titulo="Cesta / orçamento da substituição"
+                      consumidoKcal={usoCesta.kcal}
+                      consumidoCho={usoCesta.cho}
+                      metaKcal={orcamento.kcal}
+                      metaCho={orcamento.cho}
+                      tamanho="compacto"
+                      textoExplicativo={textoExplicativoCesta}
+                    />
+                  </div>
+
+                  {cesta.length > 0 && (
+                    <div className="lista-itens-refeicao mb-2">
+                      {cesta.map((c) => {
+                        const alimento = alimentosPorId.get(c.alimentoId);
+                        const usoOutrosCesta = calcularTotalItens(
+                          cesta.filter((outro) => outro.alimentoId !== c.alimentoId),
+                          alimentosPorId,
+                        );
+                        return (
+                          <ItemAlimentoEditavel
+                            key={c.alimentoId}
+                            alimento={alimento}
+                            alimentosPorId={alimentosPorId}
+                            quantidade={c.quantidadeG}
+                            onChangeQuantidade={(novaQuantidade) => atualizarQuantidadeCesta(c.alimentoId, novaQuantidade)}
+                            onRemover={() => removerDaCesta(c.alimentoId)}
+                            orcamento={orcamento}
+                            usoOutros={usoOutrosCesta}
+                            respeitarCalorias={respeitarCalorias}
+                            respeitarCarboidratos={respeitarCarboidratos}
+                          />
+                        );
+                      })}
                     </div>
-                    <small className="text-muted d-block mt-1">
-                      {Math.round(c.acrescimoKcal)} kcal · {arredondar(c.acrescimoCho)} g CHO na medida
-                      usual — máximo pra não passar:{' '}
-                      {c.alimento.quantidade_indefinida
-                        ? `${arredondar(c.quantidadeMaximaMedidas, 2)}x ${c.alimento.medida}`
-                        : `${arredondar(c.quantidadeMaximaG, 1)} g (${arredondar(c.quantidadeMaximaMedidas, 2)}x ${c.alimento.medida})`}
-                    </small>
-                  </ListGroup.Item>
-                ))}
-                {foraDoLimite.length === 0 && (
-                  <ListGroup.Item className="text-muted small">Nada encontrado.</ListGroup.Item>
-                )}
-              </ListGroup>
+                  )}
+
+                  <Form.Control
+                    className="mb-2"
+                    placeholder="Buscar alimento substituto..."
+                    value={consultaCatalogo}
+                    onChange={(e) => setConsultaCatalogo(e.target.value)}
+                  />
+
+                  <FiltroOrdenacaoCandidatos
+                    filtro={filtro}
+                    onFiltroChange={setFiltro}
+                    ordenarPor={ordenarPor}
+                    onOrdenarPorChange={setOrdenarPor}
+                    direcao={direcao}
+                    onDirecaoChange={setDirecao}
+                  />
+
+                  <div className="subsecao">
+                    <ListaPaginada
+                      itens={candidatos}
+                      itensPorPagina={5}
+                      resetKey={`${consultaCatalogo}|${filtro}|${ordenarPor}|${direcao}`}
+                      renderItem={(c) => (
+                        <CandidatoOrcamentoItem
+                          key={c.alimento.id}
+                          candidato={c}
+                          onSelecionar={(alimento, quantidade) => adicionarNaCesta(alimento, quantidade)}
+                        />
+                      )}
+                    />
+                  </div>
+
+                  {meta && (idsParaRemoverPreview.length > 0 || cesta.length > 0) && (
+                    <div className="mt-3 pt-3 border-top">
+                      <div className="small text-muted mb-1">
+                        Prévia — como ficaria essa refeição ao "Substituir os itens marcados":
+                      </div>
+                      <div className="subsecao p-2 small">
+                        {itensRestantesPreview.length === 0 && cesta.length === 0 && (
+                          <div className="text-muted">A refeição ficaria sem nenhum alimento.</div>
+                        )}
+                        {itensRestantesPreview.map((i) => {
+                          const a = alimentosPorId.get(i.alimentoId);
+                          return a ? <div key={i.id}>{a.alimento}</div> : null;
+                        })}
+                        {cesta.map((c) => {
+                          const a = alimentosPorId.get(c.alimentoId);
+                          return a ? (
+                            <div key={c.alimentoId} className="text-success">
+                              {a.alimento} (novo)
+                            </div>
+                          ) : null;
+                        })}
+                        <div className="mt-2 fw-semibold text-muted">
+                          Total previsto: {Math.round(totalPreview.kcal)} kcal · {formatarNumero(totalPreview.cho)} g CHO
+                          {' '}(meta da refeição: {Math.round(meta.kcal)} kcal · {formatarNumero(meta.cho)} g CHO)
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </Collapse>
             </>
           )}
         </Modal.Body>

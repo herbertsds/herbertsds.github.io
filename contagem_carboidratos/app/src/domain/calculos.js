@@ -56,3 +56,13 @@ export function arredondar(valor, casas = 1) {
   const fator = 10 ** casas;
   return Math.round(valor * fator) / fator;
 }
+
+// Mesmo arredondamento de `arredondar`, mas devolvendo o texto já pronto pra exibir — com
+// vírgula como separador decimal (`toLocaleString('pt-BR')`), a convenção do resto do app,
+// nunca ponto. `useGrouping: false` porque isso é só sobre separador decimal, não sobre
+// separador de milhar (não introduzir pontos de milhar onde não existiam). Nunca usar no
+// `value` de um `<input type="number">` — esses exigem ponto e um valor numérico de verdade,
+// não uma string; `QuantidadeDupla` continua com `arredondar` pra esse caso.
+export function formatarNumero(valor, casas = 1) {
+  return valor.toLocaleString('pt-BR', { useGrouping: false, maximumFractionDigits: casas });
+}

@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { Modal, Form, Button } from 'react-bootstrap';
-import { Typeahead } from 'react-bootstrap-typeahead';
 
 const TIPOS_PADRAO = [
   'Café da Manhã',
@@ -15,23 +14,22 @@ function montarOpcoesTipo(tiposExistentes) {
   return Array.from(new Set([...TIPOS_PADRAO, ...(tiposExistentes || [])]));
 }
 
-// CRUD de refeição do Plano Nutricional. O select de tipo permite escolher um dos padrões
-// ou digitar um nome novo (allowNew). Refeições do Dia não usam mais este modal — elas vêm
+// CRUD de refeição do Plano Nutricional. Select simples com os tipos padrão + já existentes.
+// Refeições do Dia não usam mais este modal — elas vêm
 // automaticamente do plano (ver RefeicoesDoDia.jsx).
 export function RefeicaoFormModal({ aberto, refeicaoInicial, tiposExistentes, onFechar, onSalvar }) {
-  const [tipo, setTipo] = useState([]);
+  const [tipo, setTipo] = useState('');
   const [horario, setHorario] = useState('');
 
   useEffect(() => {
     if (aberto) {
-      setTipo(refeicaoInicial ? [refeicaoInicial.tipo] : []);
+      setTipo(refeicaoInicial ? refeicaoInicial.tipo : '');
       setHorario(refeicaoInicial ? refeicaoInicial.horario : '');
     }
   }, [aberto, refeicaoInicial]);
 
   const opcoesTipo = montarOpcoesTipo(tiposExistentes);
-  const tipoEscolhido = tipo[0] || '';
-  const podeSalvar = String(tipoEscolhido).trim().length > 0 && horario.trim().length > 0;
+  const podeSalvar = tipo.trim().length > 0 && horario.trim().length > 0;
 
   return (
     <Modal show={aberto} onHide={onFechar} centered>
@@ -41,22 +39,14 @@ export function RefeicaoFormModal({ aberto, refeicaoInicial, tiposExistentes, on
       <Modal.Body>
         <Form.Group className="mb-3">
           <Form.Label>Tipo de refeição</Form.Label>
-          <Typeahead
-            id="tipo-refeicao"
-            allowNew
-            newSelectionPrefix="Nova refeição: "
-            options={opcoesTipo}
-            selected={tipo}
-            onChange={(selecionados) => {
-              const valor = selecionados[0];
-              if (!valor) {
-                setTipo([]);
-                return;
-              }
-              setTipo([typeof valor === 'string' ? valor : (valor.label ?? valor.tipo ?? '')]);
-            }}
-            placeholder="Selecione ou digite um novo tipo"
-          />
+          <Form.Select value={tipo} onChange={(e) => setTipo(e.target.value)}>
+            <option value="">Selecione...</option>
+            {opcoesTipo.map((t) => (
+              <option key={t} value={t}>
+                {t}
+              </option>
+            ))}
+          </Form.Select>
         </Form.Group>
         <Form.Group>
           <Form.Label>Horário</Form.Label>
@@ -75,7 +65,7 @@ export function RefeicaoFormModal({ aberto, refeicaoInicial, tiposExistentes, on
           variant="primary"
           disabled={!podeSalvar}
           onClick={() => {
-            onSalvar({ tipo: String(tipoEscolhido).trim(), horario });
+            onSalvar({ tipo: tipo.trim(), horario });
             onFechar();
           }}
         >

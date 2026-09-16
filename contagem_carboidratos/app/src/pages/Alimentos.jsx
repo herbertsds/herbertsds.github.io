@@ -5,12 +5,12 @@ import { AlimentoFormModal } from '../components/AlimentoFormModal';
 import { AlimentoVariacoesModal } from '../components/AlimentoVariacoesModal';
 import { alimentosRepository } from '../data/repositories/alimentosRepository';
 import { buscarAlimentos } from '../domain/busca';
-import { arredondar } from '../domain/calculos';
+import { formatarNumero } from '../domain/calculos';
 
 function linhaResumo(alimento) {
   return `${alimento.medida} (${
-    alimento.quantidade_indefinida ? 'sem peso definido' : `${alimento.quantidade_g_ml}g/ml`
-  }) · ${Math.round(alimento.calorias_kcal)} kcal · ${arredondar(alimento.carboidratos_g)} g CHO`;
+    alimento.quantidade_indefinida ? 'sem peso definido' : `${formatarNumero(alimento.quantidade_g_ml)}g/ml`
+  }) · ${Math.round(alimento.calorias_kcal)} kcal · ${formatarNumero(alimento.carboidratos_g)} g CHO`;
 }
 
 // Tela para corrigir dados do catálogo, cadastrar alimentos que não estão nele, e gerenciar
@@ -171,7 +171,12 @@ export function Alimentos() {
                       Excluir
                     </Button>
                   ) : (
-                    <Button size="sm" variant="outline-danger" onClick={() => reverterEdicao(alimento)}>
+                    <Button
+                      size="sm"
+                      variant="outline-danger"
+                      className="btn-largura-fixa"
+                      onClick={() => reverterEdicao(alimento)}
+                    >
                       Reverter edição
                     </Button>
                   )}

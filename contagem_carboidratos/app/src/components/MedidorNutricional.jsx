@@ -1,4 +1,4 @@
-import { arredondar } from '../domain/calculos';
+import { formatarNumero } from '../domain/calculos';
 
 // Escala de cor contínua pela porcentagem consumida: verde (dentro da meta) -> amarelo (na
 // metade) -> vermelho (bateu ou passou da meta). Interpola em RGB entre essas três paradas —
@@ -28,15 +28,40 @@ function misturarComBranco(rgb, proporcaoBranco) {
 }
 
 function formatar(valor, casas) {
-  return casas === 0 ? String(Math.round(valor)) : String(arredondar(valor, casas));
+  return casas === 0 ? String(Math.round(valor)) : formatarNumero(valor, casas);
 }
 
-// Um "medidor": rótulo, número grande com consumido/meta, a porcentagem embaixo (menor), e
-// uma barra de progresso — preenchimento e texto na cor da escala (verde -> amarelo ->
-// vermelho conforme a porcentagem consumida), trilha na mesma cor bem clareada.
-export function MedidorNutricional({ rotulo, consumido, meta, unidade, casas = 0, tamanho = 'padrao' }) {
+// Frase padrão pra explicar o big number quando é "consumido vs. meta" (Meta da
+// Refeição/Total do dia): quanto ainda dá pra comer, ou quanto já passou da meta. `null` sem
+// `contexto` (outros usos, como a cesta da Substituição, passam `textoExplicativo` próprio).
+function explicacaoPadrao({ restante, unidade, contexto }) {
+  const nome = unidade === 'kcal' ? 'calorias' : 'de carboidratos';
+  if (restante >= 0) {
+    return `Você ainda pode comer ${formatar(restante, unidade === 'kcal' ? 0 : 1)} ${unidade} ${nome === 'calorias' ? '' : nome + ' '}${contexto}.`;
+  }
+  return `Você já passou ${formatar(Math.abs(restante), unidade === 'kcal' ? 0 : 1)} ${unidade} ${nome === 'calorias' ? '' : nome + ' '}da meta ${contexto}.`;
+}
+
+// Um "medidor": rótulo, número grande com consumido/meta, a porcentagem embaixo (menor), uma
+// barra de progresso (preenchimento e texto na cor da escala) e, por padrão, uma frase curta
+// explicando o número ("Você ainda pode comer X kcal nessa refeição"). `contexto` ("nessa
+// refeição"/"no dia") monta a frase padrão; `textoExplicativo({ consumido, meta, restante,
+// unidade, rotulo })` substitui a frase inteira pra usos que não são "consumido vs. meta" (ex:
+// a cesta da Substituição, que é "soma dos alimentos escolhidos"). Nenhum dos dois = sem
+// frase.
+export function MedidorNutricional({
+  rotulo,
+  consumido,
+  meta,
+  unidade,
+  casas = 0,
+  tamanho = 'padrao',
+  contexto,
+  textoExplicativo,
+}) {
   const metaSegura = meta > 0 ? meta : 0;
   const percentual = metaSegura > 0 ? consumido / metaSegura : consumido > 0 ? 1 : 0;
+  const restante = metaSegura - consumido;
 
   const rgb = corDaEscala(percentual);
   const cor = `rgb(${rgb.join(',')})`;
@@ -48,6 +73,13 @@ export function MedidorNutricional({ rotulo, consumido, meta, unidade, casas = 0
       : tamanho === 'compacto'
         ? 'medidor-numero medidor-numero-compacto'
         : 'medidor-numero';
+
+  let explicacao = null;
+  if (textoExplicativo) {
+    explicacao = textoExplicativo({ consumido, meta: metaSegura, restante, unidade, rotulo });
+  } else if (contexto) {
+    explicacao = explicacaoPadrao({ restante, unidade, contexto });
+  }
 
   return (
     <div className="medidor-nutricional">
@@ -64,6 +96,7 @@ export function MedidorNutricional({ rotulo, consumido, meta, unidade, casas = 0
           style={{ width: `${Math.min(percentual, 1) * 100}%`, background: cor }}
         />
       </div>
+      {explicacao && <div className="medidor-explicacao">{explicacao}</div>}
     </div>
   );
 }

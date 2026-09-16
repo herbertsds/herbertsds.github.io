@@ -66,3 +66,155 @@ Consequência no hook `useRefeicoesDoDia`: `adicionarRefeicao`, `excluirRefeicao
 `garantirRefeicoes` (a versão anterior, que gravava antecipadamente) foram todos removidos —
 `comRefeicaoGarantida` (interno, chamado dentro de cada mutação) é a única forma de uma
 refeição passar a existir de verdade agora.
+
+## Navegação de data: reservar o espaço do "voltar para hoje"
+
+Os botões ‹ › e o link "voltar para hoje" ficam na mesma linha flex que o
+`<input type="date">`. O link só faz sentido quando o dia selecionado não é hoje — mas
+renderizá-lo condicionalmente (`{!ehHoje && <Button>...}`) muda a altura dessa coluna (uma
+linha vs. duas). Duas correções, na ordem que os problemas apareceram:
+
+1. O botão passou a ser **sempre** renderizado (só fica com a classe `invisible` do
+   Bootstrap, e `disabled`, quando `ehHoje`) — a altura da coluna fica constante entre os dois
+   estados.
+2. Isso sozinho não bastava: o container usava `align-items-center`, então ‹ › ficavam
+   centralizados **verticalmente em relação às duas linhas** (input + link, mesmo quando o
+   link só está invisível) — ou seja, sempre um pouco mais baixo que o input, não alinhados
+   com ele. A correção final trocou `align-items-center` por `align-items-start`: ‹ › ficam
+   ancorados no **topo** da coluna — que é sempre o input — independente de quantas linhas
+   existirem abaixo dele.
+
+## `RefeicaoDoDiaCard` — um card por refeição, com estado próprio
+
+Cada refeição do dia é renderizada por `components/RefeicaoDoDiaCard.jsx`, não mais montada
+inline dentro do `.map()` de `RefeicoesDoDia.jsx`. O motivo é que os toggles **Respeitar
+calorias**/**Respeitar carboidratos** viraram estado de verdade (`useState`), próprio de cada
+refeição — e hooks não podem ser chamados dentro de um `.map()`. `RefeicoesDoDia.jsx` continua
+calculando o que depende do dia inteiro (data, refeições a exibir, meta por tipo) e só passa
+pra baixo; cada `RefeicaoDoDiaCard` monta o `consumido`, as `sugestoesRestantes` e o
+`orcamentoRestante` daquela refeição específica, e é dono dos toggles.
+
+**`key={refeicao.tipo}`, não `key={refeicao.id}`**: uma refeição ainda virtual tem o id
+sintético `virtual:<tipo>`; assim que o primeiro item é lançado, `comRefeicaoGarantida` gera um
+id novo de verdade (materialização, ver acima). Se o `.map()` de `RefeicoesDoDia.jsx` usasse
+`refeicao.id` como key, esse troca de id no exato momento de materializar faria o React
+desmontar o `RefeicaoDoDiaCard` antigo e montar um novo do zero — perdendo todo o estado local
+que ele acabou de construir (colapso aberto/fechado, os dois toggles, o filtro/ordenação da
+lista de candidatos em `AlimentosNoOrcamento`) bem na hora em que o usuário está interagindo
+com o card. `refeicao.tipo` é estável nesse momento (não muda com a materialização) e único
+entre as refeições exibidas (`tiposDoPlano`, dentro de `refeicoesParaExibir`, já é deduplicado
+por tipo) — resolve sem precisar propagar nenhum estado pra cima.
+
+### Ordem dos blocos dentro do card
+
+Fixada nessa ordem, de cima pra baixo (`RefeicaoCard.jsx` expõe os slots; quem decide o que
+entra em cada um é `RefeicaoDoDiaCard.jsx`); só o item 2 fica visível com a refeição colapsada
+(ver "Refeições colapsadas" abaixo) — tudo do item 3 em diante mora dentro do `Collapse`:
+
+1. Cabeçalho (só o tipo + o indicador ▸/▾ — o horário não mora mais aqui, ver "Refeições
+   colapsadas" abaixo).
+2. **Meta da refeição** (`resumo`) — a informação principal, sempre visível, e onde o horário
+   registrado agora mora (prop `extra` de `ResumoNutricional`).
+3. **Respeitar calorias / Respeitar carboidratos** (`depoisDoResumo`) — imediatamente depois
+   da meta, antes de qualquer lista. Ficam aqui (e não escondidos dentro da lista de
+   candidatos, como antes) porque valem pra refeição inteira, não só pra uma lista específica.
+4. Itens já lançados (ver "Editar a quantidade" abaixo).
+5. **Sugestões do plano** (`sugestoesDoPlano`) — o que o plano já prevê pra essa refeição e
+   ainda não foi lançado.
+6. Lista "o que cabe (e o que ultrapassa) na meta" (`rodape`, `AlimentosNoOrcamento` — ver
+   [04](04-substituicao.md)), que inclui o próprio campo de busca. **A busca livre do topo
+   (`AlimentoBuscaInput`) não aparece no Dia** — só no Plano — porque essa lista já cobre
+   "buscar e adicionar" sozinha (ver "Um só campo de busca" abaixo).
+7. "Sugerir substituição" (`extra`).
+
+## Refeições colapsadas
+
+Cada `RefeicaoCard` nas Refeições do Dia começa **colapsada** (prop `colapsavel` em
+`RefeicaoCard.jsx`, só passada por `RefeicaoDoDiaCard.jsx` — o Plano não usa). O `Collapse` do
+react-bootstrap (envolvendo tudo a partir do item 3 da lista acima) alterna clicando em
+**qualquer ponto da barra do cabeçalho** — não só um botão pequeno: `Card.Header` inteiro
+ganha `onClick` (mais `role="button"`, `tabIndex` e `onKeyDown` pra Enter/Espaço, já que uma
+`div` clicável não é focável/acionável por teclado por padrão) quando `colapsavel`, com a
+classe `.card-header-colapsavel` (cursor + destaque de hover) pra dar a pista visual. O ▸/▾
+que sobra no canto é só um indicador (`.chevron-colapso`), não mais um `<Button>` com seu
+próprio clique — não precisa mais, já que a barra toda já aciona.
+
+Isso só foi possível depois de tirar o horário do cabeçalho (ver "Onde o horário mora agora"
+abaixo): um `<input type="time">` ali dentro brigaria pelo clique com o colapso da barra —
+teria que ter um `stopPropagation`, cliques em áreas "erradas" do cabeçalho ainda
+colapsariam, etc. Mais simples tirar o input do caminho.
+
+A Meta da Refeição (item 2 da lista acima) fica **fora** do `Collapse`, então dá pra ver o
+essencial (quanto já foi consumido daquela refeição, e o horário) sem precisar abrir cada
+card — só expande quem o usuário realmente quer editar. Detalhe de implementação: o `Collapse`
+do react-bootstrap mede/anima um único nó DOM, então o conteúdo colapsável precisa estar
+dentro de um único elemento (`<div>`) — um `Fragment` com vários filhos no topo quebra a
+medição de altura (`TypeError: Cannot set properties of undefined`).
+
+### Onde o horário mora agora
+
+O horário registrado (fixo ou editável, via `onHorarioRegistradoChange`) saiu do cabeçalho do
+`RefeicaoCard` e foi pra dentro do card de Meta da Refeição, como prop `extra` de
+`ResumoNutricional` (ver [07](07-resumo-nutricional.md)) — `RefeicaoDoDiaCard.jsx` monta o
+`<input type="time">` + "registrado" ali direto, em vez de passar `onHorarioRegistradoChange`
+como prop pro `RefeicaoCard` (que não sabe mais nada sobre horário). Como o card de Meta fica
+fora do `Collapse`, o horário continua sempre visível e editável, refeição aberta ou fechada.
+
+## Um só campo de busca
+
+Existiam dois jeitos de adicionar um alimento na mesma refeição: a busca livre do topo
+(`AlimentoBuscaInput`, abre um modal de quantidade) e o campo de busca dentro de
+`AlimentosNoOrcamento` (filtra a lista "o que cabe/ultrapassa"). Redundante — os dois faziam a
+mesma coisa, só que um mostrava o orçamento e o outro não. `RefeicaoCard` agora só renderiza o
+`AlimentoBuscaInput` quando `onEditarQuantidadeItem` **não** é passado (ou seja, só no Plano);
+no Dia, a busca de `AlimentosNoOrcamento` é o único campo — clicar num resultado adiciona
+direto na medida usual, e a quantidade dá pra ajustar depois (ver abaixo), então o modal de
+escolher quantidade antes de adicionar deixou de ser necessário ali.
+
+## Editar a quantidade de um item já lançado
+
+Cada item da refeição tinha só "remover" — pra mudar a quantidade era preciso remover e
+lançar de novo. Agora, quando `RefeicaoCard` recebe `onEditarQuantidadeItem(itemId,
+quantidadeG)` (só o Dia passa; o Plano não), cada item vira um `ItemAlimentoEditavel`
+(`components/ItemAlimentoEditavel.jsx` — o mesmo componente usado na cesta da Substituição,
+ver [04](04-substituicao.md)) em vez da linha estática antiga. Reorganizado assim, de cima pra
+baixo:
+
+1. **Nome do alimento em destaque** (`fw-700`, tamanho maior) — antes era texto comum e
+   sumia no meio do card.
+2. **Dose original**, em texto discreto: `calorias_kcal`/`carboidratos_g` do próprio
+   catálogo, direto — são literalmente os valores PARA a medida usual (não "por grama"), então
+   não precisam de cálculo nenhum, só de não usar `item.quantidadeG` (o que já foi ajustado).
+3. Os campos editáveis (`QuantidadeDupla` — gramas e múltiplos da medida usual, os dois
+   sincronizados).
+4. **"Nessa quantidade"**, com bem mais destaque (negrito, cor de texto normal em vez de
+   `text-muted`) que a dose original — os valores calculados na quantidade que está de fato
+   nos campos acima.
+5. Um separador, os **marcadores de kcal e CHO** (vermelho "excede"/verde "sobra",
+   **separados por eixo** — igual `CandidatoOrcamentoItem`, ver [04](04-substituicao.md)), e a
+   frase de conclusão: `"Respeitando {calorias e/ou carboidratos}, pode chegar até {X}."` —
+   `fraseRespeitar()` em `domain/substituicao.js` monta "calorias e carboidratos" / "calorias"
+   / "carboidratos" conforme os toggles, ou `null` (a seção some) se nenhum eixo é respeitado.
+
+O "até quanto pode chegar" continua sendo o **total** que esse item poderia ter (não "quanto
+mais"): `usoOutros` é a soma dos **outros** itens da mesma refeição (`calcularTotalItens`
+excluindo esse), e `orcamento` é a meta da refeição inteira — passados pro
+`ItemAlimentoEditavel` como props, que por baixo chama `quantidadeMaximaParaItem`
+(`domain/substituicao.js`). Isso deixa visível, na hora de editar, por que um item específico
+já está "estourando" — ex: a meta de CHO da refeição é 12 g e esse alimento sozinho permitiria
+até 40,4 g antes de passar, mas está lançado com 64 g.
+
+## Contraste e separação entre alimentos
+
+Card (branco) contendo sugestões do plano, itens já lançados e a lista de candidatos por
+orçamento ficava "branco sobre branco" — difícil notar onde uma seção acaba e a outra começa,
+e pior ainda quando havia mais de um alimento na mesma lista (sem nada os separando com
+clareza). Duas camadas de correção, em `index.css`:
+
+- `.subsecao` (sugestões, grupos e candidatos — ainda `ListGroup`) e `.lista-itens-refeicao`
+  (itens já lançados e a cesta — ver abaixo) dão um fundo cinza-claro com borda a cada bloco,
+  isolando-o visualmente do card/modal branco por trás.
+- Dentro de `.lista-itens-refeicao`, cada `ItemAlimentoEditavel` é seu próprio **cartão
+  branco** (`.item-alimento-editavel`, com borda e cantos arredondados), em coluna com espaço
+  entre eles — não mais linhas de uma `ListGroup`. Um cartão branco sobre fundo cinza deixa
+  óbvio, de relance, quantos alimentos existem na fila, mesmo sem ler o conteúdo.

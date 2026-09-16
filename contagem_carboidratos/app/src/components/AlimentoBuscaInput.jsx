@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import { buscarAlimentos } from '../domain/busca';
+import { formatarNumero } from '../domain/calculos';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 
 // Caixa de busca de alimentos reaproveitada em toda a aplicação (refeições do plano,
@@ -28,7 +29,7 @@ export function AlimentoBuscaInput({ alimentos, onSelecionar, placeholder = 'Bus
         <div>
           <div>{alimento.alimento}</div>
           <small className="text-muted">
-            {alimento.medida} · {alimento.calorias_kcal} kcal · {alimento.carboidratos_g}g CHO
+            {alimento.medida} · {Math.round(alimento.calorias_kcal)} kcal · {formatarNumero(alimento.carboidratos_g)}g CHO
           </small>
         </div>
       )}

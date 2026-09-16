@@ -82,7 +82,7 @@ body {
 /* Editar/Variações (tela Alimentos) ficavam com larguras diferentes por causa do texto —
    largura mínima igual deixa a coluna de botões alinhada. */
 .btn-largura-fixa {
-  min-width: 6.5rem;
+  min-width: 9rem;
 }
 
 /* O Bootstrap não dá sombra nenhuma ao dropdown por padrão (só uma borda quase invisível
@@ -116,6 +116,63 @@ body {
 .list-group-item-action:hover,
 .list-group-item-action:focus {
   background-color: #eef2ff;
+}
+
+/* Dentro de um Card (branco) ou de um Modal (branco), listas secundárias — sugestões do
+   plano, cesta da substituição, candidatos por orçamento — ficavam "branco sobre branco",
+   sem nenhuma pista visual de onde uma seção acaba e a outra começa. Um fundo levemente cinza
+   + borda + cantos arredondados isola cada bloco do card/modal por trás dele. */
+.subsecao {
+  background: #f2f3f5;
+  border: 1px solid #d8dadd;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.subsecao .list-group-item {
+  background: transparent;
+  border-color: #d8dadd;
+}
+
+.subsecao .list-group-item-action:hover,
+.subsecao .list-group-item-action:focus {
+  background-color: #e2e6ea;
+}
+
+/* Fila de alimentos já lançados numa refeição (ou a cesta da Substituição): mesmo fundo
+   cinza da `.subsecao`, mas os itens em si (`.item-alimento-editavel`) são cartões brancos
+   separados por espaço — não linhas de lista — pra ficar óbvio que existe mais de um alimento
+   ali quando existir mais de um. */
+.lista-itens-refeicao {
+  background: #f2f3f5;
+  border: 1px solid #d8dadd;
+  border-radius: 0.5rem;
+  padding: 0.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.item-alimento-editavel {
+  background: #fff;
+  border: 1px solid #d8dadd;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+}
+
+.item-alimento-nome {
+  font-weight: 700;
+  font-size: 1rem;
+  color: #1e1e1e;
+}
+
+/* O valor "na quantidade ajustada" precisa se destacar mais que a dose original (que é só
+   referência) — maior, mais forte, cor de texto normal (não muted) em vez da mesma cinza da
+   dose original. */
+.item-alimento-valor-atual {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #1e1e1e;
 }
 
 /* text-muted do Bootstrap (#6c757d) é baixo contraste em texto pequeno — escurece um pouco. */
@@ -214,6 +271,16 @@ body {
   transition: width 0.2s ease;
 }
 
+/* Frase curta explicando o big number ("Você ainda pode comer X kcal nessa refeição") —
+   sempre em texto neutro (não na cor da escala), pra não competir com o número/barra, que já
+   carregam a severidade. */
+.medidor-explicacao {
+  font-size: 0.78rem;
+  color: #5a6169;
+  margin-top: 0.35rem;
+  line-height: 1.3;
+}
+
 /* Botão "ⓘ" ao lado do título, que abre os créditos da fonte dos dados de alimentos. */
 .botao-info {
   border: none;
@@ -229,4 +296,33 @@ body {
 .botao-info:focus-visible {
   color: #0d6efd;
   background: #eef2ff;
+}
+
+/* Cabeçalho de uma refeição colapsável (Refeições do Dia): a barra toda é o alvo de clique
+   pra abrir/fechar — o horário saiu daqui (foi pro card de Meta), então não há mais um
+   `<input>` no meio competindo pelo clique. */
+.card-header-colapsavel {
+  cursor: pointer;
+  user-select: none;
+}
+
+.card-header-colapsavel:hover,
+.card-header-colapsavel:focus-visible {
+  background-color: #ececee;
+}
+
+/* Indicador visual (▸/▾) do colapso — não é mais um `<button>` próprio (o clique já é da
+   barra inteira); só precisa parecer clicável. */
+.chevron-colapso {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 1px solid #adb5bd;
+  border-radius: 0.375rem;
+  background: #fff;
+  color: #495057;
+  font-size: 0.9rem;
+  flex: 0 0 auto;
 }

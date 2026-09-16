@@ -1,13 +1,12 @@
 import { useMemo } from 'react';
-import { Button, Spinner, ListGroup } from 'react-bootstrap';
+import { Button, Spinner } from 'react-bootstrap';
 import { useDataSelecionada } from '../context/DataSelecionadaContext';
 import { useRefeicoesDoDia } from '../hooks/useRefeicoesDoDia';
 import { usePlanoNutricional } from '../hooks/usePlanoNutricional';
 import { useAlimentos } from '../hooks/useAlimentos';
-import { RefeicaoCard } from '../components/RefeicaoCard';
+import { RefeicaoDoDiaCard } from '../components/RefeicaoDoDiaCard';
 import { ResumoNutricional } from '../components/ResumoNutricional';
-import { SugestaoSubstituicao } from '../components/SugestaoSubstituicao';
-import { calcularItem, calcularTotalItens, calcularTotalRefeicoes, arredondar } from '../domain/calculos';
+import { calcularTotalRefeicoes } from '../domain/calculos';
 
 function horarioEfetivo(refeicao) {
   return refeicao.horarioRegistrado ?? refeicao.horario;
@@ -23,6 +22,7 @@ export function RefeicoesDoDia() {
     editarRefeicao,
     adicionarItem,
     removerItem,
+    editarQuantidadeItem,
     substituirItensNaRefeicao,
   } = useRefeicoesDoDia(data);
 
@@ -93,7 +93,7 @@ export function RefeicoesDoDia() {
 
   return (
     <div className="pb-5">
-      <div className="d-flex align-items-center justify-content-between mb-2 gap-2">
+      <div className="d-flex align-items-start justify-content-between mb-2 gap-2">
         <Button variant="outline-secondary" size="sm" onClick={() => mudarDia(-1)}>
           ‹
         </Button>
@@ -104,11 +104,21 @@ export function RefeicoesDoDia() {
             value={data}
             onChange={(e) => setData(e.target.value)}
           />
-          {!ehHoje && (
-            <Button variant="link" size="sm" className="p-0" onClick={irParaHoje}>
-              voltar para hoje
-            </Button>
-          )}
+          {/* Sempre renderizado (só fica invisível em vez de sumir) — o link "voltar para
+              hoje" não deve empurrar o input pra baixo visualmente nem mudar onde ‹ › ficam.
+              Com align-items-start (em vez de center) no container, ‹ › ficam alinhados com o
+              topo dessa coluna — ou seja, com o input — esteja o link visível ou não. */}
+          <Button
+            variant="link"
+            size="sm"
+            className={`p-0 ${ehHoje ? 'invisible' : ''}`}
+            disabled={ehHoje}
+            tabIndex={ehHoje ? -1 : 0}
+            aria-hidden={ehHoje}
+            onClick={irParaHoje}
+          >
+            voltar para hoje
+          </Button>
         </div>
         <Button variant="outline-secondary" size="sm" onClick={() => mudarDia(1)}>
           ›
@@ -123,6 +133,7 @@ export function RefeicoesDoDia() {
           metaKcal={metaTotalDia.kcal}
           metaCho={metaTotalDia.cho}
           tamanho="grande"
+          contexto="no dia"
         />
       </div>
 
@@ -138,86 +149,36 @@ export function RefeicoesDoDia() {
         .map((refeicao) => {
           const criarSeNaoExistir = { tipo: refeicao.tipo, horario: refeicao.horario };
           const meta = metaDoTipo(refeicao.tipo);
-          const consumido = calcularTotalItens(refeicao.itens, alimentosPorId);
           const itensPrevistos = plano.refeicoes
             .filter((r) => r.tipo === refeicao.tipo)
             .flatMap((r) => r.itens);
-          const idsJaAdicionados = new Set(refeicao.itens.map((i) => i.alimentoId));
-          const sugestoesRestantes = itensPrevistos.filter(
-            (item) => !idsJaAdicionados.has(item.alimentoId),
-          );
 
           return (
-            <RefeicaoCard
-              key={refeicao.id}
+            <RefeicaoDoDiaCard
+              // Por tipo, não por id: uma refeição virtual materializa com um id novo (gerado
+              // na hora) assim que o primeiro item é lançado — usar `refeicao.id` como key
+              // faria o React remontar o card do zero nesse momento (perdendo o estado local:
+              // colapso, toggles Respeitar, filtro/ordenação da lista). `tipo` é estável e
+              // único entre as refeições exibidas (`tiposDoPlano` já é deduplicado por tipo).
+              key={refeicao.tipo}
               refeicao={refeicao}
+              itensPrevistos={itensPrevistos}
+              meta={meta}
               alimentos={alimentos}
               alimentosPorId={alimentosPorId}
-              onAdicionarItem={(alimentoId, quantidade) =>
-                adicionarItem(refeicao.id, alimentoId, quantidade, 'extra', criarSeNaoExistir)
+              variacoesPorBase={variacoesPorBase}
+              onAdicionarItem={(alimentoId, quantidade, origem = 'extra') =>
+                adicionarItem(refeicao.id, alimentoId, quantidade, origem, criarSeNaoExistir)
               }
               onRemoverItem={(itemId) => removerItem(refeicao.id, itemId)}
+              onEditarQuantidadeItem={(itemId, quantidadeG) =>
+                editarQuantidadeItem(refeicao.id, itemId, quantidadeG)
+              }
               onHorarioRegistradoChange={(horario) =>
                 editarRefeicao(refeicao.id, { horarioRegistrado: horario }, criarSeNaoExistir)
               }
-              permitirVariacoes
-              variacoesPorBase={variacoesPorBase}
-              resumo={
-                <ResumoNutricional
-                  titulo="Meta da refeição"
-                  consumidoKcal={consumido.kcal}
-                  consumidoCho={consumido.cho}
-                  metaKcal={meta.kcal}
-                  metaCho={meta.cho}
-                />
-              }
-              rodape={
-                sugestoesRestantes.length > 0 && (
-                  <div className="mt-2">
-                    <div className="small text-muted mb-1">Sugestões do plano:</div>
-                    <ListGroup>
-                      {sugestoesRestantes.map((item) => {
-                        const alimento = alimentosPorId.get(item.alimentoId);
-                        if (!alimento) return null;
-                        const { kcal, cho } = calcularItem(item, alimentosPorId);
-                        return (
-                          <ListGroup.Item
-                            key={item.id}
-                            action
-                            className="d-flex justify-content-between align-items-center gap-2"
-                            onClick={() =>
-                              adicionarItem(
-                                refeicao.id,
-                                item.alimentoId,
-                                item.quantidadeG,
-                                'sugestao-plano',
-                                criarSeNaoExistir,
-                              )
-                            }
-                          >
-                            <span>{alimento.alimento}</span>
-                            <small className="text-muted text-nowrap">
-                              {item.quantidadeG}
-                              {alimento.quantidade_indefinida ? 'x' : 'g'} · {Math.round(kcal)} kcal ·{' '}
-                              {arredondar(cho)} g CHO
-                            </small>
-                          </ListGroup.Item>
-                        );
-                      })}
-                    </ListGroup>
-                  </div>
-                )
-              }
-              extra={
-                <SugestaoSubstituicao
-                  refeicao={refeicao}
-                  itensPrevistos={itensPrevistos}
-                  alimentos={alimentos}
-                  alimentosPorId={alimentosPorId}
-                  onAplicar={(refeicaoId, idsParaRemover, novosItens) =>
-                    substituirItensNaRefeicao(refeicaoId, idsParaRemover, novosItens, criarSeNaoExistir)
-                  }
-                />
+              onSubstituir={(idsParaRemover, novosItens) =>
+                substituirItensNaRefeicao(refeicao.id, idsParaRemover, novosItens, criarSeNaoExistir)
               }
             />
           );

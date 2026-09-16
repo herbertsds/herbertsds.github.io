@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 import { QuantidadeDupla } from './QuantidadeDupla';
-import { calcularItem, arredondar } from '../domain/calculos';
+import { calcularItem, formatarNumero } from '../domain/calculos';
 
 // Passo de quantidade depois de escolher um alimento (busca ou sugestão do plano). Quando
 // `permitirVariacoes` está ligado (só nas Refeições do Dia — não faz sentido escolher marca
@@ -73,7 +73,7 @@ export function AlimentoQuantidadeModal({
             <strong>{Math.round(kcal)}</strong> kcal
           </span>
           <span>
-            <strong>{arredondar(cho)}</strong> g CHO
+            <strong>{formatarNumero(cho)}</strong> g CHO
           </span>
         </div>
       </Modal.Body>

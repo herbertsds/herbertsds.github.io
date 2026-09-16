@@ -61,6 +61,48 @@ function possuiAlgumDado() {
   return chavesDoApp().length > 0;
 }
 
+// Backup por categoria: o usuário pode querer levar só o plano (ou só o catálogo de
+// alimentos) para outro dispositivo, sem sobrescrever as refeições já registradas lá. Cada
+// categoria reconhece suas chaves pelo nome/prefixo, sem que o repository correspondente
+// precise saber nada sobre backup.
+const CATEGORIAS = {
+  planos: (chave) => chave === 'plano_nutricional',
+  refeicoes: (chave) => chave.startsWith('refeicoes_do_dia:'),
+  alimentos: (chave) =>
+    chave === 'alimentos_overrides' || chave === 'alimentos_customizados' || chave === 'alimentos_variacoes',
+};
+
+function chavesDaCategoria(categoria) {
+  const pertenceACategoria = CATEGORIAS[categoria];
+  return chavesDoApp().filter(pertenceACategoria);
+}
+
+function exportarCategoria(categoria) {
+  const dados = {};
+  for (const chave of chavesDaCategoria(categoria)) {
+    dados[chave] = readJSON(chave, null);
+  }
+  return dados;
+}
+
+// Sobrescreve só as chaves dessa categoria: remove todas as que já existiam (pra um dia
+// removido no dispositivo de origem também sumir daqui) e grava as do backup importado —
+// filtrando por `pertenceACategoria`, já que `dados` pode ser um payload combinado com chaves
+// de outras categorias juntas (export com mais de um toggle marcado).
+function importarCategoria(categoria, dados) {
+  const pertenceACategoria = CATEGORIAS[categoria];
+  for (const chave of chavesDaCategoria(categoria)) {
+    remove(chave);
+  }
+  Object.entries(dados).forEach(([chave, valor]) => {
+    if (pertenceACategoria(chave)) writeJSON(chave, valor);
+  });
+}
+
+function possuiDadosDaCategoria(categoria) {
+  return chavesDaCategoria(categoria).length > 0;
+}
+
 export const localStorageAdapter = {
   readJSON,
   writeJSON,
@@ -68,4 +110,7 @@ export const localStorageAdapter = {
   exportarTudo,
   importarTudo,
   possuiAlgumDado,
+  exportarCategoria,
+  importarCategoria,
+  possuiDadosDaCategoria,
 };

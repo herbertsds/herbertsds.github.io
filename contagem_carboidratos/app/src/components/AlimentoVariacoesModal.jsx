@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Modal, Form, Button, ListGroup } from 'react-bootstrap';
-import { arredondar } from '../domain/calculos';
+import { formatarNumero } from '../domain/calculos';
 
 const CAMPOS_VAZIOS = { nomeVariacao: '', medida: '', quantidade_g_ml: '0', calorias_kcal: '0', carboidratos_g: '0' };
 
@@ -44,8 +44,8 @@ export function AlimentoVariacoesModal({ alimentoBase, variacoes, aberto, onFech
                   <div>{v.nomeVariacao}</div>
                   <small className="text-muted">
                     {v.medida} (
-                    {v.quantidade_indefinida ? 'sem peso definido' : `${v.quantidade_g_ml}g/ml`}
-                    ) · {Math.round(v.calorias_kcal)} kcal · {arredondar(v.carboidratos_g)} g CHO
+                    {v.quantidade_indefinida ? 'sem peso definido' : `${formatarNumero(v.quantidade_g_ml)}g/ml`}
+                    ) · {Math.round(v.calorias_kcal)} kcal · {formatarNumero(v.carboidratos_g)} g CHO
                   </small>
                 </div>
                 <Button size="sm" variant="outline-danger" onClick={() => onExcluir(v.id)}>

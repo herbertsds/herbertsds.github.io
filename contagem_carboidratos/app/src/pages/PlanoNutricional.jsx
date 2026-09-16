@@ -1,10 +1,11 @@
 import { useMemo, useState } from 'react';
-import { Accordion, Button, Alert, Spinner } from 'react-bootstrap';
+import { Button, Alert, Spinner } from 'react-bootstrap';
 import { usePlanoNutricional } from '../hooks/usePlanoNutricional';
 import { useAlimentos } from '../hooks/useAlimentos';
 import { RefeicaoCard } from '../components/RefeicaoCard';
 import { RefeicaoFormModal } from '../components/RefeicaoFormModal';
-import { calcularTotalRefeicoes, arredondar } from '../domain/calculos';
+import { BuscaAlimentosPlano } from '../components/BuscaAlimentosPlano';
+import { calcularTotalRefeicoes, formatarNumero } from '../domain/calculos';
 
 export function PlanoNutricional() {
   const { alimentos, todos: todosOsAlimentos, carregando: carregandoAlimentos } = useAlimentos();
@@ -16,6 +17,7 @@ export function PlanoNutricional() {
     excluirRefeicao,
     adicionarItem,
     removerItem,
+    editarQuantidadeItem,
   } = usePlanoNutricional();
 
   const [modalAberto, setModalAberto] = useState(false);
@@ -74,41 +76,39 @@ export function PlanoNutricional() {
         </Button>
       </div>
 
-      <Accordion>
-        {plano.refeicoes
-          .slice()
-          .sort((a, b) => a.horario.localeCompare(b.horario))
-          .map((refeicao, indice) => (
-            <Accordion.Item eventKey={String(indice)} key={refeicao.id} className="mb-2 border rounded">
-              <Accordion.Header>
-                <span className="me-2">{refeicao.tipo}</span>
-                <span className="text-muted small">{refeicao.horario}</span>
-              </Accordion.Header>
-              <Accordion.Body>
-                <RefeicaoCard
-                  refeicao={refeicao}
-                  alimentos={alimentos}
-                  alimentosPorId={alimentosPorId}
-                  onAdicionarItem={(alimentoId, quantidade) =>
-                    adicionarItem(refeicao.id, alimentoId, quantidade)
-                  }
-                  onRemoverItem={(itemId) => removerItem(refeicao.id, itemId)}
-                  onEditar={() => {
-                    setRefeicaoEditando(refeicao);
-                    setModalAberto(true);
-                  }}
-                  onExcluir={() => excluirRefeicao(refeicao.id)}
-                  totalLabel="Total da refeição (meta)"
-                />
-              </Accordion.Body>
-            </Accordion.Item>
-          ))}
-      </Accordion>
+      {plano.refeicoes
+        .slice()
+        .sort((a, b) => a.horario.localeCompare(b.horario))
+        .map((refeicao) => (
+          <RefeicaoCard
+            key={refeicao.id}
+            refeicao={refeicao}
+            alimentos={alimentos}
+            alimentosPorId={alimentosPorId}
+            colapsavel
+            ocultarBuscaLivre
+            onAdicionarItem={(alimentoId, quantidade) => adicionarItem(refeicao.id, alimentoId, quantidade)}
+            onRemoverItem={(itemId) => removerItem(refeicao.id, itemId)}
+            onEditarQuantidadeItem={(itemId, quantidadeG) => editarQuantidadeItem(refeicao.id, itemId, quantidadeG)}
+            rodape={
+              <BuscaAlimentosPlano
+                alimentos={alimentos}
+                onAdicionar={(alimentoId, quantidade) => adicionarItem(refeicao.id, alimentoId, quantidade)}
+              />
+            }
+            onEditar={() => {
+              setRefeicaoEditando(refeicao);
+              setModalAberto(true);
+            }}
+            onExcluir={() => excluirRefeicao(refeicao.id)}
+            totalLabel="Total da refeição (meta)"
+          />
+        ))}
 
       <Alert variant="light" className="border mt-3 mb-0 d-flex justify-content-between">
         <span>Total do plano</span>
         <strong>
-          {Math.round(totalPlano.kcal)} kcal · {arredondar(totalPlano.cho)} g CHO
+          {Math.round(totalPlano.kcal)} kcal · {formatarNumero(totalPlano.cho)} g CHO
         </strong>
       </Alert>
 

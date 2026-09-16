@@ -105,6 +105,21 @@ porções** (múltiplo inteiro da medida usual), e o cálculo é `calorias_kcal 
 vez de dividir por peso. A UI (`AlimentoQuantidadeModal`) troca o rótulo do campo para
 "Quantas porções?" nesse caso.
 
+## Números com casa decimal: vírgula no texto, ponto nos campos
+
+`arredondar(valor, casas)` (`domain/calculos.js`) sempre devolveu um **número** — certo pra
+cálculo, mas quando interpolado direto num texto (`` `${arredondar(cho)} g CHO` ``) o
+JavaScript usa ponto como separador decimal (`"12.5"`), o oposto da convenção brasileira.
+`formatarNumero(valor, casas)`, ao lado de `arredondar`, resolve isso pro texto exibido:
+mesmo arredondamento, mas devolve a **string** já formatada com `toLocaleString('pt-BR')`
+(vírgula decimal; `useGrouping: false` pra não introduzir ponto de milhar, que não foi
+pedido). Regra de uso: **todo número solto num texto** (kcal/CHO, gramas, "pode chegar até",
+medida usual em g/ml) passa por `formatarNumero` — só os dois campos de
+`QuantidadeDupla.jsx` continuam com `arredondar` (um número de verdade), porque são `value`
+de `<input type="number">`, que exige ponto e quebra com string. Kcal em geral não passa por
+nenhum dos dois — é sempre `Math.round(...)` puro, já que o app nunca mostra casa decimal de
+caloria.
+
 ## Meta e delta (Refeições do Dia)
 
 Não existe vínculo por id entre uma refeição do dia e uma refeição do plano — o casamento é

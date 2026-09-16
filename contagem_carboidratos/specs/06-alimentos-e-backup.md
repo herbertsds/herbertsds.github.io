@@ -89,17 +89,50 @@ página.
 ## Backup (Importar/Exportar)
 
 Solução deliberadamente temporária enquanto o app não tem um backend — para levar os dados de
-um navegador/dispositivo para outro. Fica toda em `localStorageAdapter`, sem depender de saber
-os nomes das chaves de cada repository:
+um navegador/dispositivo para outro. Três categorias — Planos, Refeições, Alimentos —, porque
+o usuário nem sempre quer levar tudo: às vezes só o plano mudou de dispositivo, às vezes só o
+catálogo foi editado.
 
-- `exportarTudo()` varre todas as chaves do `localStorage` com o prefixo do app e devolve um
-  objeto `{ chave: valor }`. Isso inclui automaticamente qualquer repository novo que apareça
-  no futuro (plano, refeições de cada dia, overrides de alimentos) sem precisar atualizar essa
-  função.
-- **Exportar** serializa esse objeto com `JSON.stringify` e copia para a área de transferência
-  (`navigator.clipboard.writeText`).
-- **Importar** cola o texto, faz `JSON.parse` e grava cada chave de volta
-  (`importarTudo`). Se `possuiAlgumDado()` disser que já existe algo salvo, mostra um modal de
-  confirmação antes de sobrescrever — a importação substitui tudo, não faz merge.
-- Depois de importar, é preciso recarregar a página — os hooks já montados (plano, alimentos,
-  refeições do dia) têm o dado antigo em memória e não ficam observando o localStorage.
+Tudo fica em `localStorageAdapter`, sem os repositories saberem nada sobre backup. Cada
+categoria reconhece as próprias chaves por nome/prefixo (`CATEGORIAS` em
+`localStorageAdapter.js`): `planos` → `plano_nutricional`; `refeicoes` → tudo que começa com
+`refeicoes_do_dia:`; `alimentos` → `alimentos_overrides`, `alimentos_customizados` e
+`alimentos_variacoes`.
+
+### Exportar: toggles + um payload só
+
+`ImportarExportar.jsx` tem um `Form.Check` por categoria (todas marcadas por padrão); o botão
+**Exportar** junta as chaves de cada categoria marcada (`exportarCategoria`) num payload só —
+`{ categorias: ['planos', ...], dados: { <chave>: <valor> } }` — e copia pra área de
+transferência (`navigator.clipboard.writeText`). O array `categorias` viaja junto porque é ele
+quem diz, na hora de importar, o que fazer com cada chave — sem ele não daria pra saber se uma
+chave de refeição faz parte de um backup que só devia mexer no plano.
+
+### Importar: um botão só, lê a área de transferência sozinho
+
+Nada de colar texto: o botão **Importar** chama `navigator.clipboard.readText()` direto. Erros
+tratados explicitamente (nunca uma tela quebrada silenciosa):
+- Falha ao ler a área de transferência (permissão negada, vazia) → erro.
+- Texto não é JSON, ou não tem `categorias` (array) + `dados` (objeto) → "não é um backup
+  válido".
+
+Pra cada `categoria` do payload:
+- **Planos/Refeições**: substituem, como antes (`importarCategoria`, que agora filtra `dados`
+  pelas chaves da própria categoria — necessário porque `dados` pode vir com chaves de outras
+  categorias juntas no mesmo payload). Se já existe algo salvo numa dessas categorias, um modal
+  confirma antes (`possuiDadosDaCategoria`) — Alimentos nunca entra nessa checagem, porque não
+  sobrescreve, faz merge.
+- **Alimentos**: nunca substitui — faz **merge** (`domain/mergeAlimentos.js`,
+  `mesclarAlimentos`). Compara cada uma das três coleções (o mapa de overrides por id; as
+  listas de customizados/variações por id) contra o que já está salvo: o que só existe de um
+  lado entra direto; o que existe dos dois lados com o **mesmo** conteúdo nem conta como
+  conflito; só entra em conflito quando o mesmo id tem conteúdo diferente dos dois lados. Sem
+  conflito nenhum, grava direto. Com conflito, abre um modal listando cada um (rótulo = nome do
+  alimento/variação) com rádio "Manter o meu" / "Manter o importado", mais dois atalhos em
+  massa ("Manter todos os meus" / "Manter todos os importados") — `aplicarResolucoes` aplica as
+  escolhas em cima do resultado já mesclado (que, pros conflitos ainda não resolvidos, vale
+  "meu" até a pessoa decidir).
+
+Depois de importar, é preciso recarregar a página — os hooks já montados (plano, alimentos,
+refeições do dia) têm o dado antigo em memória e não ficam observando o localStorage; o botão
+"Recarregar página" só aparece depois de uma importação de verdade (não depois de exportar).
