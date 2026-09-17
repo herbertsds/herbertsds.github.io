@@ -69,10 +69,27 @@ escolhida, não o do alimento base. Como cada variação já é um alimento comp
 `alimentosPorId`, nenhum outro lugar do app (cálculo, exibição na lista da refeição, busca de
 substituição) precisa saber que ela é "uma variação de algo" — é só mais um alimento.
 
+**Onde o `AlimentoQuantidadeModal` de verdade abre**: `RefeicaoCard` sabe renderizar uma busca
+livre própria (`AlimentoBuscaInput` + esse modal), mas as duas telas que o usam
+(`RefeicaoDoDiaCard.jsx` e `PlanoNutricional.jsx`) sempre passam `ocultarBuscaLivre` — esse
+caminho nunca roda na prática. Quem abre o modal de verdade, quando o alimento tem variação, é
+`AlimentosNoOrcamento` (a lista de candidatos por orçamento — "Adicione novos alimentos na sua
+refeição") e a lista "Sugestões do plano" dentro de `RefeicaoDoDiaCard.jsx`: em vez de
+adicionar direto ao clicar (como fazem pra qualquer alimento sem variação), essas duas
+verificam `variacoesPorBase.get(alimentoId)` e, se houver algo, abrem o modal para escolher a
+marca antes de lançar. **Bug real, corrigido**: antes dessa checagem existir, não havia
+NENHUM jeito de escolher uma variação ao adicionar algo numa refeição do dia — o único código
+que sabia mostrar o seletor (a busca livre de `RefeicaoCard`) estava sempre oculto, e as duas
+listas que realmente adicionam alimento sempre lançavam direto na medida usual do alimento
+base, sem chance de trocar a marca. O modal aceita uma prop opcional `quantidadeInicial` (a
+quantidade planejada/testada de quem abriu, em vez da medida usual) — só vale enquanto
+"Padrão" estiver selecionado; trocar pra uma variação volta a usar a medida usual dela.
+
 **Só nas Refeições do Dia, nunca no Plano**: o seletor de variação só é passado quando
 `RefeicaoCard` recebe `permitirVariacoes` (feito em `RefeicoesDoDia.jsx`, não em
 `PlanoNutricional.jsx`) — o plano registra o que foi receitado de forma genérica, a escolha de
-marca é um detalhe do que foi realmente comprado/comido no dia.
+marca é um detalhe do que foi realmente comprado/comido no dia. Por isso `BuscaAlimentosPlano`
+(a busca do Plano) nunca precisa dessa checagem.
 
 ## Destaque na tela
 
@@ -168,3 +185,10 @@ alimento, quantidade de uma refeição):
   só quando o campo perde o foco (ou quando o valor muda por fora — ex: o campo de "Gramas" e o
   de "Qtd." em `QuantidadeDupla` se recalculando um ao outro) o texto é resincronizado com o
   valor formatado. Usado em `QuantidadeDupla`, `AlimentoFormModal` e `AlimentoVariacoesModal`.
+  A resincronização é bloqueada por "está sendo editado" (`editando`, ligado só no `onChange` —
+  na digitação de verdade), não por "está focado": um `autoFocus` (ex: o campo "Gramas" do
+  `AlimentoQuantidadeModal`) dispara o foco do navegador antes de um valor inicial assíncrono
+  terminar de chegar (`quantidadeInicial`, ver seção de variações acima); se o gate fosse só
+  foco, o campo ficaria travado no valor velho assim que fosse focado, mesmo sem a pessoa ter
+  digitado nada — bug real, pego ao ligar o seletor de variação numa sugestão do plano (o campo
+  "Gramas" ficava em 0 enquanto "Qtd." — sem `autoFocus` — mostrava o valor certo).

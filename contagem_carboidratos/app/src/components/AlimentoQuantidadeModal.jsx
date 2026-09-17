@@ -3,16 +3,21 @@ import { Modal, Button, Form } from 'react-bootstrap';
 import { QuantidadeDupla } from './QuantidadeDupla';
 import { calcularItem, formatarNumero } from '../domain/calculos';
 
-// Passo de quantidade depois de escolher um alimento (busca ou sugestão do plano). Quando
-// `permitirVariacoes` está ligado (só nas Refeições do Dia — não faz sentido escolher marca
-// no Plano) e o alimento tem variações cadastradas (ver AlimentoVariacoesModal), aparece um
-// seletor: o padrão é o próprio alimento, mas dá pra trocar pra qualquer variação, que passa a
-// valer pros cálculos e é o que efetivamente entra na refeição (onConfirmar recebe o id da
-// variação escolhida, não o do alimento base).
+// Passo de quantidade depois de escolher um alimento (busca, sugestão do plano ou candidato
+// por orçamento). Quando `permitirVariacoes` está ligado (só nas Refeições do Dia — não faz
+// sentido escolher marca no Plano) e o alimento tem variações cadastradas (ver
+// AlimentoVariacoesModal), aparece um seletor: o padrão é o próprio alimento, mas dá pra trocar
+// pra qualquer variação, que passa a valer pros cálculos e é o que efetivamente entra na
+// refeição (onConfirmar recebe o id da variação escolhida, não o do alimento base).
+// `quantidadeInicial` (opcional) substitui a medida usual como valor de partida — usado quando
+// quem abriu o modal já tinha uma quantidade específica em mente (a sugestão do plano, ou a
+// quantidade testada de um candidato por orçamento); só vale pro alimento base — trocar pra uma
+// variação volta a usar a medida usual dela, que é outra.
 export function AlimentoQuantidadeModal({
   alimento,
   variacoes = [],
   permitirVariacoes = false,
+  quantidadeInicial,
   aberto,
   onFechar,
   onConfirmar,
@@ -28,7 +33,10 @@ export function AlimentoQuantidadeModal({
 
   useEffect(() => {
     if (alimentoEfetivo) {
-      setQuantidade(alimentoEfetivo.quantidade_indefinida ? 1 : alimentoEfetivo.quantidade_g_ml || 0);
+      const usarInicial = quantidadeInicial != null && alimentoEfetivo.id === alimento?.id;
+      setQuantidade(
+        usarInicial ? quantidadeInicial : alimentoEfetivo.quantidade_indefinida ? 1 : alimentoEfetivo.quantidade_g_ml || 0,
+      );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [alimentoEfetivo?.id]);

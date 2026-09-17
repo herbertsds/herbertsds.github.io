@@ -163,13 +163,22 @@ fora do `Collapse`, o horário continua sempre visível e editável, refeição 
 ## Um só campo de busca
 
 Existiam dois jeitos de adicionar um alimento na mesma refeição: a busca livre do topo
-(`AlimentoBuscaInput`, abre um modal de quantidade) e o campo de busca dentro de
-`AlimentosNoOrcamento` (filtra a lista "o que cabe/ultrapassa"). Redundante — os dois faziam a
-mesma coisa, só que um mostrava o orçamento e o outro não. `RefeicaoCard` agora só renderiza o
-`AlimentoBuscaInput` quando `onEditarQuantidadeItem` **não** é passado (ou seja, só no Plano);
-no Dia, a busca de `AlimentosNoOrcamento` é o único campo — clicar num resultado adiciona
-direto na medida usual, e a quantidade dá pra ajustar depois (ver abaixo), então o modal de
-escolher quantidade antes de adicionar deixou de ser necessário ali.
+(`AlimentoBuscaInput`, dentro do próprio `RefeicaoCard`, abre um modal de quantidade) e o campo
+de busca dentro de `AlimentosNoOrcamento` (filtra a lista "o que cabe/ultrapassa"). Redundante
+— os dois faziam a mesma coisa, só que um mostrava o orçamento e o outro não. A prop
+`ocultarBuscaLivre` do `RefeicaoCard` esconde a primeira; tanto `RefeicaoDoDiaCard.jsx` (Dia)
+quanto `PlanoNutricional.jsx` (Plano) passam essa prop hoje — ou seja, o `AlimentoBuscaInput`
+de dentro do `RefeicaoCard` nunca roda de verdade em nenhuma das duas telas; cada uma tem sua
+própria busca (`AlimentosNoOrcamento` no Dia, `BuscaAlimentosPlano` no Plano).
+
+No Dia, clicar num resultado de `AlimentosNoOrcamento` (ou numa "Sugestão do plano") adiciona
+direto na medida usual, sem passar por um modal — **exceto quando o alimento tem uma variação
+de marca cadastrada** (ver [06](06-alimentos-e-backup.md)): nesse caso, em vez de lançar direto,
+abre o `AlimentoQuantidadeModal` (o mesmo que ficaria morto dentro do `RefeicaoCard`) pra
+escolher a marca antes. Bug corrigido: antes dessa checagem em `AlimentosNoOrcamento` e na
+lista "Sugestões do plano" (ambas em `RefeicaoDoDiaCard.jsx`), não existia NENHUM jeito de
+escolher uma variação ao adicionar algo — o clique sempre ia direto pro alimento base, mesmo
+tendo variação cadastrada.
 
 ## Editar a quantidade de um item já lançado
 
