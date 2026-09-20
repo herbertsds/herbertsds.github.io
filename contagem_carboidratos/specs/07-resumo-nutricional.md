@@ -49,12 +49,14 @@ visualmente (`Math.min(percentual, 1)`), mesmo quando o valor real passa disso.
 - **Total do dia** (`RefeicoesDoDia.jsx`): logo abaixo da navegação de data, antes de
   "Refeições do dia" — o primeiro bloco da página, tamanho grande.
 - **Meta da refeição** (dentro de cada `RefeicaoCard`, nas duas telas): prop `resumo` do
-  `RefeicaoCard`, renderizado logo após o cabeçalho (só o tipo) — a única coisa que continua
-  visível mesmo com a refeição colapsada (ver [08](08-refeicoes-do-dia.md)). Também é onde mora
-  o horário, via a prop `extra` (ver abaixo) — não no cabeçalho do card, pra esse poder ser
-  clicado em qualquer ponto pra colapsar. Nas Refeições do Dia é `ResumoNutricional`
-  (consumido vs. meta); no Plano Nutricional é `ResumoMetaRefeicao` (só a meta — não existe
-  "consumido" ali, o plano **é** a meta) com o horário fixo do plano em `extra`.
+  `RefeicaoCard`, renderizado logo após o cabeçalho (só o tipo) — some junto com o resto do
+  conteúdo quando a refeição está colapsada, então só aparece com o card aberto (ver
+  [08](08-refeicoes-do-dia.md); já foi diferente — ver "Refeições colapsadas" lá). Também é
+  onde mora o horário, via a prop `extra` (ver abaixo), enquanto aberto — não no cabeçalho do
+  card, pra esse poder ser clicado em qualquer ponto pra colapsar; fechado, o horário volta pro
+  cabeçalho. Nas Refeições do Dia é `ResumoNutricional` (consumido vs. meta); no Plano
+  Nutricional é `ResumoMetaRefeicao` (só a meta — não existe "consumido" ali, o plano **é** a
+  meta) com o horário fixo do plano em `extra`.
 - **Total do plano** (`PlanoNutricional.jsx`): mesmo lugar/tamanho que o "Total do dia" das
   Refeições (primeiro bloco da página, `tamanho="grande"`), também com `ResumoMetaRefeicao`.
 - **Cesta / orçamento da substituição** (dentro do modal de Sugestão de Substituição, ver
@@ -93,9 +95,10 @@ com `titulo`, à direita. Hoje o único uso é o horário registrado da refeiç�
 (`RefeicaoDoDiaCard.jsx`): o `<input type="time">` + "registrado" que antes ficava no
 cabeçalho do `RefeicaoCard` mudou pra cá quando o cabeçalho virou colapsável (ver
 [08](08-refeicoes-do-dia.md)) — um `<input>` no meio de uma barra inteira clicável ia
-disputar o clique com o colapso, então saiu de lá. Como o card de Meta fica **fora** do
-`Collapse` (sempre visível), o horário continua sempre alcançável mesmo com a refeição
-recolhida.
+disputar o clique com o colapso, então saiu de lá. O card de Meta (com esse `extra`) mora
+**dentro** do `Collapse` — some com a refeição recolhida, e o horário some junto; nesse caso
+`RefeicaoCard.jsx` mostra o horário de volta no próprio cabeçalho (ver "Onde o horário mora
+agora" em [08](08-refeicoes-do-dia.md)).
 
 ## Impressão do plano (botão "Imprimir")
 

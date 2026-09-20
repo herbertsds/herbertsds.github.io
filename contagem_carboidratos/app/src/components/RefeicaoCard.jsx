@@ -11,20 +11,22 @@ const ROTULOS_ORIGEM = {
 };
 
 // Card genérico de refeição: cabeçalho (tipo/horário + editar/excluir, ou — quando
-// `colapsavel` — só o tipo e o indicador de colapso, já que a barra toda vira clicável) , o
-// resumo de calorias/carboidratos logo em seguida (a informação principal — sempre visível,
-// mesmo colapsado) e, escondível (`colapsavel`), o resto: toggles de Respeitar
-// calorias/carboidratos (`depoisDoResumo`), a lista de itens já lançados, e a área de
-// adicionar — sugestões do plano (`sugestoesDoPlano`) primeiro, busca livre
-// (`AlimentoBuscaInput`, só quando NÃO há edição de quantidade — ver abaixo) logo abaixo
-// dela, depois `rodape` (lista de candidatos por orçamento) e `extra` (sugestão de
-// substituição). Usado tanto no Plano Nutricional quanto nas Refeições do Dia — o que muda
-// entre eles entra via esses slots. `onEditar`/`onExcluir` são opcionais (só o Plano os usa,
-// nunca junto de `colapsavel`). O horário (fixo ou editável via
-// `onHorarioRegistradoChange`) não mora mais aqui — quem chama é responsável por colocá-lo
-// dentro do `resumo` (ver `extra` de `ResumoNutricional`), pra barra do cabeçalho poder ficar
-// livre pra ser o clique inteiro do colapso, sem um `<input type="time">` no meio brigando
-// pelo clique. `onEditarQuantidadeItem` (só o Dia) troca cada item já lançado por um
+// `colapsavel` — só o tipo e o indicador de colapso, já que a barra toda vira clicável) e,
+// escondível (`colapsavel`), todo o resto: o resumo de calorias/carboidratos (`resumo`) já foi
+// a "informação principal, sempre visível mesmo colapsado" numa versão anterior — agora fica
+// **dentro** do colapso também, junto com os toggles de Respeitar calorias/carboidratos
+// (`depoisDoResumo`), a lista de itens já lançados, e a área de adicionar — sugestões do plano
+// (`sugestoesDoPlano`) primeiro, busca livre (`AlimentoBuscaInput`, só quando NÃO há edição de
+// quantidade — ver abaixo) logo abaixo dela, depois `rodape` (lista de candidatos por
+// orçamento) e `extra` (sugestão de substituição). Fechado, o card não mostra número nenhum —
+// só o tipo (e o horário, ver abaixo). Usado tanto no Plano Nutricional quanto nas Refeições do
+// Dia — o que muda entre eles entra via esses slots. `onEditar`/`onExcluir` são opcionais (só o
+// Plano os usa, nunca junto de `colapsavel`). O horário (fixo ou editável via
+// `onHorarioRegistradoChange`) mora dentro do `resumo` (prop `extra` de `ResumoNutricional`)
+// quando o card está aberto — pra barra do cabeçalho poder ficar livre pra ser o clique inteiro
+// do colapso, sem um `<input type="time">` no meio brigando pelo clique — e volta pro
+// cabeçalho quando fechado, já que o `resumo` (e o horário dentro dele) some junto com o resto
+// do conteúdo colapsado. `onEditarQuantidadeItem` (só o Dia) troca cada item já lançado por um
 // `ItemAlimentoEditavel` (dose original + dose ajustada + limite) em vez da linha estática —
 // e, como esse mesmo componente já cobre "buscar e adicionar" via `rodape` (o botão "+
 // Adicionar alimento" que abre `BuscarAlimentoModal`), a busca livre do topo (que abre um modal
@@ -65,6 +67,7 @@ export function RefeicaoCard({
     // O Collapse do react-bootstrap mede/anima um único nó DOM — precisa de UM filho real
     // (não um Fragment com vários irmãos no topo), senão quebra ao tentar medir a altura.
     <div>
+      {resumo && <Card.Body className="pb-2">{resumo}</Card.Body>}
       {depoisDoResumo && <Card.Body className="pt-0 pb-2">{depoisDoResumo}</Card.Body>}
 
       {refeicao.itens.length > 0 && (
@@ -170,7 +173,15 @@ export function RefeicaoCard({
       >
         <div className="d-flex align-items-center gap-2 flex-wrap">
           <strong>{refeicao.tipo}</strong>
-          {!resumo && <span className="text-muted">{refeicao.horario}</span>}
+          {/* O resumo (com o horário, via `extra`) agora só aparece aberto — some junto com o
+              resto do conteúdo colapsável. Fechado, sem outro lugar pro horário aparecer,
+              volta pro cabeçalho; aberto, ele mora dentro do `resumo` e não duplica aqui.
+              `horarioRegistrado` (só existe nas Refeições do Dia) tem prioridade sobre o
+              horário fixo do plano — é o mesmo valor que apareceria no input dentro do
+              `resumo`, se estivesse aberto. */}
+          {(!resumo || !aberto) && (
+            <span className="text-muted">{refeicao.horarioRegistrado ?? refeicao.horario}</span>
+          )}
         </div>
         {(onEditar || onExcluir || colapsavel) && (
           <div className="d-flex align-items-center gap-1">
@@ -192,8 +203,6 @@ export function RefeicaoCard({
           </div>
         )}
       </Card.Header>
-
-      {resumo && <Card.Body className="pb-2">{resumo}</Card.Body>}
 
       {colapsavel ? <Collapse in={aberto}>{conteudoColapsavel}</Collapse> : conteudoColapsavel}
 

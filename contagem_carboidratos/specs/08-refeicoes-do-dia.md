@@ -125,13 +125,14 @@ por tipo) — resolve sem precisar propagar nenhum estado pra cima.
 ### Ordem dos blocos dentro do card
 
 Fixada nessa ordem, de cima pra baixo (`RefeicaoCard.jsx` expõe os slots; quem decide o que
-entra em cada um é `RefeicaoDoDiaCard.jsx`); só o item 2 fica visível com a refeição colapsada
-(ver "Refeições colapsadas" abaixo) — tudo do item 3 em diante mora dentro do `Collapse`:
+entra em cada um é `RefeicaoDoDiaCard.jsx`); com a refeição colapsada, **nenhum** item da lista
+fica visível — só o cabeçalho (ver "Refeições colapsadas" abaixo). Todos os itens, do 2 em
+diante, moram dentro do `Collapse`:
 
-1. Cabeçalho (só o tipo + o indicador ▸/▾ — o horário não mora mais aqui, ver "Refeições
-   colapsadas" abaixo).
-2. **Meta da refeição** (`resumo`) — a informação principal, sempre visível, e onde o horário
-   registrado agora mora (prop `extra` de `ResumoNutricional`).
+1. Cabeçalho (só o tipo + o indicador ▸/▾ — o horário só mora aqui quando colapsada, ver
+   "Refeições colapsadas" abaixo).
+2. **Meta da refeição** (`resumo`) — os números grandes de consumido/meta, e onde o horário
+   registrado mora (prop `extra` de `ResumoNutricional`) enquanto a refeição está aberta.
 3. **Respeitar calorias / Respeitar carboidratos** (`depoisDoResumo`) — imediatamente depois
    da meta, antes de qualquer lista. Ficam aqui (e não escondidos dentro da lista de
    candidatos, como antes) porque valem pra refeição inteira, não só pra uma lista específica.
@@ -161,21 +162,29 @@ abaixo): um `<input type="time">` ali dentro brigaria pelo clique com o colapso 
 teria que ter um `stopPropagation`, cliques em áreas "erradas" do cabeçalho ainda
 colapsariam, etc. Mais simples tirar o input do caminho.
 
-A Meta da Refeição (item 2 da lista acima) fica **fora** do `Collapse`, então dá pra ver o
-essencial (quanto já foi consumido daquela refeição, e o horário) sem precisar abrir cada
-card — só expande quem o usuário realmente quer editar. Detalhe de implementação: o `Collapse`
-do react-bootstrap mede/anima um único nó DOM, então o conteúdo colapsável precisa estar
-dentro de um único elemento (`<div>`) — um `Fragment` com vários filhos no topo quebra a
-medição de altura (`TypeError: Cannot set properties of undefined`).
+**Mudou de novo**: a Meta da Refeição (item 2 da lista acima) já foi deliberadamente colocada
+**fora** do `Collapse`, pra dar pra ver o essencial sem precisar abrir cada card — decisão
+revertida depois, porque a pessoa queria a refeição colapsada de verdade "totalmente fechada",
+sem número nenhum até abrir de propósito. Hoje o `resumo` mora **dentro** de
+`conteudoColapsavel`, junto com tudo mais — `RefeicaoCard.jsx` só decide se o `Card` inteiro
+tem um `Collapse` em volta (`colapsavel`) ou não; o que fica dentro dele é sempre o mesmo bloco
+(`resumo` incluído). Detalhe de implementação que não mudou: o `Collapse` do react-bootstrap
+mede/anima um único nó DOM, então o conteúdo colapsável precisa estar dentro de um único
+elemento (`<div>`) — um `Fragment` com vários filhos no topo quebra a medição de altura
+(`TypeError: Cannot set properties of undefined`).
 
 ### Onde o horário mora agora
 
-O horário registrado (fixo ou editável, via `onHorarioRegistradoChange`) saiu do cabeçalho do
-`RefeicaoCard` e foi pra dentro do card de Meta da Refeição, como prop `extra` de
-`ResumoNutricional` (ver [07](07-resumo-nutricional.md)) — `RefeicaoDoDiaCard.jsx` monta o
-`<input type="time">` + "registrado" ali direto, em vez de passar `onHorarioRegistradoChange`
-como prop pro `RefeicaoCard` (que não sabe mais nada sobre horário). Como o card de Meta fica
-fora do `Collapse`, o horário continua sempre visível e editável, refeição aberta ou fechada.
+O horário registrado (fixo ou editável, via `onHorarioRegistradoChange`) fica dentro do card de
+Meta da Refeição, como prop `extra` de `ResumoNutricional` (ver [07](07-resumo-nutricional.md))
+— `RefeicaoDoDiaCard.jsx` monta o `<input type="time">` + "registrado" ali direto, em vez de
+passar `onHorarioRegistradoChange` como prop pro `RefeicaoCard` (que não sabe nada sobre
+horário) — **só enquanto a refeição está aberta**, já que o `resumo` (e o horário dentro dele)
+some junto com o resto quando colapsada. Fechada, o horário reaparece no **cabeçalho**
+(`RefeicaoCard.jsx`: `{(!resumo || !aberto) && <span>{refeicao.horarioRegistrado ??
+refeicao.horario}</span>}`) — usando `horarioRegistrado` quando existe, nunca o horário fixo do
+plano por engano, senão fechar a refeição depois de registrar um horário diferente mostraria a
+hora errada.
 
 ## Um só campo de busca, atrás de um botão
 
