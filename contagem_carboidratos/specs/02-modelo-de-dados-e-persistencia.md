@@ -135,9 +135,9 @@ exibição (não é fisicamente exato pra todo líquido, mas é a mesma aproxima
 app já fazia ao usar o mesmo `quantidade_g_ml` pra calcular kcal/CHO por grama independente do
 tipo). `domain/calculos.js` centraliza isso em `textoMedidaComPeso(alimento)` — devolve
 `"{medida} · {peso} g"` (ex: "1 copo duplo cheio · 240 g"), ou só a medida pros alimentos
-`quantidade_indefinida` (sem peso conhecido); usado nas listas de busca
-(`CandidatoOrcamentoItem.jsx`, `BuscaAlimentosPlano.jsx`) pra sempre mostrar o peso da medida
-usual, não só o nome dela.
+`quantidade_indefinida` (sem peso conhecido); usado em `CandidatoOrcamentoItem.jsx` — o cartão
+de cada item na lista de busca do `BuscarAlimentoModal`, hoje usado tanto em Refeições do Dia
+quanto no Plano — pra sempre mostrar o peso da medida usual, não só o nome dela.
 
 ## Meta e delta (Refeições do Dia)
 

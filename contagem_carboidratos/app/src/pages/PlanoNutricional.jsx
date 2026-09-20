@@ -2,9 +2,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { Button, Spinner } from 'react-bootstrap';
 import { usePlanoNutricional } from '../hooks/usePlanoNutricional';
 import { useAlimentos } from '../hooks/useAlimentos';
-import { RefeicaoCard } from '../components/RefeicaoCard';
+import { RefeicaoPlanoCard } from '../components/RefeicaoPlanoCard';
 import { RefeicaoFormModal } from '../components/RefeicaoFormModal';
-import { BuscaAlimentosPlano } from '../components/BuscaAlimentosPlano';
 import { ResumoMetaRefeicao } from '../components/ResumoMetaRefeicao';
 import { ImprimirPlanoModal } from '../components/ImprimirPlanoModal';
 import { calcularTotalItens, calcularTotalRefeicoes } from '../domain/calculos';
@@ -119,18 +118,15 @@ export function PlanoNutricional() {
           };
           const totalRefeicao = calcularTotalItens(refeicao.itens, alimentosPorId);
           return (
-            <RefeicaoCard
+            <RefeicaoPlanoCard
               key={refeicao.id}
               refeicao={refeicao}
               alimentos={alimentos}
               alimentosPorId={alimentosPorId}
-              colapsavel
-              ocultarBuscaLivre
               recemAdicionadoId={recemAdicionadoId}
               onAdicionarItem={adicionarComDestaque}
               onRemoverItem={(itemId) => removerItem(refeicao.id, itemId)}
               onEditarQuantidadeItem={(itemId, quantidadeG) => editarQuantidadeItem(refeicao.id, itemId, quantidadeG)}
-              rodape={<BuscaAlimentosPlano alimentos={alimentos} onAdicionar={adicionarComDestaque} />}
               onEditar={() => {
                 setRefeicaoEditando(refeicao);
                 setModalAberto(true);

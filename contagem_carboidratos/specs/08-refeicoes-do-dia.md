@@ -189,20 +189,27 @@ hora errada.
 ## Um só campo de busca, atrás de um botão
 
 Existiam dois jeitos de adicionar um alimento na mesma refeição: a busca livre do topo
-(`AlimentoBuscaInput`, dentro do próprio `RefeicaoCard`, abre um modal de quantidade) e o campo
-de busca de `AlimentosNoOrcamento` (filtra a lista "o que cabe/ultrapassa"), sempre visível
-dentro do card. Redundante — os dois faziam a mesma coisa. A prop `ocultarBuscaLivre` do
-`RefeicaoCard` esconde a primeira; tanto `RefeicaoDoDiaCard.jsx` (Dia) quanto
-`PlanoNutricional.jsx` (Plano) passam essa prop hoje — ou seja, o `AlimentoBuscaInput` de
-dentro do `RefeicaoCard` nunca roda de verdade em nenhuma das duas telas; o Plano ainda tem sua
-própria busca sempre visível (`BuscaAlimentosPlano`), mas o Dia mudou de novo (ver abaixo).
+(`AlimentoBuscaInput`, dentro do próprio `RefeicaoCard`, abre um modal de quantidade) e um campo
+de busca sempre visível dentro do card, com sua própria lista. Redundante — os dois faziam a
+mesma coisa. A prop `ocultarBuscaLivre` do `RefeicaoCard` esconde a primeira; tanto
+`RefeicaoDoDiaCard.jsx` (Dia) quanto `RefeicaoPlanoCard.jsx` (Plano) passam essa prop hoje — ou
+seja, o `AlimentoBuscaInput` de dentro do `RefeicaoCard` nunca roda de verdade em nenhuma das
+duas telas.
 
-**De busca sempre visível pra busca atrás de um botão**: `AlimentosNoOrcamento` (busca + filtro
-+ ordenação + lista paginada, sempre expandida dentro do card) virou incômodo — muita coisa
-sempre visível, competindo com "Sugestões do plano" e a lista de itens já lançados. Virou
-`BuscarAlimentoModal.jsx`: o `rodape` do card agora é só um botão grande, **"+ Adicionar
-alimento"**; clicar nele abre a busca (mesmo campo + `FiltroOrdenacaoCandidatos` + lista de
-candidatos, classificação idêntica à de antes) dentro de um modal.
+**De busca sempre visível pra busca atrás de um botão**: primeiro no Dia, depois no Plano — as
+duas telas passaram pela mesma transformação, só em momentos diferentes. No Dia,
+`AlimentosNoOrcamento` (busca + filtro + ordenação + lista paginada, sempre expandida dentro do
+card) virou incômodo — muita coisa sempre visível, competindo com "Sugestões do plano" e a
+lista de itens já lançados. No Plano, era `BuscaAlimentosPlano` — mais simples (sem
+classificação de orçamento, o Plano não tem "cabe/excede"), mas do mesmo jeito sempre visível e
+sem passo de quantidade nenhum: clicar num item lançava direto na medida usual, sem chance de
+ajustar antes. As duas viraram o mesmo `BuscarAlimentoModal.jsx`: o `rodape` do card agora é só
+um botão grande, **"+ Adicionar alimento"**; clicar nele abre a busca (campo + lista de
+candidatos) dentro de um modal — no Dia, com `FiltroOrdenacaoCandidatos` e a classificação
+"cabe/ultrapassa" (`orcamentoRestante`/`respeitarCalorias`/`respeitarCarboidratos`); no Plano,
+sem nenhum desses três props (não faz sentido classificar contra uma meta que não existe ali),
+então nenhum badge de "cabe/excede" aparece — só nome, medida e kcal/CHO na medida usual.
+`BuscaAlimentosPlano.jsx` foi apagado depois dessa troca, por ficar sem nenhum uso.
 
 **Escolher um alimento sempre abre o passo de quantidade — nunca lança direto**: ao clicar num
 candidato (nesse modal, ou numa "Sugestão do plano"), o modal de busca fecha e o

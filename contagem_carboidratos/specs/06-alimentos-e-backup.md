@@ -72,11 +72,12 @@ substituição) precisa saber que ela é "uma variação de algo" — é só mai
 
 **Onde o `AlimentoQuantidadeModal` de verdade abre**: `RefeicaoCard` sabe renderizar uma busca
 livre própria (`AlimentoBuscaInput` + esse modal), mas as duas telas que o usam
-(`RefeicaoDoDiaCard.jsx` e `PlanoNutricional.jsx`) sempre passam `ocultarBuscaLivre` — esse
+(`RefeicaoDoDiaCard.jsx` e `RefeicaoPlanoCard.jsx`) sempre passam `ocultarBuscaLivre` — esse
 caminho nunca roda na prática. Quem abre o modal de verdade é `BuscarAlimentoModal` (o modal de
-busca por trás do botão "+ Adicionar alimento" — ver [08](08-refeicoes-do-dia.md)) e a lista
-"Sugestões do plano" dentro de `RefeicaoDoDiaCard.jsx`: as duas abrem o `AlimentoQuantidadeModal`
-**sempre** ao escolher um alimento, tenha variação cadastrada ou não — é o próprio modal quem
+busca por trás do botão "+ Adicionar alimento", em **ambas** as telas — ver
+[08](08-refeicoes-do-dia.md)) e a lista "Sugestões do plano" dentro de `RefeicaoDoDiaCard.jsx`:
+as três abrem o `AlimentoQuantidadeModal` **sempre** ao escolher um alimento, tenha variação
+cadastrada ou não — é o próprio modal quem
 decide se mostra o seletor (não mostra nada quando `variacoes` vem vazio). **Bug real,
 corrigido**: antes de ficar assim, só abria o modal quando o alimento TINHA variação
 (`variacoesPorBase.get(alimentoId)`) — qualquer outro lançava direto na medida usual, sem
@@ -88,10 +89,12 @@ só vale enquanto "Padrão" estiver selecionado; trocar pra uma variação volta
 usual dela.
 
 **Só nas Refeições do Dia, nunca no Plano**: o seletor de variação só é passado quando
-`RefeicaoCard` recebe `permitirVariacoes` (feito em `RefeicoesDoDia.jsx`, não em
-`PlanoNutricional.jsx`) — o plano registra o que foi receitado de forma genérica, a escolha de
-marca é um detalhe do que foi realmente comprado/comido no dia. Por isso `BuscaAlimentosPlano`
-(a busca do Plano) nunca precisa dessa checagem.
+`RefeicaoCard`/`BuscarAlimentoModal` recebem `permitirVariacoes`/`variacoesPorBase` (feito em
+`RefeicoesDoDia.jsx`/`RefeicaoDoDiaCard.jsx`, não em `RefeicaoPlanoCard.jsx`) — o plano registra
+o que foi receitado de forma genérica, a escolha de marca é um detalhe do que foi realmente
+comprado/comido no dia. Por isso o `BuscarAlimentoModal` do Plano é chamado sem essas duas
+props: `variacoesPorBase` vem `undefined`, e o próprio modal já trata isso como "nenhuma
+variação" (`variacoesPorBase?.get(...) ?? []`).
 
 ## Destaque na tela
 
