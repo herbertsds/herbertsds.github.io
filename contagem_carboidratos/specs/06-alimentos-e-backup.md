@@ -3,8 +3,9 @@
 ## Alimentos: editar o catálogo
 
 Alguns valores do manual da SBD podem estar errados. A seção **Catálogo** da tela deixa buscar
-qualquer item (mesmo algoritmo de busca de sempre) e editar: nome, medida usual, peso/volume da
-medida (g ou ml), calorias e carboidratos.
+qualquer item (mesmo algoritmo de busca de sempre) e editar: nome, medida usual, peso da medida
+(em gramas — a interface nunca mostra "ml", ver [02](02-modelo-de-dados-e-persistencia.md)),
+calorias e carboidratos.
 
 A edição **não reescreve** `app/public/alimentos.json` (é um arquivo estático do build, o
 navegador não pode gravar nele). Em vez disso, cada edição vira um "override" salvo em
@@ -72,18 +73,19 @@ substituição) precisa saber que ela é "uma variação de algo" — é só mai
 **Onde o `AlimentoQuantidadeModal` de verdade abre**: `RefeicaoCard` sabe renderizar uma busca
 livre própria (`AlimentoBuscaInput` + esse modal), mas as duas telas que o usam
 (`RefeicaoDoDiaCard.jsx` e `PlanoNutricional.jsx`) sempre passam `ocultarBuscaLivre` — esse
-caminho nunca roda na prática. Quem abre o modal de verdade, quando o alimento tem variação, é
-`AlimentosNoOrcamento` (a lista de candidatos por orçamento — "Adicione novos alimentos na sua
-refeição") e a lista "Sugestões do plano" dentro de `RefeicaoDoDiaCard.jsx`: em vez de
-adicionar direto ao clicar (como fazem pra qualquer alimento sem variação), essas duas
-verificam `variacoesPorBase.get(alimentoId)` e, se houver algo, abrem o modal para escolher a
-marca antes de lançar. **Bug real, corrigido**: antes dessa checagem existir, não havia
-NENHUM jeito de escolher uma variação ao adicionar algo numa refeição do dia — o único código
-que sabia mostrar o seletor (a busca livre de `RefeicaoCard`) estava sempre oculto, e as duas
-listas que realmente adicionam alimento sempre lançavam direto na medida usual do alimento
-base, sem chance de trocar a marca. O modal aceita uma prop opcional `quantidadeInicial` (a
-quantidade planejada/testada de quem abriu, em vez da medida usual) — só vale enquanto
-"Padrão" estiver selecionado; trocar pra uma variação volta a usar a medida usual dela.
+caminho nunca roda na prática. Quem abre o modal de verdade é `BuscarAlimentoModal` (o modal de
+busca por trás do botão "+ Adicionar alimento" — ver [08](08-refeicoes-do-dia.md)) e a lista
+"Sugestões do plano" dentro de `RefeicaoDoDiaCard.jsx`: as duas abrem o `AlimentoQuantidadeModal`
+**sempre** ao escolher um alimento, tenha variação cadastrada ou não — é o próprio modal quem
+decide se mostra o seletor (não mostra nada quando `variacoes` vem vazio). **Bug real,
+corrigido**: antes de ficar assim, só abria o modal quando o alimento TINHA variação
+(`variacoesPorBase.get(alimentoId)`) — qualquer outro lançava direto na medida usual, sem
+chance de ajustar quantidade nem, antes disso ainda, de trocar de marca (não existia NENHUM
+jeito de escolher variação, porque o único código que sabia mostrar o seletor — a busca livre
+de `RefeicaoCard` — estava sempre oculto). O modal aceita uma prop opcional
+`quantidadeInicial` (a quantidade planejada/testada de quem abriu, em vez da medida usual) —
+só vale enquanto "Padrão" estiver selecionado; trocar pra uma variação volta a usar a medida
+usual dela.
 
 **Só nas Refeições do Dia, nunca no Plano**: o seletor de variação só é passado quando
 `RefeicaoCard` recebe `permitirVariacoes` (feito em `RefeicoesDoDia.jsx`, não em

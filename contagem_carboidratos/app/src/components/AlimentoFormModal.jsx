@@ -68,7 +68,7 @@ export function AlimentoFormModal({ modo, alimento, aberto, onFechar, onSalvar }
           />
         </Form.Group>
         <Form.Group className="mb-3">
-          <Form.Label>Peso/volume da medida usual (g ou ml)</Form.Label>
+          <Form.Label>Peso da medida usual (g)</Form.Label>
           <CampoNumerico
             valor={campos.quantidade_g_ml}
             formatar={(v) => v}

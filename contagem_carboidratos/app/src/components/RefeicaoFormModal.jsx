@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Modal, Form, Button } from 'react-bootstrap';
+import { fecharTecladoNoEnter } from '../utils/teclado';
 
 const TIPOS_PADRAO = [
+  'Desjejum',
   'Café da Manhã',
   'Colação',
   'Almoço',
@@ -14,9 +16,10 @@ function montarOpcoesTipo(tiposExistentes) {
   return Array.from(new Set([...TIPOS_PADRAO, ...(tiposExistentes || [])]));
 }
 
-// CRUD de refeição do Plano Nutricional. Select simples com os tipos padrão + já existentes.
-// Refeições do Dia não usam mais este modal — elas vêm
-// automaticamente do plano (ver RefeicoesDoDia.jsx).
+// CRUD de refeição do Plano Nutricional. Campo de texto com sugestões (datalist nativo) dos
+// tipos padrão + já cadastrados no plano — a pessoa pode escolher um da lista ou digitar
+// qualquer nome novo, os dois num campo só. Refeições do Dia não usam mais este modal — elas
+// vêm automaticamente do plano (ver RefeicoesDoDia.jsx).
 export function RefeicaoFormModal({ aberto, refeicaoInicial, tiposExistentes, onFechar, onSalvar }) {
   const [tipo, setTipo] = useState('');
   const [horario, setHorario] = useState('');
@@ -39,14 +42,19 @@ export function RefeicaoFormModal({ aberto, refeicaoInicial, tiposExistentes, on
       <Modal.Body>
         <Form.Group className="mb-3">
           <Form.Label>Tipo de refeição</Form.Label>
-          <Form.Select value={tipo} onChange={(e) => setTipo(e.target.value)}>
-            <option value="">Selecione...</option>
+          <Form.Control
+            list="tipos-refeicao-opcoes"
+            placeholder="Selecione ou digite um nome novo..."
+            value={tipo}
+            onChange={(e) => setTipo(e.target.value)}
+            enterKeyHint="done"
+            onKeyDown={fecharTecladoNoEnter}
+          />
+          <datalist id="tipos-refeicao-opcoes">
             {opcoesTipo.map((t) => (
-              <option key={t} value={t}>
-                {t}
-              </option>
+              <option key={t} value={t} />
             ))}
-          </Form.Select>
+          </datalist>
         </Form.Group>
         <Form.Group>
           <Form.Label>Horário</Form.Label>

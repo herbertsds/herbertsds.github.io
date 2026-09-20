@@ -36,9 +36,26 @@ refeição vazia gravada. Na prática: remover o último alimento de uma refeiç
 armazenamento daquele dia (volta a ser a exibição virtual do plano); se todas as refeições do
 dia ficarem vazias, o registro do dia inteiro volta a `{ data, refeicoes: [] }`.
 
-Se o plano ganhar um tipo novo depois (ex: o usuário adiciona "Ceia"), ele já aparece
-(virtualmente) em qualquer dia que for renderizado dali pra frente — não precisa de nenhuma
-migração, já que a lista exibida é sempre recalculada a partir do plano atual.
+### Categoria nova no plano: só aparece a partir do dia em que foi criada
+
+Se o plano ganha um tipo novo (ex: o usuário adiciona "Desjejum" hoje), ele só aparece
+(virtualmente) a partir de **hoje em diante** — não retroage pra dias passados. Antes disso não
+existia esse filtro: qualquer tipo novo aparecia em **todo** dia, inclusive navegando pra trás
+no calendário, o que é estranho (o plano daquele dia passado, na época, não incluía esse tipo).
+
+Implementado com dois campos gravados em cada refeição do plano na hora da criação
+(`usePlanoNutricional.js`, `adicionarRefeicao`):
+- `criadoEm` (`Date.now()`) — desempata a ordem quando duas refeições do plano têm o **mesmo
+  horário**: tanto na lista do Plano (`PlanoNutricional.jsx`) quanto na materialização virtual
+  aqui, o sort é `horário, depois criadoEm` (ordem de criação como critério secundário).
+- `criadoEmData` (`dataLocalISO()`, ver `src/lib/data.js`) — o dia local em que a refeição foi
+  criada. Em `refeicoesParaExibir`, um tipo do plano só entra em `tiposDoPlano` se
+  `!r.criadoEmData || r.criadoEmData <= data` (`data` = o dia sendo exibido).
+
+Refeições do plano cadastradas **antes** desses campos existirem não têm `criadoEmData` nem
+`criadoEm` — tratadas como "sempre existiu": continuam aparecendo em qualquer dia (a condição
+`!r.criadoEmData` deixa passar) e entram primeiro em qualquer desempate por horário (`?? 0`).
+Não precisa de nenhuma migração de dados existentes.
 
 ## Horário registrado vs. horário do plano
 
@@ -99,9 +116,9 @@ sintético `virtual:<tipo>`; assim que o primeiro item é lançado, `comRefeicao
 id novo de verdade (materialização, ver acima). Se o `.map()` de `RefeicoesDoDia.jsx` usasse
 `refeicao.id` como key, esse troca de id no exato momento de materializar faria o React
 desmontar o `RefeicaoDoDiaCard` antigo e montar um novo do zero — perdendo todo o estado local
-que ele acabou de construir (colapso aberto/fechado, os dois toggles, o filtro/ordenação da
-lista de candidatos em `AlimentosNoOrcamento`) bem na hora em que o usuário está interagindo
-com o card. `refeicao.tipo` é estável nesse momento (não muda com a materialização) e único
+que ele acabou de construir (colapso aberto/fechado, os dois toggles, o modal de busca aberto)
+bem na hora em que o usuário está interagindo com o card. `refeicao.tipo` é estável nesse
+momento (não muda com a materialização) e único
 entre as refeições exibidas (`tiposDoPlano`, dentro de `refeicoesParaExibir`, já é deduplicado
 por tipo) — resolve sem precisar propagar nenhum estado pra cima.
 
@@ -121,10 +138,10 @@ entra em cada um é `RefeicaoDoDiaCard.jsx`); só o item 2 fica visível com a r
 4. Itens já lançados (ver "Editar a quantidade" abaixo).
 5. **Sugestões do plano** (`sugestoesDoPlano`) — o que o plano já prevê pra essa refeição e
    ainda não foi lançado.
-6. Lista "o que cabe (e o que ultrapassa) na meta" (`rodape`, `AlimentosNoOrcamento` — ver
-   [04](04-substituicao.md)), que inclui o próprio campo de busca. **A busca livre do topo
-   (`AlimentoBuscaInput`) não aparece no Dia** — só no Plano — porque essa lista já cobre
-   "buscar e adicionar" sozinha (ver "Um só campo de busca" abaixo).
+6. Botão grande **"+ Adicionar alimento"** (`rodape`) — abre o `BuscarAlimentoModal` com a
+   busca e a lista "o que cabe (e o que ultrapassa) na meta" (ver [04](04-substituicao.md) e
+   "Um só campo de busca" abaixo). **A busca livre do topo (`AlimentoBuscaInput`) não aparece
+   no Dia** — só no Plano — porque esse botão já cobre "buscar e adicionar" sozinho.
 7. "Sugerir substituição" (`extra`).
 
 ## Refeições colapsadas
@@ -160,25 +177,36 @@ O horário registrado (fixo ou editável, via `onHorarioRegistradoChange`) saiu 
 como prop pro `RefeicaoCard` (que não sabe mais nada sobre horário). Como o card de Meta fica
 fora do `Collapse`, o horário continua sempre visível e editável, refeição aberta ou fechada.
 
-## Um só campo de busca
+## Um só campo de busca, atrás de um botão
 
 Existiam dois jeitos de adicionar um alimento na mesma refeição: a busca livre do topo
 (`AlimentoBuscaInput`, dentro do próprio `RefeicaoCard`, abre um modal de quantidade) e o campo
-de busca dentro de `AlimentosNoOrcamento` (filtra a lista "o que cabe/ultrapassa"). Redundante
-— os dois faziam a mesma coisa, só que um mostrava o orçamento e o outro não. A prop
-`ocultarBuscaLivre` do `RefeicaoCard` esconde a primeira; tanto `RefeicaoDoDiaCard.jsx` (Dia)
-quanto `PlanoNutricional.jsx` (Plano) passam essa prop hoje — ou seja, o `AlimentoBuscaInput`
-de dentro do `RefeicaoCard` nunca roda de verdade em nenhuma das duas telas; cada uma tem sua
-própria busca (`AlimentosNoOrcamento` no Dia, `BuscaAlimentosPlano` no Plano).
+de busca de `AlimentosNoOrcamento` (filtra a lista "o que cabe/ultrapassa"), sempre visível
+dentro do card. Redundante — os dois faziam a mesma coisa. A prop `ocultarBuscaLivre` do
+`RefeicaoCard` esconde a primeira; tanto `RefeicaoDoDiaCard.jsx` (Dia) quanto
+`PlanoNutricional.jsx` (Plano) passam essa prop hoje — ou seja, o `AlimentoBuscaInput` de
+dentro do `RefeicaoCard` nunca roda de verdade em nenhuma das duas telas; o Plano ainda tem sua
+própria busca sempre visível (`BuscaAlimentosPlano`), mas o Dia mudou de novo (ver abaixo).
 
-No Dia, clicar num resultado de `AlimentosNoOrcamento` (ou numa "Sugestão do plano") adiciona
-direto na medida usual, sem passar por um modal — **exceto quando o alimento tem uma variação
-de marca cadastrada** (ver [06](06-alimentos-e-backup.md)): nesse caso, em vez de lançar direto,
-abre o `AlimentoQuantidadeModal` (o mesmo que ficaria morto dentro do `RefeicaoCard`) pra
-escolher a marca antes. Bug corrigido: antes dessa checagem em `AlimentosNoOrcamento` e na
-lista "Sugestões do plano" (ambas em `RefeicaoDoDiaCard.jsx`), não existia NENHUM jeito de
-escolher uma variação ao adicionar algo — o clique sempre ia direto pro alimento base, mesmo
-tendo variação cadastrada.
+**De busca sempre visível pra busca atrás de um botão**: `AlimentosNoOrcamento` (busca + filtro
++ ordenação + lista paginada, sempre expandida dentro do card) virou incômodo — muita coisa
+sempre visível, competindo com "Sugestões do plano" e a lista de itens já lançados. Virou
+`BuscarAlimentoModal.jsx`: o `rodape` do card agora é só um botão grande, **"+ Adicionar
+alimento"**; clicar nele abre a busca (mesmo campo + `FiltroOrdenacaoCandidatos` + lista de
+candidatos, classificação idêntica à de antes) dentro de um modal.
+
+**Escolher um alimento sempre abre o passo de quantidade — nunca lança direto**: ao clicar num
+candidato (nesse modal, ou numa "Sugestão do plano"), o modal de busca fecha e o
+`AlimentoQuantidadeModal` abre no lugar — **sempre**, tenha o alimento uma variação de marca
+cadastrada (ver [06](06-alimentos-e-backup.md)) ou não; quem decide se mostra o seletor de
+variação é o próprio `AlimentoQuantidadeModal` (não mostra nada quando a lista de variações vem
+vazia). Antes, só abria o modal quando havia variação — qualquer outro alimento lançava direto
+na medida usual, sem chance de ajustar a quantidade antes. `BuscarAlimentoModal` implementa a
+troca de "modal de busca" pra "modal de quantidade" com dois `<Modal>` e um estado só
+(`candidatoEmEscolha`): o de busca fica com `show={aberto && !candidatoEmEscolha}`, o de
+quantidade com `show={aberto && !!candidatoEmEscolha}` — nunca os dois abertos ao mesmo tempo,
+e cancelar no passo de quantidade (`onFechar` limpa só `candidatoEmEscolha`) volta pro modal de
+busca sozinho, de graça, sem precisar de um estado de "etapa" à parte.
 
 ## Editar a quantidade de um item já lançado
 

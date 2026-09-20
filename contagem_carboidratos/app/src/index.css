@@ -26,6 +26,17 @@ body {
   background: #fff;
   border-bottom: 1px solid #e5e5e5;
   padding: 0.75rem 1rem;
+  /* status bar "black-translucent" (index.html) faz o conteúdo passar por baixo do
+     notch/relógio no iOS instalado como PWA — sem isso o topo do header fica escondido atrás
+     da barra de status. */
+  padding-top: max(0.75rem, env(safe-area-inset-top, 0px));
+}
+
+/* Mesma razão do .app-header acima: sem isso, um modal alto (que não cabe centralizado e
+   "sobe" até o topo) nasce com o cabeçalho — e o botão de fechar — por baixo do notch/relógio
+   no iOS instalado como PWA. */
+.modal {
+  padding-top: env(safe-area-inset-top, 0px) !important;
 }
 
 .app-conteudo {

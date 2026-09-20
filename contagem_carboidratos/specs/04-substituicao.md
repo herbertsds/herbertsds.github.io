@@ -123,7 +123,8 @@ quantos substitutos forem escolhidos, sem relação 1-para-1 entre eles.
 
 `components/CandidatoOrcamentoItem.jsx` renderiza uma linha de candidato — usado tanto na
 lista única do passo 2 da Substituição quanto na lista de "o que cabe (e o que ultrapassa) na
-meta" ao adicionar um alimento direto numa refeição (`AlimentosNoOrcamento.jsx`, ver abaixo).
+meta" dentro do modal de adicionar um alimento numa refeição (`BuscarAlimentoModal.jsx`, ver
+abaixo, e [08](08-refeicoes-do-dia.md)).
 Recebe um candidato já classificado (`classificarCandidato`, de `domain/substituicao.js`) e
 mostra:
 
@@ -176,26 +177,44 @@ meta" ao adicionar um alimento direto numa refeição — as duas passam `itensP
 trocar de busca podia deixar a paginação apontando pra uma página que não existe mais no novo
 resultado.
 
-## Cabe na meta — ao adicionar um alimento direto na refeição
+## Cabe na meta — ao adicionar um alimento numa refeição
 
 A mesma ideia da Substituição (classificar candidatos contra um orçamento, com os toggles
 Respeitar calorias/carboidratos) também ajuda **fora** do fluxo de substituição: ao adicionar
-um alimento novo direto numa refeição do dia, `components/AlimentosNoOrcamento.jsx` mostra
-numa lista única o que ainda cabe — e o que não cabe mais — no que **resta da meta daquela
-refeição** (`meta - consumido`, nunca negativo).
+um alimento novo numa refeição do dia (pelo modal `components/BuscarAlimentoModal.jsx`, ver
+[08](08-refeicoes-do-dia.md)), a busca mostra numa lista única o que ainda cabe — e o que não
+cabe mais — no que **resta da meta daquela refeição** (`meta - consumido`, nunca negativo).
 
 Reaproveita `classificarCandidato` do mesmo jeito que a Substituição, só que comparando contra
 o restante da própria refeição em vez de uma cesta (`usoAtual` fixo em `{ kcal: 0, cho: 0 }` —
-cada clique adiciona direto, não acumula num carrinho), com a mesma `CandidatoOrcamentoItem` e
-os mesmos controles de `FiltroOrdenacaoCandidatos` descritos acima. **Toda linha é clicável,
-cabendo ou não** — clicar adiciona direto na refeição, na medida usual, do mesmo jeito que as
-sugestões do plano; a decisão de estourar a meta é do usuário, o app só deixa o aviso (badge
-vermelho + "pode consumir até") bem claro antes do clique, não impede.
+cada escolha vira o passo de quantidade, não acumula num carrinho), com a mesma
+`CandidatoOrcamentoItem` e os mesmos controles de `FiltroOrdenacaoCandidatos` descritos acima.
+**Toda linha é clicável, cabendo ou não** — clicar abre o `AlimentoQuantidadeModal` (ver
+[06](06-alimentos-e-backup.md) e [08](08-refeicoes-do-dia.md)) já na medida usual; a decisão de
+estourar a meta é do usuário, o app só deixa o aviso (badge vermelho + "pode consumir até") bem
+claro antes de confirmar, não impede.
 
 Diferente da Substituição, os toggles Respeitar calorias/carboidratos **não pertencem a esse
 componente** — são estado da refeição inteira (`RefeicaoDoDiaCard.jsx`, ver
 [08](08-refeicoes-do-dia.md)), passados como prop, porque também aparecem fixos logo depois da
 Meta da Refeição (ver "Ordem dos blocos" em [08](08-refeicoes-do-dia.md)).
+
+### O mesmo aviso continua no passo de quantidade
+
+O card da lista mostra "cabe/excede" pra medida usual, mas a pessoa ainda vai ajustar a
+quantidade no passo seguinte (`AlimentoQuantidadeModal`) — sem repetir o cálculo ali, o aviso
+sumia assim que o modal de busca fechava, bem na hora que a pessoa está decidindo o número
+final. `AlimentoQuantidadeModal` aceita as mesmas quatro props que `ItemAlimentoEditavel` usa
+pra isso (`orcamento`, `usoOutros`, `respeitarCalorias`, `respeitarCarboidratos`) e roda
+exatamente a mesma conta (`quantidadeMaximaParaItem` + os mesmos badges verde/vermelho +
+"Respeitando X, pode chegar até Y") — só que reagindo à quantidade sendo digitada ali, contra
+`alimentoEfetivo` (a variação escolhida, se houver, não o alimento base). `BuscarAlimentoModal`
+passa `orcamento={orcamentoRestante}` com `usoOutros` zerado (mesma razão do `usoAtual` do
+parágrafo acima); "Sugestões do plano" (`RefeicaoDoDiaCard.jsx`) passa `orcamento={meta}` e
+`usoOutros={consumido}` (o que os OUTROS itens já lançados nessa refeição já usam do
+orçamento, já que o item sendo escolhido ainda não foi lançado). Sem essas quatro props (ex: no
+Plano, que nunca as passa), o modal simplesmente não mostra essa seção — só o kcal/CHO
+absoluto da quantidade, como sempre mostrou.
 
 ## Por que dois botões em vez de um modal de conflito
 

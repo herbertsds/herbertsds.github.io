@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Modal, Button, Form } from 'react-bootstrap';
+import { Modal, Button, Form, Badge } from 'react-bootstrap';
 import { QuantidadeDupla } from './QuantidadeDupla';
 import { calcularItem, formatarNumero } from '../domain/calculos';
+import { quantidadeMaximaParaItem, textoQuantidadeMaxima, fraseRespeitar } from '../domain/substituicao';
 
 // Passo de quantidade depois de escolher um alimento (busca, sugestão do plano ou candidato
 // por orçamento). Quando `permitirVariacoes` está ligado (só nas Refeições do Dia — não faz
@@ -13,11 +14,22 @@ import { calcularItem, formatarNumero } from '../domain/calculos';
 // quem abriu o modal já tinha uma quantidade específica em mente (a sugestão do plano, ou a
 // quantidade testada de um candidato por orçamento); só vale pro alimento base — trocar pra uma
 // variação volta a usar a medida usual dela, que é outra.
+//
+// `orcamento`/`usoOutros`/`respeitarCalorias`/`respeitarCarboidratos` (opcionais) trazem pra cá
+// o mesmo feedback de "cabe ou excede" que já existia no card da lista de busca
+// (`CandidatoOrcamentoItem`) e no item já lançado (`ItemAlimentoEditavel`) — sem eles, esse
+// modal só mostrava o kcal/CHO absoluto da quantidade escolhida, sem dizer se isso ainda cabe
+// no que resta da meta. Mesma lógica de cálculo dos outros dois (`quantidadeMaximaParaItem`),
+// só que reagindo à quantidade sendo ajustada aqui, em vez de uma quantidade já fixada.
 export function AlimentoQuantidadeModal({
   alimento,
   variacoes = [],
   permitirVariacoes = false,
   quantidadeInicial,
+  orcamento,
+  usoOutros,
+  respeitarCalorias,
+  respeitarCarboidratos,
   aberto,
   onFechar,
   onConfirmar,
@@ -48,6 +60,33 @@ export function AlimentoQuantidadeModal({
     { alimentoId: alimentoEfetivo.id, quantidadeG: quantidade },
     alimentosPorId,
   );
+
+  const frase = fraseRespeitar(respeitarCalorias, respeitarCarboidratos);
+
+  let excedeKcalEm = 0;
+  let excedeChoEm = 0;
+  let restanteKcalDepois = null;
+  let restanteChoDepois = null;
+  let textoLimite = null;
+
+  if (orcamento && usoOutros && frase) {
+    const novoKcal = usoOutros.kcal + kcal;
+    const novoCho = usoOutros.cho + cho;
+    const excedeKcal = respeitarCalorias && novoKcal > orcamento.kcal;
+    const excedeCho = respeitarCarboidratos && novoCho > orcamento.cho;
+    excedeKcalEm = excedeKcal ? novoKcal - orcamento.kcal : 0;
+    excedeChoEm = excedeCho ? novoCho - orcamento.cho : 0;
+    restanteKcalDepois = respeitarCalorias && !excedeKcal ? orcamento.kcal - novoKcal : null;
+    restanteChoDepois = respeitarCarboidratos && !excedeCho ? orcamento.cho - novoCho : null;
+
+    const { quantidadeMaximaG, quantidadeMaximaMedidas } = quantidadeMaximaParaItem(
+      alimentoEfetivo,
+      usoOutros,
+      orcamento,
+      { calorias: respeitarCalorias, carboidratos: respeitarCarboidratos },
+    );
+    textoLimite = textoQuantidadeMaxima(alimentoEfetivo, quantidadeMaximaG, quantidadeMaximaMedidas);
+  }
 
   return (
     <Modal show={aberto} onHide={onFechar} centered>
@@ -84,6 +123,38 @@ export function AlimentoQuantidadeModal({
             <strong>{formatarNumero(cho)}</strong> g CHO
           </span>
         </div>
+
+        {frase && orcamento && (
+          <div className="mt-2 pt-2 border-top">
+            <div className="d-flex gap-1 flex-wrap mb-1">
+              {excedeKcalEm > 0 && (
+                <Badge bg="danger" className="text-nowrap">
+                  +{Math.round(excedeKcalEm)} kcal
+                </Badge>
+              )}
+              {restanteKcalDepois !== null && (
+                <Badge bg="success" className="text-nowrap">
+                  -{Math.round(restanteKcalDepois)} kcal
+                </Badge>
+              )}
+              {excedeChoEm > 0 && (
+                <Badge bg="danger" className="text-nowrap">
+                  +{formatarNumero(excedeChoEm)} g CHO
+                </Badge>
+              )}
+              {restanteChoDepois !== null && (
+                <Badge bg="success" className="text-nowrap">
+                  -{formatarNumero(restanteChoDepois)} g CHO
+                </Badge>
+              )}
+            </div>
+            {textoLimite && (
+              <small className="text-muted d-block">
+                Respeitando {frase}, pode chegar até {textoLimite}.
+              </small>
+            )}
+          </div>
+        )}
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={onFechar}>

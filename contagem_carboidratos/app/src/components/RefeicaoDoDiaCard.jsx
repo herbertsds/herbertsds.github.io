@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { Form } from 'react-bootstrap';
+import { Form, Button } from 'react-bootstrap';
 import { RefeicaoCard } from './RefeicaoCard';
 import { ResumoNutricional } from './ResumoNutricional';
-import { AlimentosNoOrcamento } from './AlimentosNoOrcamento';
+import { BuscarAlimentoModal } from './BuscarAlimentoModal';
 import { SugestaoSubstituicao } from './SugestaoSubstituicao';
 import { AlimentoQuantidadeModal } from './AlimentoQuantidadeModal';
 import { calcularItem, calcularTotalItens, formatarNumero } from '../domain/calculos';
@@ -28,6 +28,7 @@ export function RefeicaoDoDiaCard({
   const [respeitarCalorias, setRespeitarCalorias] = useState(true);
   const [respeitarCarboidratos, setRespeitarCarboidratos] = useState(true);
   const [sugestaoEmEscolha, setSugestaoEmEscolha] = useState(null); // { alimento, quantidade }
+  const [buscaAberta, setBuscaAberta] = useState(false);
 
   const consumido = calcularTotalItens(refeicao.itens, alimentosPorId);
   const idsJaAdicionados = new Set(refeicao.itens.map((i) => i.alimentoId));
@@ -99,14 +100,7 @@ export function RefeicaoDoDiaCard({
                   const alimento = alimentosPorId.get(item.alimentoId);
                   if (!alimento) return null;
                   const { kcal, cho } = calcularItem(item, alimentosPorId);
-                  const temVariacoes = (variacoesPorBase?.get(alimento.id) ?? []).length > 0;
-                  const adicionar = () => {
-                    if (temVariacoes) {
-                      setSugestaoEmEscolha({ alimento, quantidade: item.quantidadeG });
-                      return;
-                    }
-                    onAdicionarItem(item.alimentoId, item.quantidadeG, 'sugestao-plano');
-                  };
+                  const adicionar = () => setSugestaoEmEscolha({ alimento, quantidade: item.quantidadeG });
                   return (
                     <div
                       key={item.id}
@@ -135,17 +129,9 @@ export function RefeicaoDoDiaCard({
           )
         }
         rodape={
-          <AlimentosNoOrcamento
-            alimentos={alimentos}
-            variacoesPorBase={variacoesPorBase}
-            orcamentoRestante={{
-              kcal: Math.max(0, meta.kcal - consumido.kcal),
-              cho: Math.max(0, meta.cho - consumido.cho),
-            }}
-            respeitarCalorias={respeitarCalorias}
-            respeitarCarboidratos={respeitarCarboidratos}
-            onAdicionar={(alimentoId, quantidade) => onAdicionarItem(alimentoId, quantidade, 'extra')}
-          />
+          <Button variant="primary" size="lg" className="w-100 mt-2" onClick={() => setBuscaAberta(true)}>
+            + Adicionar alimento
+          </Button>
         }
         extra={
           <SugestaoSubstituicao
@@ -158,11 +144,30 @@ export function RefeicaoDoDiaCard({
           />
         }
       />
+
+      <BuscarAlimentoModal
+        aberto={buscaAberta}
+        onFechar={() => setBuscaAberta(false)}
+        alimentos={alimentos}
+        variacoesPorBase={variacoesPorBase}
+        orcamentoRestante={{
+          kcal: Math.max(0, meta.kcal - consumido.kcal),
+          cho: Math.max(0, meta.cho - consumido.cho),
+        }}
+        respeitarCalorias={respeitarCalorias}
+        respeitarCarboidratos={respeitarCarboidratos}
+        onAdicionar={(alimentoId, quantidade) => onAdicionarItem(alimentoId, quantidade, 'extra')}
+      />
+
       <AlimentoQuantidadeModal
         alimento={sugestaoEmEscolha?.alimento}
         variacoes={variacoesPorBase?.get(sugestaoEmEscolha?.alimento?.id) ?? []}
         permitirVariacoes
         quantidadeInicial={sugestaoEmEscolha?.quantidade}
+        orcamento={meta}
+        usoOutros={consumido}
+        respeitarCalorias={respeitarCalorias}
+        respeitarCarboidratos={respeitarCarboidratos}
         aberto={!!sugestaoEmEscolha}
         onFechar={() => setSugestaoEmEscolha(null)}
         onConfirmar={(alimentoId, quantidade) => onAdicionarItem(alimentoId, quantidade, 'sugestao-plano')}

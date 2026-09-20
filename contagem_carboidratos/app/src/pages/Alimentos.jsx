@@ -10,7 +10,7 @@ import { fecharTecladoNoEnter } from '../utils/teclado';
 
 function linhaResumo(alimento) {
   return `${alimento.medida} (${
-    alimento.quantidade_indefinida ? 'sem peso definido' : `${formatarNumero(alimento.quantidade_g_ml)}g/ml`
+    alimento.quantidade_indefinida ? 'sem peso definido' : `${formatarNumero(alimento.quantidade_g_ml)} g`
   }) · ${Math.round(alimento.calorias_kcal)} kcal · ${formatarNumero(alimento.carboidratos_g)} g CHO`;
 }
 

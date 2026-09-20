@@ -71,24 +71,29 @@ export function RefeicoesDoDia() {
     const vistos = new Set();
     const tiposDoPlano = [];
     for (const r of plano.refeicoes) {
+      // Categoria nova no plano só passa a aparecer a partir do dia em que foi cadastrada —
+      // sem `criadoEmData` (refeições antigas, de antes desse campo existir) continua
+      // aparecendo em qualquer dia, como sempre apareceu.
+      if (r.criadoEmData && r.criadoEmData > data) continue;
       if (!vistos.has(r.tipo)) {
         vistos.add(r.tipo);
-        tiposDoPlano.push({ tipo: r.tipo, horario: r.horario });
+        tiposDoPlano.push({ tipo: r.tipo, horario: r.horario, criadoEm: r.criadoEm ?? 0 });
       }
     }
     const porTipo = new Map(diaRegistro.refeicoes.map((r) => [r.tipo, r]));
     return tiposDoPlano.map((def) => {
       const existente = porTipo.get(def.tipo);
-      if (existente) return existente;
+      if (existente) return { ...existente, criadoEm: def.criadoEm };
       return {
         id: `virtual:${def.tipo}`,
         tipo: def.tipo,
         horario: def.horario,
         horarioRegistrado: null,
         itens: [],
+        criadoEm: def.criadoEm,
       };
     });
-  }, [plano, diaRegistro]);
+  }, [plano, diaRegistro, data]);
 
   const metaDoTipo = (tipo) =>
     calcularTotalRefeicoes(
@@ -160,7 +165,10 @@ export function RefeicoesDoDia() {
 
       {refeicoesParaExibir
         .slice()
-        .sort((a, b) => horarioEfetivo(a).localeCompare(horarioEfetivo(b)))
+        .sort(
+          (a, b) =>
+            horarioEfetivo(a).localeCompare(horarioEfetivo(b)) || (a.criadoEm ?? 0) - (b.criadoEm ?? 0),
+        )
         .map((refeicao) => {
           const criarSeNaoExistir = { tipo: refeicao.tipo, horario: refeicao.horario };
           const meta = metaDoTipo(refeicao.tipo);

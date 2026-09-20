@@ -1,13 +1,7 @@
 import { createContext, useContext, useMemo, useState } from 'react';
+import { dataLocalISO } from '../lib/data';
 
 const DataSelecionadaContext = createContext(null);
-
-function hojeISO() {
-  const agora = new Date();
-  const offset = agora.getTimezoneOffset();
-  const local = new Date(agora.getTime() - offset * 60000);
-  return local.toISOString().slice(0, 10);
-}
 
 function somarDias(dataISO, delta) {
   const [ano, mes, dia] = dataISO.split('-').map(Number);
@@ -22,15 +16,15 @@ function somarDias(dataISO, delta) {
 // (embutida no Plano) — aplicar uma substituição sempre afeta a refeição do dia que está
 // selecionado aqui, sempre abrindo em hoje.
 export function DataSelecionadaProvider({ children }) {
-  const [data, setData] = useState(hojeISO());
+  const [data, setData] = useState(dataLocalISO());
 
   const valor = useMemo(
     () => ({
       data,
       setData,
-      irParaHoje: () => setData(hojeISO()),
+      irParaHoje: () => setData(dataLocalISO()),
       mudarDia: (delta) => setData((atual) => somarDias(atual, delta)),
-      ehHoje: data === hojeISO(),
+      ehHoje: data === dataLocalISO(),
     }),
     [data],
   );

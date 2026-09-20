@@ -46,7 +46,7 @@ export function AlimentoVariacoesModal({ alimentoBase, variacoes, aberto, onFech
                   <div>{v.nomeVariacao}</div>
                   <small className="text-muted">
                     {v.medida} (
-                    {v.quantidade_indefinida ? 'sem peso definido' : `${formatarNumero(v.quantidade_g_ml)}g/ml`}
+                    {v.quantidade_indefinida ? 'sem peso definido' : `${formatarNumero(v.quantidade_g_ml)} g`}
                     ) · {Math.round(v.calorias_kcal)} kcal · {formatarNumero(v.carboidratos_g)} g CHO
                   </small>
                 </div>
@@ -80,7 +80,7 @@ export function AlimentoVariacoesModal({ alimentoBase, variacoes, aberto, onFech
           />
         </Form.Group>
         <Form.Group className="mb-2">
-          <Form.Label>Peso/volume da medida usual (g ou ml)</Form.Label>
+          <Form.Label>Peso da medida usual (g)</Form.Label>
           <CampoNumerico
             valor={campos.quantidade_g_ml}
             formatar={(v) => v}

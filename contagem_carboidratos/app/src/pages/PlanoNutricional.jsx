@@ -51,7 +51,10 @@ export function PlanoNutricional() {
   );
   const tiposExistentes = plano.refeicoes.map((r) => r.tipo);
   const totalPlano = calcularTotalRefeicoes(plano.refeicoes, alimentosPorId);
-  const refeicoesOrdenadas = plano.refeicoes.slice().sort((a, b) => a.horario.localeCompare(b.horario));
+  // Por horário; empatou (dois cadastrados no mesmo horário), desempata por ordem de criação.
+  const refeicoesOrdenadas = plano.refeicoes
+    .slice()
+    .sort((a, b) => a.horario.localeCompare(b.horario) || (a.criadoEm ?? 0) - (b.criadoEm ?? 0));
 
   if (carregandoAlimentos || carregandoPlano) {
     return (

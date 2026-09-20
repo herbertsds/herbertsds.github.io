@@ -26,9 +26,9 @@ const ROTULOS_ORIGEM = {
 // livre pra ser o clique inteiro do colapso, sem um `<input type="time">` no meio brigando
 // pelo clique. `onEditarQuantidadeItem` (só o Dia) troca cada item já lançado por um
 // `ItemAlimentoEditavel` (dose original + dose ajustada + limite) em vez da linha estática —
-// e, como esse mesmo componente já cobre "buscar e adicionar" via `rodape`
-// (`AlimentosNoOrcamento`), a busca livre do topo (que abre um modal de quantidade à parte)
-// fica redundante nesse caso e não é renderizada.
+// e, como esse mesmo componente já cobre "buscar e adicionar" via `rodape` (o botão "+
+// Adicionar alimento" que abre `BuscarAlimentoModal`), a busca livre do topo (que abre um modal
+// de quantidade à parte) fica redundante nesse caso e não é renderizada.
 export function RefeicaoCard({
   refeicao,
   alimentos,

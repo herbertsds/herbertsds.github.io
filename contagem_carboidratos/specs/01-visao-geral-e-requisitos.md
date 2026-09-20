@@ -40,9 +40,12 @@ para uso pessoal; os dados de alimentos permanecem da SBD).
 
 ## CRUD de Refeição
 
-Só existe no **Plano** (`RefeicaoFormModal`): tipo de refeição com os 6 padrões (Café da
-Manhã, Colação, Almoço, Lanche da Tarde, Lanche da Noite/Jantar, Ceia) + opção de digitar um
-nome novo (`allowNew`), horário (`<input type="time">`), editar/excluir a refeição inteira.
+Só existe no **Plano** (`RefeicaoFormModal`): tipo de refeição com os 7 padrões (Desjejum, Café
+da Manhã, Colação, Almoço, Lanche da Tarde, Lanche da Noite/Jantar, Ceia) + opção de digitar
+qualquer nome novo — um único `<input>` com `list` apontando pra um `<datalist>` nativo (sem
+depender de nenhuma lib de typeahead): sugere os padrões e os já cadastrados no plano, mas
+aceita qualquer texto digitado —, horário (`<input type="time">`), editar/excluir a refeição
+inteira.
 
 Em **Refeições** não existe mais criação manual — toda refeição do plano aparece
 automaticamente em todo dia (ver [08](08-refeicoes-do-dia.md)); o que dá pra editar ali é

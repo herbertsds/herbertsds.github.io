@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { planoNutricionalRepository } from '../data/repositories/planoNutricionalRepository';
 import { gerarId } from '../lib/id';
+import { dataLocalISO } from '../lib/data';
 
 export function usePlanoNutricional() {
   const [plano, setPlano] = useState({ refeicoes: [] });
@@ -26,7 +27,19 @@ export function usePlanoNutricional() {
 
   const adicionarRefeicao = useCallback(
     (tipo, horario) => {
-      const novaRefeicao = { id: gerarId('ref'), tipo, horario, itens: [] };
+      // `criadoEm` (timestamp) desempata a ordem quando duas refeições têm o mesmo horário;
+      // `criadoEmData` (dia local, "YYYY-MM-DD") é o que faz uma categoria nova só passar a
+      // aparecer em Refeições do Dia a partir do dia em que foi cadastrada — ver
+      // RefeicoesDoDia.jsx. Refeições antigas (sem esses campos) continuam aparecendo em
+      // qualquer dia, como sempre apareceram.
+      const novaRefeicao = {
+        id: gerarId('ref'),
+        tipo,
+        horario,
+        itens: [],
+        criadoEm: Date.now(),
+        criadoEmData: dataLocalISO(),
+      };
       return persistir({ refeicoes: [...plano.refeicoes, novaRefeicao] });
     },
     [plano, persistir],

@@ -57,9 +57,16 @@ PlanoNutricional = {
   refeicoes: [
     {
       id: string,
-      tipo: string,     // 'Café da Manhã' | ... | qualquer nome digitado pelo usuário
-      horario: string,  // 'HH:MM'
+      tipo: string,           // 'Café da Manhã' | ... | qualquer nome digitado pelo usuário
+      horario: string,        // 'HH:MM'
       itens: [ { id: string, alimentoId: string, quantidadeG: number } ],
+      criadoEm: number,       // Date.now() — desempata ordenação quando duas refeições
+                               // dividem o mesmo horário. Ausente em refeições de antes
+                               // desse campo existir (tratado como 0, ou seja, vêm primeiro).
+      criadoEmData: string,   // 'YYYY-MM-DD' local (ver src/lib/data.js) — dia a partir do
+                               // qual essa categoria passa a aparecer em Refeições do Dia.
+                               // Ausente em refeições antigas: aparecem em qualquer dia, como
+                               // sempre apareceram (ver 08).
     },
   ],
 }
@@ -114,11 +121,23 @@ JavaScript usa ponto como separador decimal (`"12.5"`), o oposto da convenção 
 mesmo arredondamento, mas devolve a **string** já formatada com `toLocaleString('pt-BR')`
 (vírgula decimal; `useGrouping: false` pra não introduzir ponto de milhar, que não foi
 pedido). Regra de uso: **todo número solto num texto** (kcal/CHO, gramas, "pode chegar até",
-medida usual em g/ml) passa por `formatarNumero` — só os dois campos de
+peso da medida usual) passa por `formatarNumero` — só os dois campos de
 `QuantidadeDupla.jsx` continuam com `arredondar` (um número de verdade), porque são `value`
 de `<input type="number">`, que exige ponto e quebra com string. Kcal em geral não passa por
 nenhum dos dois — é sempre `Math.round(...)` puro, já que o app nunca mostra casa decimal de
 caloria.
+
+**Sempre "g", nunca "ml"**: mesmo `quantidade_g_ml` guardando peso OU volume dependendo do
+alimento (o nome do campo é literal — g pra sólidos, ml pra líquidos, no manual original da
+SBD), a interface nunca mostra a unidade "ml" pra não confundir com dois sistemas de medida
+diferentes na mesma tela — tudo aparece como "g", tratando volume e peso como equivalentes pra
+exibição (não é fisicamente exato pra todo líquido, mas é a mesma aproximação que o resto do
+app já fazia ao usar o mesmo `quantidade_g_ml` pra calcular kcal/CHO por grama independente do
+tipo). `domain/calculos.js` centraliza isso em `textoMedidaComPeso(alimento)` — devolve
+`"{medida} · {peso} g"` (ex: "1 copo duplo cheio · 240 g"), ou só a medida pros alimentos
+`quantidade_indefinida` (sem peso conhecido); usado nas listas de busca
+(`CandidatoOrcamentoItem.jsx`, `BuscaAlimentosPlano.jsx`) pra sempre mostrar o peso da medida
+usual, não só o nome dela.
 
 ## Meta e delta (Refeições do Dia)
 

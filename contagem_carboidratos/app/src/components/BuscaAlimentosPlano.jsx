@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Form } from 'react-bootstrap';
 import { buscarAlimentos } from '../domain/busca';
-import { formatarNumero } from '../domain/calculos';
+import { formatarNumero, textoMedidaComPeso } from '../domain/calculos';
 import { ListaPaginada } from './ListaPaginada';
 import { fecharTecladoNoEnter } from '../utils/teclado';
 
@@ -45,7 +45,7 @@ export function BuscaAlimentosPlano({ alimentos, onAdicionar }) {
             }}
           >
             <div className="fw-semibold">{a.alimento}</div>
-            <small className="text-muted d-block">({a.medida})</small>
+            <small className="text-muted d-block">({textoMedidaComPeso(a)})</small>
             <small className="text-muted d-block mt-1">
               {Math.round(a.calorias_kcal)} kcal · {formatarNumero(a.carboidratos_g)} g CHO
             </small>

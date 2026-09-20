@@ -68,6 +68,20 @@ num fundo branco sólido com margem generosa (~19% de cada lado) pra sobreviver 
 circulares/arredondadas que Android e iOS aplicam por cima do ícone quadrado — não há script de
 geração no repo, foram só copiados prontos.
 
+### Notch/relógio sobrepondo o topo (`black-translucent`)
+
+`apple-mobile-web-app-status-bar-style: black-translucent` (em `index.html`) faz a barra de
+status do iOS ficar **translúcida por cima** do conteúdo, em vez de reservar espaço próprio —
+é o que dá aquele visual "tela cheia de verdade" do app instalado, mas como efeito colateral
+qualquer elemento encostado no topo (o `.app-header`, ou um modal alto que não cabe
+centralizado e "sobe" até lá) nasce fisicamente por baixo do relógio/notch, ilegível e
+inclicável (bug real: o botão de fechar de um modal ficava embaixo do relógio). Corrigido em
+`index.css` com `padding-top: env(safe-area-inset-top)` — no `.app-header` (via
+`max(0.75rem, env(...))`, pra não perder o padding normal em telas sem notch) e no `.modal` do
+react-bootstrap (`padding-top: env(safe-area-inset-top) !important`, porque a lib não sabe
+nada sobre safe area). Só funciona porque o `viewport-fit=cover` já estava na tag de viewport
+— sem ele, `env(safe-area-inset-*)` sempre resolve pra `0px`.
+
 **Sem service worker de propósito**: não é necessário pro "Adicionar à tela de início" abrir
 em `standalone` nem em nenhuma das duas plataformas, e cache offline traria complexidade
 (invalidação a cada deploy) sem necessidade real aqui — o app já funciona só com rede.

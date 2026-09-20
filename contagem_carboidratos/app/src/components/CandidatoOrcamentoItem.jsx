@@ -1,5 +1,5 @@
 import { Badge } from 'react-bootstrap';
-import { formatarNumero } from '../domain/calculos';
+import { formatarNumero, textoMedidaComPeso } from '../domain/calculos';
 import { textoQuantidadeMaxima } from '../domain/substituicao';
 
 // Um cartão da lista de candidatos (usada tanto na Sugestão de Substituição quanto ao
@@ -36,7 +36,7 @@ export function CandidatoOrcamentoItem({ candidato: c, onSelecionar }) {
       }}
     >
       <div className="fw-semibold">{c.alimento.alimento}</div>
-      <small className="text-muted d-block">({c.alimento.medida})</small>
+      <small className="text-muted d-block">({textoMedidaComPeso(c.alimento)})</small>
       <div className="d-flex gap-1 flex-wrap mt-1">
         {c.excedeKcalEm > 0 && (
           <Badge bg="danger" className="text-nowrap">

@@ -66,3 +66,12 @@ export function arredondar(valor, casas = 1) {
 export function formatarNumero(valor, casas = 1) {
   return valor.toLocaleString('pt-BR', { useGrouping: false, maximumFractionDigits: casas });
 }
+
+// "1 fatia · 25 g" nas listas de busca — sempre em gramas, nunca "ml" (mesmo pra líquidos, que
+// no catálogo já vêm com o peso equivalente em `quantidade_g_ml`, não em volume de verdade).
+// Sem sufixo de peso pros itens de quantidade_indefinida (~3,5% do catálogo, sem peso
+// informado no manual original — ver comentário no topo do arquivo).
+export function textoMedidaComPeso(alimento) {
+  if (alimento.quantidade_indefinida) return alimento.medida;
+  return `${alimento.medida} · ${formatarNumero(alimento.quantidade_g_ml)} g`;
+}
