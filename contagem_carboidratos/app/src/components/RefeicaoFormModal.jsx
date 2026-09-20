@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Modal, Form, Button } from 'react-bootstrap';
+import { Typeahead } from 'react-bootstrap-typeahead';
+import 'react-bootstrap-typeahead/css/Typeahead.css';
 import { fecharTecladoNoEnter } from '../utils/teclado';
 
 const TIPOS_PADRAO = [
@@ -16,10 +18,13 @@ function montarOpcoesTipo(tiposExistentes) {
   return Array.from(new Set([...TIPOS_PADRAO, ...(tiposExistentes || [])]));
 }
 
-// CRUD de refeição do Plano Nutricional. Campo de texto com sugestões (datalist nativo) dos
-// tipos padrão + já cadastrados no plano — a pessoa pode escolher um da lista ou digitar
-// qualquer nome novo, os dois num campo só. Refeições do Dia não usam mais este modal — elas
-// vêm automaticamente do plano (ver RefeicoesDoDia.jsx).
+// CRUD de refeição do Plano Nutricional. Campo de tipo com aparência de select (Typeahead do
+// react-bootstrap-typeahead, `allowNew`) que mostra os tipos padrão + já cadastrados no plano
+// como opções clicáveis, mas aceita digitar qualquer nome novo — os dois num campo só. Antes
+// era um `<input list>` com `<datalist>` nativo, mas o Safari do iOS não exibe esse dropdown
+// direito (não aparece nenhuma lista visível ao tocar no campo); o Typeahead resolve isso por
+// ser inteiramente renderizado em React, sem depender de widget nativo do navegador. Refeições
+// do Dia não usam mais este modal — elas vêm automaticamente do plano (ver RefeicoesDoDia.jsx).
 export function RefeicaoFormModal({ aberto, refeicaoInicial, tiposExistentes, onFechar, onSalvar }) {
   const [tipo, setTipo] = useState('');
   const [horario, setHorario] = useState('');
@@ -42,19 +47,24 @@ export function RefeicaoFormModal({ aberto, refeicaoInicial, tiposExistentes, on
       <Modal.Body>
         <Form.Group className="mb-3">
           <Form.Label>Tipo de refeição</Form.Label>
-          <Form.Control
-            list="tipos-refeicao-opcoes"
+          <Typeahead
+            id="tipo-refeicao"
+            allowNew
+            newSelectionPrefix="Nova categoria: "
+            options={opcoesTipo}
+            selected={tipo ? [tipo] : []}
+            onInputChange={setTipo}
+            onChange={(selecionados) => {
+              const escolhido = selecionados[0];
+              if (!escolhido) {
+                setTipo('');
+                return;
+              }
+              setTipo(typeof escolhido === 'string' ? escolhido : escolhido.label);
+            }}
             placeholder="Selecione ou digite um nome novo..."
-            value={tipo}
-            onChange={(e) => setTipo(e.target.value)}
-            enterKeyHint="done"
-            onKeyDown={fecharTecladoNoEnter}
+            inputProps={{ enterKeyHint: 'done', onKeyDown: fecharTecladoNoEnter }}
           />
-          <datalist id="tipos-refeicao-opcoes">
-            {opcoesTipo.map((t) => (
-              <option key={t} value={t} />
-            ))}
-          </datalist>
         </Form.Group>
         <Form.Group>
           <Form.Label>Horário</Form.Label>

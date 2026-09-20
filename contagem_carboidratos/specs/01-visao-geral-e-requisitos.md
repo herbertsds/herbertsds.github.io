@@ -42,10 +42,13 @@ para uso pessoal; os dados de alimentos permanecem da SBD).
 
 Só existe no **Plano** (`RefeicaoFormModal`): tipo de refeição com os 7 padrões (Desjejum, Café
 da Manhã, Colação, Almoço, Lanche da Tarde, Lanche da Noite/Jantar, Ceia) + opção de digitar
-qualquer nome novo — um único `<input>` com `list` apontando pra um `<datalist>` nativo (sem
-depender de nenhuma lib de typeahead): sugere os padrões e os já cadastrados no plano, mas
-aceita qualquer texto digitado —, horário (`<input type="time">`), editar/excluir a refeição
-inteira.
+qualquer nome novo — campo com aparência de select (`Typeahead` do `react-bootstrap-typeahead`,
+`allowNew`, já usado em `AlimentoBuscaInput`): mostra os padrões e os já cadastrados no plano
+como opções clicáveis ao focar, filtra conforme digita, e mostra "Nova categoria: {texto}" como
+opção quando não bate com nenhuma existente. Antes era um `<input list>` com `<datalist>`
+nativo — trocado porque o Safari do iOS não exibe esse dropdown (o campo nunca chegava a
+mostrar as sugestões ao tocar nele, embora funcionasse em desktop). Também tem horário
+(`<input type="time">`), editar/excluir a refeição inteira.
 
 Em **Refeições** não existe mais criação manual — toda refeição do plano aparece
 automaticamente em todo dia (ver [08](08-refeicoes-do-dia.md)); o que dá pra editar ali é
