@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react';
-import { Form, ListGroup, Spinner, Alert, Button, Badge } from 'react-bootstrap';
+import { Form, Spinner, Alert, Button, Badge } from 'react-bootstrap';
 import { useAlimentos } from '../hooks/useAlimentos';
 import { AlimentoFormModal } from '../components/AlimentoFormModal';
 import { AlimentoVariacoesModal } from '../components/AlimentoVariacoesModal';
+import { ListaPaginada } from '../components/ListaPaginada';
 import { alimentosRepository } from '../data/repositories/alimentosRepository';
 import { buscarAlimentos } from '../domain/busca';
 import { formatarNumero } from '../domain/calculos';
@@ -14,37 +15,27 @@ function linhaResumo(alimento) {
   }) · ${Math.round(alimento.calorias_kcal)} kcal · ${formatarNumero(alimento.carboidratos_g)} g CHO`;
 }
 
+const FILTROS = [
+  { chave: 'editado', rotulo: 'Editados' },
+  { chave: 'adicionado', rotulo: 'Adicionados' },
+  { chave: 'comVariacoes', rotulo: 'Com variações' },
+];
+
 // Tela para corrigir dados do catálogo, cadastrar alimentos que não estão nele, e gerenciar
 // variações de marca de qualquer um dos dois.
 export function Alimentos() {
   const { alimentos, todos, carregando, recarregar } = useAlimentos();
   const [consulta, setConsulta] = useState('');
+  // Conjunto de filtros ligados ('editado' | 'adicionado' | 'comVariacoes') — vazio = ver
+  // tudo; um ou mais ligados = OU lógico entre eles (ex: "editado" + "adicionado" ligados
+  // mostra os dois juntos, não a interseção). Editados e adicionados voltaram a viver na MESMA
+  // lista — antes "Meus alimentos" era uma seção à parte, sem busca nem filtro; agora é tudo
+  // uma coisa só, com os badges (`editado`/`adicionado`) marcando cada item.
+  const [filtrosAtivos, setFiltrosAtivos] = useState(() => new Set());
   const [editando, setEditando] = useState(null);
   const [criando, setCriando] = useState(false);
   const [gerenciandoVariacoes, setGerenciandoVariacoes] = useState(null);
   const [mensagem, setMensagem] = useState(null);
-
-  // "Meus alimentos": tudo que foi editado (correção em cima do catálogo) ou adicionado
-  // (não existe no manual), destacado à parte da lista geral. Um adicionado já excluído não
-  // aparece mais aqui nem na busca — mas continua existindo por baixo pra não quebrar
-  // refeições antigas que já o usam (ver alimentosCustomizadosRepository).
-  const meusAlimentos = useMemo(
-    () => todos.filter((a) => (a._editado || a._adicionado) && !a.excluido),
-    [todos],
-  );
-
-  const resultadosCatalogo = useMemo(
-    () => buscarAlimentos(alimentos.filter((a) => !a._adicionado), consulta, 50),
-    [alimentos, consulta],
-  );
-
-  const variacoesDoGerenciado = useMemo(
-    () =>
-      gerenciandoVariacoes
-        ? todos.filter((a) => a._variacao && a.alimentoBaseId === gerenciandoVariacoes.id && !a.excluido)
-        : [],
-    [todos, gerenciandoVariacoes],
-  );
 
   const contagemVariacoesPorBase = useMemo(() => {
     const mapa = new Map();
@@ -55,6 +46,37 @@ export function Alimentos() {
     }
     return mapa;
   }, [todos]);
+
+  // A busca roda sobre a lista inteira (sem limite arbitrário) e o filtro por
+  // editado/adicionado/com variações é aplicado em cima do resultado inteiro da busca, antes
+  // de paginar — assim o filtro nunca perde item por causa de um corte anterior.
+  const resultados = useMemo(() => {
+    const buscados = buscarAlimentos(alimentos, consulta, alimentos.length);
+    if (filtrosAtivos.size === 0) return buscados;
+    return buscados.filter(
+      (a) =>
+        (filtrosAtivos.has('editado') && a._editado) ||
+        (filtrosAtivos.has('adicionado') && a._adicionado) ||
+        (filtrosAtivos.has('comVariacoes') && contagemVariacoesPorBase.get(a.id) > 0),
+    );
+  }, [alimentos, consulta, filtrosAtivos, contagemVariacoesPorBase]);
+
+  const variacoesDoGerenciado = useMemo(
+    () =>
+      gerenciandoVariacoes
+        ? todos.filter((a) => a._variacao && a.alimentoBaseId === gerenciandoVariacoes.id && !a.excluido)
+        : [],
+    [todos, gerenciandoVariacoes],
+  );
+
+  function alternarFiltro(chave) {
+    setFiltrosAtivos((atual) => {
+      const novo = new Set(atual);
+      if (novo.has(chave)) novo.delete(chave);
+      else novo.add(chave);
+      return novo;
+    });
+  }
 
   async function salvarEdicao(dados) {
     // Um "adicionado" (custom) não passa pela camada de overrides — o registro dele já é
@@ -126,84 +148,37 @@ export function Alimentos() {
         </Alert>
       )}
 
-      {meusAlimentos.length > 0 && (
-        <div className="mb-4">
-          <div className="fw-semibold mb-2">Meus alimentos</div>
-          <ListGroup>
-            {meusAlimentos.map((alimento) => (
-              <ListGroup.Item key={alimento.id} className="d-flex justify-content-between align-items-start gap-2">
-                <div>
-                  <div>
-                    {alimento.alimento}{' '}
-                    {alimento._adicionado ? (
-                      <Badge bg="primary">adicionado</Badge>
-                    ) : (
-                      <Badge bg="warning" text="dark">
-                        editado
-                      </Badge>
-                    )}
-                  </div>
-                  <small className="text-muted">{linhaResumo(alimento)}</small>
-                  {contagemVariacoesPorBase.get(alimento.id) > 0 && (
-                    <small className="text-muted d-block">
-                      {contagemVariacoesPorBase.get(alimento.id)} variação(ões)
-                    </small>
-                  )}
-                </div>
-                <div className="d-flex flex-column gap-1 align-items-end">
-                  <Button
-                    size="sm"
-                    variant="outline-secondary"
-                    className="btn-largura-fixa"
-                    onClick={() => setEditando(alimento)}
-                  >
-                    Editar
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline-primary"
-                    className="btn-largura-fixa"
-                    onClick={() => setGerenciandoVariacoes(alimento)}
-                  >
-                    Variações
-                  </Button>
-                  {alimento._adicionado ? (
-                    <Button size="sm" variant="outline-danger" onClick={() => excluirCustomizado(alimento)}>
-                      Excluir
-                    </Button>
-                  ) : (
-                    <Button
-                      size="sm"
-                      variant="outline-danger"
-                      className="btn-largura-fixa"
-                      onClick={() => reverterEdicao(alimento)}
-                    >
-                      Reverter edição
-                    </Button>
-                  )}
-                </div>
-              </ListGroup.Item>
-            ))}
-          </ListGroup>
-        </div>
-      )}
-
-      <div className="fw-semibold mb-2">Catálogo</div>
       <Form.Control
-        className="mb-3"
+        className="mb-2"
         placeholder="Buscar alimento para editar..."
         value={consulta}
         onChange={(e) => setConsulta(e.target.value)}
         enterKeyHint="search"
         onKeyDown={fecharTecladoNoEnter}
       />
+      <div className="d-flex gap-3 flex-wrap mb-3">
+        {FILTROS.map(({ chave, rotulo }) => (
+          <Form.Check
+            key={chave}
+            type="checkbox"
+            id={`filtro-${chave}`}
+            label={rotulo}
+            checked={filtrosAtivos.has(chave)}
+            onChange={() => alternarFiltro(chave)}
+          />
+        ))}
+      </div>
 
-      <ListGroup>
-        {resultadosCatalogo.map((alimento) => (
-          <ListGroup.Item key={alimento.id} className="d-flex justify-content-between align-items-start gap-2">
+      <ListaPaginada
+        itens={resultados}
+        itensPorPagina={10}
+        resetKey={`${consulta}|${[...filtrosAtivos].sort().join(',')}`}
+        renderItem={(alimento) => (
+          <div key={alimento.id} className="item-alimento-editavel d-flex justify-content-between align-items-start gap-2">
             <div>
               <div>
                 {alimento.alimento}{' '}
+                {alimento._adicionado && <Badge bg="primary">adicionado</Badge>}{' '}
                 {alimento._editado && (
                   <Badge bg="warning" text="dark">
                     editado
@@ -234,13 +209,25 @@ export function Alimentos() {
               >
                 Variações
               </Button>
+              {alimento._adicionado && (
+                <Button size="sm" variant="outline-danger" onClick={() => excluirCustomizado(alimento)}>
+                  Excluir
+                </Button>
+              )}
+              {alimento._editado && (
+                <Button
+                  size="sm"
+                  variant="outline-danger"
+                  className="btn-largura-fixa"
+                  onClick={() => reverterEdicao(alimento)}
+                >
+                  Reverter edição
+                </Button>
+              )}
             </div>
-          </ListGroup.Item>
-        ))}
-        {resultadosCatalogo.length === 0 && (
-          <ListGroup.Item className="text-muted small">Nada encontrado.</ListGroup.Item>
+          </div>
         )}
-      </ListGroup>
+      />
 
       <AlimentoFormModal
         modo="editar"

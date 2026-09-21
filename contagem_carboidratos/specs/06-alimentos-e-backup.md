@@ -37,7 +37,8 @@ Isso é resolvido em duas camadas:
   `alimentosPorId` (usado pra resolver os itens já lançados numa refeição) usa em
   `PlanoNutricional`/`RefeicoesDoDia`.
 - `alimentosRepository.getDisponiveis()` filtra os excluídos — é o que entra na busca/lista
-  para adicionar algo **novo** a uma refeição, e na seção "Meus alimentos" da tela.
+  para adicionar algo **novo** a uma refeição, e na lista da tela de Alimentos (ver "Destaque
+  na tela" abaixo).
 - O hook `useAlimentos()` expõe os dois: `alimentos` (disponíveis, para buscar/adicionar) e
   `todos` (tudo, para montar `alimentosPorId`).
 
@@ -96,12 +97,34 @@ comprado/comido no dia. Por isso o `BuscarAlimentoModal` do Plano é chamado sem
 props: `variacoesPorBase` vem `undefined`, e o próprio modal já trata isso como "nenhuma
 variação" (`variacoesPorBase?.get(...) ?? []`).
 
-## Destaque na tela
+## Destaque na tela: tudo na mesma lista, com filtros
 
-A seção "Meus alimentos" no topo lista só o que é `_editado` ou `_adicionado` (e não
-excluído), com um badge diferenciando os dois (`editado` em amarelo, `adicionado` em azul) e a
-ação certa por tipo — "Reverter edição" para editados, "Excluir" para adicionados. O restante
-da tela é a busca normal no catálogo base (sem os customizados, que já têm a seção própria).
+Antes existia uma seção "Meus alimentos" separada, no topo, listando só editados/adicionados
+(sem busca nem filtro); o resto da tela era uma busca à parte no catálogo base, que excluía os
+adicionados de propósito. **Mudou**: agora é uma lista só, com um campo de busca e três
+checkboxes de filtro (`editado`, `adicionado`, `comVariacoes`) por cima — editados e
+adicionados aparecem misturados com o resto do catálogo, na ordem normal de busca/paginação, e
+o badge (`editado` em amarelo, `adicionado` em azul) mais a "quantidade de variações" no card
+são o que sinaliza cada um, não a posição na tela.
+
+Os três filtros são **um conjunto** (`Set` de chaves ligadas), não um seletor único: nenhum
+ligado mostra tudo (todo o catálogo, editados, adicionados, com ou sem variação — sem
+distinção); um ou mais ligados mostra a **união** dos que batem com qualquer um deles (OU
+lógico, não E) — marcar `editado` + `adicionado` junto mostra os dois tipos misturados, não a
+interseção (que aliás seria sempre vazia, já que um alimento nunca é os dois ao mesmo tempo: um
+customizado não passa pela camada de overrides). `comVariacoes` é computado a partir do mesmo
+`Map` de contagem de variações por alimento base já usado pro badge "X variação(ões)"
+(`contagemVariacoesPorBase`) — não é sobre alimentos que SÃO variação (esses nunca aparecem
+nessa lista, ver acima), é sobre alimentos que TÊM pelo menos uma.
+
+**O filtro roda sobre o resultado inteiro da busca, antes de paginar** (`buscarAlimentos(...,
+alimentos.length)`, sem limite arbitrário, igual ao padrão já usado no `BuscarAlimentoModal`) —
+se o filtro cortasse depois de um corte de busca já limitado, um item que bate no filtro mas
+ficou fora do topo do ranking de busca sumiria sem explicação. A lista renderiza com
+`ListaPaginada` (10 por página), cujo `resetKey` inclui a busca **e** o conjunto de filtros
+ordenado (`[...filtrosAtivos].sort().join(',')`) — trocar qualquer um dos dois volta pra página
+1, senão a paginação podia ficar apontando pra uma página que não existe mais no novo
+resultado.
 
 Como o catálogo é carregado uma vez e cacheado em memória (`alimentosRepository`), qualquer
 escrita (editar, reverter, criar, excluir) invalida esse cache; o hook `useAlimentos` expõe
