@@ -15,9 +15,11 @@ const ROTULOS_ORIGEM = {
 // escondível (`colapsavel`), todo o resto: o resumo de calorias/carboidratos (`resumo`) já foi
 // a "informação principal, sempre visível mesmo colapsado" numa versão anterior — agora fica
 // **dentro** do colapso também, junto com os toggles de Respeitar calorias/carboidratos
-// (`depoisDoResumo`), a lista de itens já lançados, e a área de adicionar — sugestões do plano
-// (`sugestoesDoPlano`) primeiro, busca livre (`AlimentoBuscaInput`, só quando NÃO há edição de
-// quantidade — ver abaixo) logo abaixo dela, depois `rodape` (lista de candidatos por
+// (`depoisDoResumo`), a lista de itens já lançados, e a área de adicionar — atalhos rápidos
+// (`sugestoesDoPlano`: hoje são duas sub-seções colapsáveis nas Refeições do Dia, "Sugestões
+// do plano" e "Usados recentemente" — ver `RefeicaoDoDiaCard.jsx`) primeiro, busca livre
+// (`AlimentoBuscaInput`, só quando NÃO há edição de quantidade — ver abaixo) logo abaixo dela,
+// depois `rodape` (lista de candidatos por
 // orçamento) e `extra` (sugestão de substituição). Fechado, o card não mostra número nenhum —
 // só o tipo (e o horário, ver abaixo). Usado tanto no Plano Nutricional quanto nas Refeições do
 // Dia — o que muda entre eles entra via esses slots. `onEditar`/`onExcluir` são opcionais (só o

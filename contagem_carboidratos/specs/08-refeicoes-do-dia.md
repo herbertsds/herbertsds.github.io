@@ -137,13 +137,49 @@ diante, moram dentro do `Collapse`:
    da meta, antes de qualquer lista. Ficam aqui (e não escondidos dentro da lista de
    candidatos, como antes) porque valem pra refeição inteira, não só pra uma lista específica.
 4. Itens já lançados (ver "Editar a quantidade" abaixo).
-5. **Sugestões do plano** (`sugestoesDoPlano`) — o que o plano já prevê pra essa refeição e
-   ainda não foi lançado.
+5. Duas sub-seções colapsáveis (`sugestoesDoPlano`), cada uma fechada por padrão — ver
+   "Sugestões do plano e Usados recentemente" abaixo:
+   - **Sugestões do plano** — o que o plano já prevê pra essa refeição e ainda não foi
+     lançado.
+   - **Usados recentemente** — alimentos lançados nessa mesma refeição (mesmo `tipo`) nos
+     dias anteriores e ainda não lançados hoje.
 6. Botão grande **"+ Adicionar alimento"** (`rodape`) — abre o `BuscarAlimentoModal` com a
    busca e a lista "o que cabe (e o que ultrapassa) na meta" (ver [04](04-substituicao.md) e
    "Um só campo de busca" abaixo). **A busca livre do topo (`AlimentoBuscaInput`) não aparece
    no Dia** — só no Plano — porque esse botão já cobre "buscar e adicionar" sozinho.
 7. "Sugerir substituição" (`extra`).
+
+### Sugestões do plano e Usados recentemente: duas sub-seções colapsáveis
+
+As duas listas de atalho pra adicionar (sem precisar buscar) começavam sempre abertas, direto
+dentro do card — o que já competia por espaço com "Meta da refeição" e a lista de itens
+lançados antes mesmo de existir uma segunda lista. Viraram duas `SecaoColapsavel` (componente
+novo, `components/SecaoColapsavel.jsx`) fechadas por padrão: cabeçalho clicável ("Título
+(quantidade)" + chevron ▸/▾, mesmas classes `card-header-colapsavel`/`chevron-colapso` do
+cabeçalho da própria refeição) que abre/fecha um `Collapse` só daquela lista — não some
+nenhuma, cada uma abre e fecha por si. Só aparecem (cabeçalho incluso) quando têm pelo menos um
+item; as duas vazias juntas não deixam buraco nenhum no card.
+
+**De onde vem "Usados recentemente"**: `RefeicoesDoDia.jsx` carrega, junto com o dia
+selecionado, os 15 dias imediatamente anteriores a ele (`useHistoricoRefeicoes`, novo hook —
+`refeicoesDoDiaRepository.getUltimosDias(dataReferencia, quantidadeDias)`, 15 leituras de
+localStorage via `getByData`, uma por dia, não um índice por período) e passa esse array bruto
+(`diasAnteriores`) pra baixo, pra cada `RefeicaoDoDiaCard`. Cada card filtra sozinho
+(`domain/historico.js`, `alimentosUsadosRecentemente`): olha só as refeições com o mesmo `tipo`
+dentro da janela, pega o **uso mais recente** de cada alimento (não soma nem faz média — é a
+quantidade mais provável de servir de novo, a mesma da última vez), ordena da mais recente pra
+trás, e descarta qualquer alimento que já esteja lançado hoje nessa refeição (mesma lógica de
+`idsJaAdicionados` que já filtra "Sugestões do plano"). A janela é sempre relativa à data
+**selecionada**, não a hoje — navegar pro passado em "Refeições do dia" também navega a janela
+de "usados recentemente" junto.
+
+**Clicar num item de qualquer uma das duas sempre abre o passo de quantidade** (nunca lança
+direto), igual ao resto do fluxo de adicionar (ver "Um só campo de busca" abaixo) — as duas
+escrevem no mesmo estado (`atalhoEmEscolha: { alimento, quantidade, origem }`), só a `origem`
+muda: `'sugestao-plano'` pra quem vem do plano (ganha o badge "do plano" no item lançado, ver
+[06](06-alimentos-e-backup.md)), `'extra'` pra quem vem de "Usados recentemente" (mesma origem
+de um item achado por busca livre — nada especial marca que ele veio do histórico, porque não
+faz sentido carregar essa origem pra sempre num item já lançado).
 
 ## Refeições colapsadas
 

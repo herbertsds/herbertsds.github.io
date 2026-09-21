@@ -5,7 +5,9 @@ import { ResumoNutricional } from './ResumoNutricional';
 import { BuscarAlimentoModal } from './BuscarAlimentoModal';
 import { SugestaoSubstituicao } from './SugestaoSubstituicao';
 import { AlimentoQuantidadeModal } from './AlimentoQuantidadeModal';
+import { SecaoColapsavel } from './SecaoColapsavel';
 import { calcularItem, calcularTotalItens, formatarNumero } from '../domain/calculos';
+import { alimentosUsadosRecentemente } from '../domain/historico';
 
 // Uma refeição do dia, renderizada dentro de `RefeicoesDoDia.jsx`. Existe como componente à
 // parte (em vez de um bloco JSX montado dentro do `.map()` da página) porque os toggles
@@ -14,6 +16,7 @@ import { calcularItem, calcularTotalItens, formatarNumero } from '../domain/calc
 export function RefeicaoDoDiaCard({
   refeicao,
   itensPrevistos,
+  diasAnteriores,
   meta,
   alimentos,
   alimentosPorId,
@@ -27,12 +30,18 @@ export function RefeicaoDoDiaCard({
 }) {
   const [respeitarCalorias, setRespeitarCalorias] = useState(true);
   const [respeitarCarboidratos, setRespeitarCarboidratos] = useState(true);
-  const [sugestaoEmEscolha, setSugestaoEmEscolha] = useState(null); // { alimento, quantidade }
+  const [atalhoEmEscolha, setAtalhoEmEscolha] = useState(null); // { alimento, quantidade, origem }
   const [buscaAberta, setBuscaAberta] = useState(false);
 
   const consumido = calcularTotalItens(refeicao.itens, alimentosPorId);
   const idsJaAdicionados = new Set(refeicao.itens.map((i) => i.alimentoId));
   const sugestoesRestantes = itensPrevistos.filter((item) => !idsJaAdicionados.has(item.alimentoId));
+  // "Usados recentemente": mesma refeição (tipo), últimos dias — ver `domain/historico.js`.
+  // Descarta alimentos removidos do catálogo (`alimentosPorId.get` vindo undefined) em vez de
+  // quebrar a lista.
+  const usadosRecentemente = alimentosUsadosRecentemente(diasAnteriores, refeicao.tipo, idsJaAdicionados)
+    .map((uso) => ({ ...uso, alimento: alimentosPorId.get(uso.alimentoId) }))
+    .filter((uso) => uso.alimento);
 
   return (
     <>
@@ -92,41 +101,77 @@ export function RefeicaoDoDiaCard({
           </div>
         }
         sugestoesDoPlano={
-          sugestoesRestantes.length > 0 && (
-            <div className="mb-3">
-              <div className="small text-muted mb-1">Sugestões do plano:</div>
-              <div className="lista-itens-refeicao">
-                {sugestoesRestantes.map((item) => {
-                  const alimento = alimentosPorId.get(item.alimentoId);
-                  if (!alimento) return null;
-                  const { kcal, cho } = calcularItem(item, alimentosPorId);
-                  const adicionar = () => setSugestaoEmEscolha({ alimento, quantidade: item.quantidadeG });
-                  return (
-                    <div
-                      key={item.id}
-                      className="item-alimento-editavel clicavel d-flex justify-content-between align-items-center gap-2"
-                      role="button"
-                      tabIndex={0}
-                      onClick={adicionar}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          adicionar();
-                        }
-                      }}
-                    >
-                      <span className="fw-semibold">{alimento.alimento}</span>
-                      <small className="text-muted text-nowrap">
-                        {formatarNumero(item.quantidadeG, alimento.quantidade_indefinida ? 2 : 1)}
-                        {alimento.quantidade_indefinida ? 'x' : 'g'} · {Math.round(kcal)} kcal ·{' '}
-                        {formatarNumero(cho)} g CHO
-                      </small>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )
+          <>
+            {sugestoesRestantes.length > 0 && (
+              <SecaoColapsavel titulo="Sugestões do plano" quantidade={sugestoesRestantes.length}>
+                <div className="lista-itens-refeicao">
+                  {sugestoesRestantes.map((item) => {
+                    const alimento = alimentosPorId.get(item.alimentoId);
+                    if (!alimento) return null;
+                    const { kcal, cho } = calcularItem(item, alimentosPorId);
+                    const adicionar = () =>
+                      setAtalhoEmEscolha({ alimento, quantidade: item.quantidadeG, origem: 'sugestao-plano' });
+                    return (
+                      <div
+                        key={item.id}
+                        className="item-alimento-editavel clicavel d-flex justify-content-between align-items-center gap-2"
+                        role="button"
+                        tabIndex={0}
+                        onClick={adicionar}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            adicionar();
+                          }
+                        }}
+                      >
+                        <span className="fw-semibold">{alimento.alimento}</span>
+                        <small className="text-muted text-nowrap">
+                          {formatarNumero(item.quantidadeG, alimento.quantidade_indefinida ? 2 : 1)}
+                          {alimento.quantidade_indefinida ? 'x' : 'g'} · {Math.round(kcal)} kcal ·{' '}
+                          {formatarNumero(cho)} g CHO
+                        </small>
+                      </div>
+                    );
+                  })}
+                </div>
+              </SecaoColapsavel>
+            )}
+            {usadosRecentemente.length > 0 && (
+              <SecaoColapsavel titulo="Usados recentemente" quantidade={usadosRecentemente.length}>
+                <div className="lista-itens-refeicao">
+                  {usadosRecentemente.map((uso) => {
+                    const { alimento } = uso;
+                    const { kcal, cho } = calcularItem(uso, alimentosPorId);
+                    const adicionar = () =>
+                      setAtalhoEmEscolha({ alimento, quantidade: uso.quantidadeG, origem: 'extra' });
+                    return (
+                      <div
+                        key={uso.alimentoId}
+                        className="item-alimento-editavel clicavel d-flex justify-content-between align-items-center gap-2"
+                        role="button"
+                        tabIndex={0}
+                        onClick={adicionar}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            adicionar();
+                          }
+                        }}
+                      >
+                        <span className="fw-semibold">{alimento.alimento}</span>
+                        <small className="text-muted text-nowrap">
+                          {formatarNumero(uso.quantidadeG, alimento.quantidade_indefinida ? 2 : 1)}
+                          {alimento.quantidade_indefinida ? 'x' : 'g'} · {Math.round(kcal)} kcal ·{' '}
+                          {formatarNumero(cho)} g CHO
+                        </small>
+                      </div>
+                    );
+                  })}
+                </div>
+              </SecaoColapsavel>
+            )}
+          </>
         }
         rodape={
           <Button variant="primary" size="lg" className="w-100 mt-2" onClick={() => setBuscaAberta(true)}>
@@ -160,17 +205,17 @@ export function RefeicaoDoDiaCard({
       />
 
       <AlimentoQuantidadeModal
-        alimento={sugestaoEmEscolha?.alimento}
-        variacoes={variacoesPorBase?.get(sugestaoEmEscolha?.alimento?.id) ?? []}
+        alimento={atalhoEmEscolha?.alimento}
+        variacoes={variacoesPorBase?.get(atalhoEmEscolha?.alimento?.id) ?? []}
         permitirVariacoes
-        quantidadeInicial={sugestaoEmEscolha?.quantidade}
+        quantidadeInicial={atalhoEmEscolha?.quantidade}
         orcamento={meta}
         usoOutros={consumido}
         respeitarCalorias={respeitarCalorias}
         respeitarCarboidratos={respeitarCarboidratos}
-        aberto={!!sugestaoEmEscolha}
-        onFechar={() => setSugestaoEmEscolha(null)}
-        onConfirmar={(alimentoId, quantidade) => onAdicionarItem(alimentoId, quantidade, 'sugestao-plano')}
+        aberto={!!atalhoEmEscolha}
+        onFechar={() => setAtalhoEmEscolha(null)}
+        onConfirmar={(alimentoId, quantidade) => onAdicionarItem(alimentoId, quantidade, atalhoEmEscolha.origem)}
       />
     </>
   );

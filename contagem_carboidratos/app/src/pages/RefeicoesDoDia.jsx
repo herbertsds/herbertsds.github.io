@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Button, Spinner } from 'react-bootstrap';
 import { useDataSelecionada } from '../context/DataSelecionadaContext';
 import { useRefeicoesDoDia } from '../hooks/useRefeicoesDoDia';
+import { useHistoricoRefeicoes } from '../hooks/useHistoricoRefeicoes';
 import { usePlanoNutricional } from '../hooks/usePlanoNutricional';
 import { useAlimentos } from '../hooks/useAlimentos';
 import { RefeicaoDoDiaCard } from '../components/RefeicaoDoDiaCard';
@@ -25,6 +26,7 @@ export function RefeicoesDoDia() {
     editarQuantidadeItem,
     substituirItensNaRefeicao,
   } = useRefeicoesDoDia(data);
+  const { diasAnteriores, carregando: carregandoHistorico } = useHistoricoRefeicoes(data);
 
   const alimentosPorId = useMemo(
     () => new Map(todosOsAlimentos.map((a) => [a.id, a])),
@@ -103,7 +105,7 @@ export function RefeicoesDoDia() {
   const metaTotalDia = calcularTotalRefeicoes(plano.refeicoes, alimentosPorId);
   const consumidoTotalDia = calcularTotalRefeicoes(refeicoesParaExibir, alimentosPorId);
 
-  if (carregandoAlimentos || carregandoPlano || carregandoDia) {
+  if (carregandoAlimentos || carregandoPlano || carregandoDia || carregandoHistorico) {
     return (
       <div className="text-center py-5">
         <Spinner animation="border" />
@@ -186,6 +188,7 @@ export function RefeicoesDoDia() {
               key={refeicao.tipo}
               refeicao={refeicao}
               itensPrevistos={itensPrevistos}
+              diasAnteriores={diasAnteriores}
               meta={meta}
               alimentos={alimentos}
               alimentosPorId={alimentosPorId}
