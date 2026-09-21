@@ -150,6 +150,22 @@ body {
   background-color: #e2e6ea;
 }
 
+/* Cabeçalho de uma `SecaoColapsavel` (ex: "Usados recentemente", "Sugestões do plano" em
+   Refeições do Dia): mesmas cores da `.subsecao` (que já isola listas secundárias do card
+   branco), só que aqui é o próprio cabeçalho clicável — precisa parecer um controle de
+   verdade, não uma legenda solta, senão nada indica que dá pra clicar ali pra abrir/fechar. */
+.subsecao-cabecalho {
+  cursor: pointer;
+  user-select: none;
+  background: #f2f3f5;
+  border: 1px solid #d8dadd;
+}
+
+.subsecao-cabecalho:hover,
+.subsecao-cabecalho:focus-visible {
+  background: #e2e6ea;
+}
+
 /* Fila de alimentos já lançados numa refeição (ou a cesta da Substituição): mesmo fundo
    cinza da `.subsecao`, mas os itens em si (`.item-alimento-editavel`) são cartões brancos
    separados por espaço — não linhas de lista — pra ficar óbvio que existe mais de um alimento

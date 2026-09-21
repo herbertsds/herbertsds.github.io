@@ -102,6 +102,40 @@ export function RefeicaoDoDiaCard({
         }
         sugestoesDoPlano={
           <>
+            {usadosRecentemente.length > 0 && (
+              <SecaoColapsavel titulo="Usados recentemente" quantidade={usadosRecentemente.length} defaultAberto>
+                <div className="lista-itens-refeicao">
+                  {usadosRecentemente.map((uso) => {
+                    const { alimento } = uso;
+                    const { kcal, cho } = calcularItem(uso, alimentosPorId);
+                    const adicionar = () =>
+                      setAtalhoEmEscolha({ alimento, quantidade: uso.quantidadeG, origem: 'extra' });
+                    return (
+                      <div
+                        key={uso.alimentoId}
+                        className="item-alimento-editavel clicavel d-flex justify-content-between align-items-center gap-2"
+                        role="button"
+                        tabIndex={0}
+                        onClick={adicionar}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            adicionar();
+                          }
+                        }}
+                      >
+                        <span className="fw-semibold">{alimento.alimento}</span>
+                        <small className="text-muted text-nowrap">
+                          {formatarNumero(uso.quantidadeG, alimento.quantidade_indefinida ? 2 : 1)}
+                          {alimento.quantidade_indefinida ? 'x' : 'g'} · {Math.round(kcal)} kcal ·{' '}
+                          {formatarNumero(cho)} g CHO
+                        </small>
+                      </div>
+                    );
+                  })}
+                </div>
+              </SecaoColapsavel>
+            )}
             {sugestoesRestantes.length > 0 && (
               <SecaoColapsavel titulo="Sugestões do plano" quantidade={sugestoesRestantes.length}>
                 <div className="lista-itens-refeicao">
@@ -128,40 +162,6 @@ export function RefeicaoDoDiaCard({
                         <span className="fw-semibold">{alimento.alimento}</span>
                         <small className="text-muted text-nowrap">
                           {formatarNumero(item.quantidadeG, alimento.quantidade_indefinida ? 2 : 1)}
-                          {alimento.quantidade_indefinida ? 'x' : 'g'} · {Math.round(kcal)} kcal ·{' '}
-                          {formatarNumero(cho)} g CHO
-                        </small>
-                      </div>
-                    );
-                  })}
-                </div>
-              </SecaoColapsavel>
-            )}
-            {usadosRecentemente.length > 0 && (
-              <SecaoColapsavel titulo="Usados recentemente" quantidade={usadosRecentemente.length}>
-                <div className="lista-itens-refeicao">
-                  {usadosRecentemente.map((uso) => {
-                    const { alimento } = uso;
-                    const { kcal, cho } = calcularItem(uso, alimentosPorId);
-                    const adicionar = () =>
-                      setAtalhoEmEscolha({ alimento, quantidade: uso.quantidadeG, origem: 'extra' });
-                    return (
-                      <div
-                        key={uso.alimentoId}
-                        className="item-alimento-editavel clicavel d-flex justify-content-between align-items-center gap-2"
-                        role="button"
-                        tabIndex={0}
-                        onClick={adicionar}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' || e.key === ' ') {
-                            e.preventDefault();
-                            adicionar();
-                          }
-                        }}
-                      >
-                        <span className="fw-semibold">{alimento.alimento}</span>
-                        <small className="text-muted text-nowrap">
-                          {formatarNumero(uso.quantidadeG, alimento.quantidade_indefinida ? 2 : 1)}
                           {alimento.quantidade_indefinida ? 'x' : 'g'} · {Math.round(kcal)} kcal ·{' '}
                           {formatarNumero(cho)} g CHO
                         </small>

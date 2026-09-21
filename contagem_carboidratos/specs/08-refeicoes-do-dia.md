@@ -137,12 +137,14 @@ diante, moram dentro do `Collapse`:
    da meta, antes de qualquer lista. Ficam aqui (e não escondidos dentro da lista de
    candidatos, como antes) porque valem pra refeição inteira, não só pra uma lista específica.
 4. Itens já lançados (ver "Editar a quantidade" abaixo).
-5. Duas sub-seções colapsáveis (`sugestoesDoPlano`), cada uma fechada por padrão — ver
-   "Sugestões do plano e Usados recentemente" abaixo:
-   - **Sugestões do plano** — o que o plano já prevê pra essa refeição e ainda não foi
-     lançado.
+5. Duas sub-seções colapsáveis (`sugestoesDoPlano`) — ver "Sugestões do plano e Usados
+   recentemente" abaixo:
    - **Usados recentemente** — alimentos lançados nessa mesma refeição (mesmo `tipo`) nos
-     dias anteriores e ainda não lançados hoje.
+     dias anteriores e ainda não lançados hoje. **Primeira das duas, aberta por padrão** — é a
+     mais específica de "essa refeição, dessa pessoa" (o plano é genérico, o histórico é o que
+     ela de fato costuma comer ali), por isso vem antes e já visível.
+   - **Sugestões do plano** — o que o plano já prevê pra essa refeição e ainda não foi
+     lançado. Fechada por padrão.
 6. Botão grande **"+ Adicionar alimento"** (`rodape`) — abre o `BuscarAlimentoModal` com a
    busca e a lista "o que cabe (e o que ultrapassa) na meta" (ver [04](04-substituicao.md) e
    "Um só campo de busca" abaixo). **A busca livre do topo (`AlimentoBuscaInput`) não aparece
@@ -154,11 +156,18 @@ diante, moram dentro do `Collapse`:
 As duas listas de atalho pra adicionar (sem precisar buscar) começavam sempre abertas, direto
 dentro do card — o que já competia por espaço com "Meta da refeição" e a lista de itens
 lançados antes mesmo de existir uma segunda lista. Viraram duas `SecaoColapsavel` (componente
-novo, `components/SecaoColapsavel.jsx`) fechadas por padrão: cabeçalho clicável ("Título
-(quantidade)" + chevron ▸/▾, mesmas classes `card-header-colapsavel`/`chevron-colapso` do
-cabeçalho da própria refeição) que abre/fecha um `Collapse` só daquela lista — não some
-nenhuma, cada uma abre e fecha por si. Só aparecem (cabeçalho incluso) quando têm pelo menos um
-item; as duas vazias juntas não deixam buraco nenhum no card.
+novo, `components/SecaoColapsavel.jsx`), cada uma com seu próprio estado de aberto/fechado —
+não some nenhuma, cada uma abre e fecha por si; só aparecem (cabeçalho incluso) quando têm pelo
+menos um item, as duas vazias juntas não deixam buraco nenhum no card.
+
+**Cabeçalho com cara de controle, não de legenda**: a primeira versão usava só texto cinza
+pequeno + um chevron discreto — fácil de ler como rótulo estático, nada indicava que dava pra
+clicar. Virou uma barra com fundo e borda cinza (`.subsecao-cabecalho`, mesmas cores da
+`.subsecao` que já isola listas secundárias do card branco por trás — ver
+[06](06-alimentos-e-backup.md)), título em negrito, e o mesmo chevron ▸/▾ dentro do quadrado
+com borda (`.chevron-colapso`, herdado do cabeçalho da própria refeição). O contraste da caixa
+cinza contra o card branco é o que sinaliza "isso é um controle", igual a `.subsecao` já sinaliza
+"isso é uma lista à parte" — mesma linguagem visual, papéis diferentes.
 
 **De onde vem "Usados recentemente"**: `RefeicoesDoDia.jsx` carrega, junto com o dia
 selecionado, os 15 dias imediatamente anteriores a ele (`useHistoricoRefeicoes`, novo hook —
