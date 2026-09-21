@@ -103,7 +103,7 @@ export function RefeicaoDoDiaCard({
         sugestoesDoPlano={
           <>
             {usadosRecentemente.length > 0 && (
-              <SecaoColapsavel titulo="Usados recentemente" quantidade={usadosRecentemente.length} defaultAberto>
+              <SecaoColapsavel titulo="Usados recentemente" quantidade={usadosRecentemente.length}>
                 <div className="lista-itens-refeicao">
                   {usadosRecentemente.map((uso) => {
                     const { alimento } = uso;

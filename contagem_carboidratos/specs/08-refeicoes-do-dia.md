@@ -140,11 +140,12 @@ diante, moram dentro do `Collapse`:
 5. Duas sub-seções colapsáveis (`sugestoesDoPlano`) — ver "Sugestões do plano e Usados
    recentemente" abaixo:
    - **Usados recentemente** — alimentos lançados nessa mesma refeição (mesmo `tipo`) nos
-     dias anteriores e ainda não lançados hoje. **Primeira das duas, aberta por padrão** — é a
-     mais específica de "essa refeição, dessa pessoa" (o plano é genérico, o histórico é o que
-     ela de fato costuma comer ali), por isso vem antes e já visível.
+     dias anteriores e ainda não lançados hoje. **Primeira das duas** — é a mais específica de
+     "essa refeição, dessa pessoa" (o plano é genérico, o histórico é o que ela de fato costuma
+     comer ali). Fechada por padrão, como a outra — nenhuma das duas some, mas também nenhuma
+     ocupa espaço até a pessoa pedir.
    - **Sugestões do plano** — o que o plano já prevê pra essa refeição e ainda não foi
-     lançado. Fechada por padrão.
+     lançado. Também fechada por padrão.
 6. Botão grande **"+ Adicionar alimento"** (`rodape`) — abre o `BuscarAlimentoModal` com a
    busca e a lista "o que cabe (e o que ultrapassa) na meta" (ver [04](04-substituicao.md) e
    "Um só campo de busca" abaixo). **A busca livre do topo (`AlimentoBuscaInput`) não aparece
