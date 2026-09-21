@@ -131,7 +131,38 @@ escrita (editar, reverter, criar, excluir) invalida esse cache; o hook `useAlime
 `recarregar()` para os componentes pedirem os dados atualizados sem precisar de um reload de
 página.
 
-## Backup (Importar/Exportar)
+## Backup (antiga "Importar/Exportar dados", agora com mais uma função)
+
+A aba **Backup** (`ImportarExportar.jsx`, h1 renomeado de "Importar / Exportar dados" pra só
+"Backup" quando ganhou uma segunda responsabilidade — atualizar o app — que não é sobre
+dados) tem três seções, cada uma com seu próprio `h2`: **Atualizar o app** (ver abaixo),
+**Exportar / Importar**, e **Apagar dados**.
+
+### Atualizar o app: recarregar ignorando o cache
+
+O app instalado na tela de início do iPhone (`display: standalone`, ver
+[05](05-build-e-deploy.md)) às vezes não busca uma versão nova sozinho — fica preso numa cópia
+antiga de `index.html` em cache, e por tabela nos arquivos com hash que ele referencia (o
+projeto não tem service worker nem usa a Cache Storage API — é cache HTTP comum do navegador,
+mais agressivo/persistente em modo standalone no iOS do que numa aba normal do Safari). Um
+`window.location.reload()` comum não resolve de forma confiável porque o próprio pedido de
+reload pode ser respondido pelo cache sem revalidar com o servidor.
+
+`atualizarApp()` (topo de `ImportarExportar.jsx`) resolve navegando pra uma URL que o cache
+nunca viu: acrescenta um parâmetro de query com o timestamp atual
+(`?atualizado_em=<Date.now()>`) e usa `window.location.replace(...)` (não `href =`, pra não
+empilhar essas URLs de cache-bust no histórico — voltar não deveria passar por elas). Uma URL
+com query string nova é, pro cache do navegador, uma URL nunca vista — ele é obrigado a buscar
+`index.html` de novo no servidor, que já vem apontando pros arquivos JS/CSS com hash da versão
+publicada mais recente.
+
+**Não precisa (e não tenta) preservar o localStorage** porque nunca esteve em risco: navegar
+ou recarregar a página, com ou sem cache, nunca apaga `localStorage` — só uma ação explícita
+(a própria tela de Backup, "Apagar dados", ou limpar dados do site pelo navegador) apaga isso.
+Verificado ao vivo: gravar uma chave de teste, clicar "Buscar atualizações", confirmar que a
+chave sobrevive ao reload.
+
+### Exportar: toggles + um payload só
 
 Solução deliberadamente temporária enquanto o app não tem um backend — para levar os dados de
 um navegador/dispositivo para outro. Três categorias — Planos, Refeições, Alimentos —, porque
@@ -143,8 +174,6 @@ categoria reconhece as próprias chaves por nome/prefixo (`CATEGORIAS` em
 `localStorageAdapter.js`): `planos` → `plano_nutricional`; `refeicoes` → tudo que começa com
 `refeicoes_do_dia:`; `alimentos` → `alimentos_overrides`, `alimentos_customizados` e
 `alimentos_variacoes`.
-
-### Exportar: toggles + um payload só
 
 `ImportarExportar.jsx` tem um `Form.Check` por categoria (todas marcadas por padrão); o botão
 **Exportar** junta as chaves de cada categoria marcada (`exportarCategoria`) num payload só —

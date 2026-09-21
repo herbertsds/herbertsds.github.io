@@ -84,7 +84,10 @@ nada sobre safe area). Só funciona porque o `viewport-fit=cover` já estava na 
 
 **Sem service worker de propósito**: não é necessário pro "Adicionar à tela de início" abrir
 em `standalone` nem em nenhuma das duas plataformas, e cache offline traria complexidade
-(invalidação a cada deploy) sem necessidade real aqui — o app já funciona só com rede.
+(invalidação a cada deploy) sem necessidade real aqui — o app já funciona só com rede. Sem
+service worker, quem invalida o cache HTTP em standalone no iOS (que às vezes não revalida
+sozinho) é a pessoa: botão "Buscar atualizações" na aba Backup, ver
+[06](06-alimentos-e-backup.md).
 
 ## Verificação local sem GitHub Pages
 

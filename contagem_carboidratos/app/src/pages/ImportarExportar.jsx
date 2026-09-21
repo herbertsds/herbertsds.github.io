@@ -11,6 +11,20 @@ const CATEGORIAS = [
 
 const CHAVES_ALIMENTOS = ['alimentos_overrides', 'alimentos_customizados', 'alimentos_variacoes'];
 
+// Recarrega ignorando o cache do navegador — no iPhone, o app instalado na tela de início às
+// vezes fica preso numa cópia antiga de `index.html` (e por tabela dos arquivos com hash que
+// ele referencia) sem nunca buscar a versão nova sozinho. Um `location.reload()` comum não
+// resolve porque o próprio reload pode ser respondido pelo cache. O truque é navegar pra uma
+// URL que o cache nunca viu antes (query string nova a cada clique) — o navegador é obrigado a
+// buscar `index.html` de novo no servidor, que já vem apontando pros arquivos da versão atual.
+// `replace` (não `href=`) pra não empilhar essas URLs de cache-bust no histórico. Não toca em
+// localStorage de jeito nenhum — recarregar a página nunca apaga isso, só o cache HTTP.
+function atualizarApp() {
+  const url = new URL(window.location.href);
+  url.searchParams.set('atualizado_em', Date.now().toString());
+  window.location.replace(url.toString());
+}
+
 // Backup: exporta as categorias marcadas nos toggles num payload só, copiado pra área de
 // transferência. Importar é um botão só — lê a área de transferência sozinho (sem colar) e
 // decide o que importar pelo `categorias` do próprio payload. Planos/Refeições substituem
@@ -147,12 +161,24 @@ export function ImportarExportar() {
 
   return (
     <div className="pb-5">
-      <h1 className="h5 mb-3">Importar / Exportar dados</h1>
+      <h1 className="h5 mb-3">Backup</h1>
+
+      <h2 className="h6">Atualizar o app</h2>
+      <p className="text-muted small">
+        No iPhone, o app instalado na tela de início às vezes não busca uma versão nova sozinho
+        — fica preso numa cópia antiga em cache. O botão abaixo força buscar a versão mais
+        recente direto do servidor, sem apagar nada do que está salvo aqui.
+      </p>
+      <Button variant="outline-secondary" className="mb-3" onClick={atualizarApp}>
+        Buscar atualizações
+      </Button>
+
+      <hr className="my-4" />
+      <h2 className="h6">Exportar / Importar</h2>
       <p className="text-muted small">
         Solução temporária enquanto o app não salva tudo num servidor. Marque o que exportar; a
         importação lê sozinha o que estiver na área de transferência.
       </p>
-
       <Form.Group className="mb-3 d-flex gap-3 flex-wrap">
         {CATEGORIAS.map((c) => (
           <Form.Check
