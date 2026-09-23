@@ -1,0 +1,27 @@
+# Deploy deste projeto num servidor de verdade (não é o docker-compose de build local, que
+# fica em ../docker/docker-compose.yml): sobe o próprio Vite dev server e deixa rodando, sem
+# gerar build estático nenhum — servido direto por trás do Nginx Proxy Manager (proxy reverso
+# pra dentro dessa rede, na porta 5173). Editou o código, o dev server já reflete na hora,
+# igual rodar `npm run dev` local.
+#
+# node_modules em volume nomeado (não vem do bind mount de ./app) de propósito: o app roda
+# dentro de um container Linux, mas o host pode ser outra plataforma — misturar um
+# node_modules instalado fora com um instalado dentro já causou binário incompatível (ver
+# specs/05-build-e-deploy.md). Assim cada um cuida do próprio node_modules.
+#
+#   docker compose -f contagem_carboidratos/docker-compose.yml up -d
+services:
+  contagem_carboidratos_dev:
+    image: node:20-alpine
+    container_name: contagem_carboidratos_dev
+    working_dir: /site/app
+    volumes:
+      - ./app:/site/app
+      - contagem_carboidratos_node_modules:/site/app/node_modules
+    ports:
+      - "5173:5173"
+    command: sh -c "npm ci && npm run dev -- --host 0.0.0.0"
+    restart: unless-stopped
+
+volumes:
+  contagem_carboidratos_node_modules:

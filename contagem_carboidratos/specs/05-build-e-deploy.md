@@ -97,3 +97,28 @@ python3 -m http.server 8765
 ```
 
 E abrir `http://localhost:8765/`.
+
+## Deploy contínuo num servidor próprio (dev server, sem build)
+
+Além do GitHub Pages (build estático, commitado), existe um segundo jeito de rodar este
+projeto: `contagem_carboidratos/docker-compose.yml` (diferente de `../docker/docker-compose.yml`,
+que é só ferramental local de build/preview) sobe o próprio **Vite dev server** e deixa no ar
+(`restart: unless-stopped`), sem gerar nenhum artefato de build — pensado pra um servidor que já
+tenha o repositório clonado e atualizado via `git pull` (feito à parte, fora deste compose), por
+trás de um proxy reverso (ex: Nginx Proxy Manager).
+
+```bash
+docker compose -f contagem_carboidratos/docker-compose.yml up -d
+```
+
+Três detalhes:
+- `npm run dev -- --host 0.0.0.0`: por padrão o Vite dev server só escuta em `localhost`, o que
+  fica inacessível de fora do container. `--host 0.0.0.0` é obrigatório aqui.
+- `node_modules` em **volume nomeado** próprio, não vindo do bind mount de `./app`: o container
+  roda Linux (`node:20-alpine`) mas o host que clona o repo pode ser outra plataforma — um
+  `node_modules` instalado fora (com binários nativos de outra arquitetura, ex: `rollup`/`esbuild`)
+  sendo montado dentro quebraria o container. Cada lado cuida do próprio `node_modules`.
+- **Sem `base: './'` no dev server**: diferente do build estático (que usa paths relativos pra
+  funcionar em qualquer subpath do GitHub Pages), o Vite dev server sempre serve os módulos em
+  paths absolutos (`/src/main.jsx`, `/@vite/client`) — o proxy reverso precisa apontar um
+  **subdomínio inteiro** pra essa porta (5173), não um subpath tipo `/contagem_carboidratos/`.
