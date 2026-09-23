@@ -13,4 +13,13 @@ export default defineConfig({
     outDir: '../',
     emptyOutDir: false,
   },
+  // Só importa fora do dev server (build/preview não usam isso). Por padrão o Vite recusa
+  // (403) requisições cujo cabeçalho Host não seja localhost/IP direto — proteção contra DNS
+  // rebinding para quem expõe o dev server direto na internet. Aqui ele nunca é exposto direto
+  // (só alcançável dentro da rede Docker `infra_net`, atrás do Nginx Proxy Manager — ver
+  // ../docker-compose.yml), então desligar essa checagem é seguro; sem isso, nem o nome do
+  // container nem o domínio público que o NPM usa passariam.
+  server: {
+    allowedHosts: true,
+  },
 })
